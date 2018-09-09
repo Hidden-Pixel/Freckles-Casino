@@ -14,7 +14,8 @@ global_variable char *GlobalWindowTitle = "Mr. Freckles Casino";
 global_variable unsigned char GlobalRunning = 1;
 global_variable int GlobalTargetFPS = 60;
 
-global_variable Texture2D TestTexture;
+global_variable Texture2D TestTexture1;
+global_variable Texture2D TestTexture2;
 
 void
 LoadTextures();
@@ -56,14 +57,21 @@ LoadTextures()
 {
     Image tempImage = LoadImage("assets/Cards/BackOfCard/BackOfCard.png");
     ImageResizeNN(&tempImage, tempImage.width / 4, tempImage.height / 4);
-    TestTexture = LoadTextureFromImage(tempImage);
+    TestTexture1 = LoadTextureFromImage(tempImage);
+    UnloadImage(tempImage);
+
+    tempImage = LoadImage("assets/Cards/Hearts/2_Hearts.png");
+    ImageResizeNN(&tempImage, tempImage.width / 4, tempImage.height / 4);
+    TestTexture2 = LoadTextureFromImage(tempImage);
     UnloadImage(tempImage);
 }
 
 void
 UnloadTextures()
 {
-    UnloadTexture(TestTexture);
+    UnloadTexture(TestTexture1);
+    UnloadTexture(TestTexture2);
+
 }
 
 void
@@ -71,8 +79,10 @@ Render()
 {
     BeginDrawing();
     {
-        ClearBackground(BLACK);
-        DrawTexture(TestTexture, GlobalWindowWidth / 2, GlobalWindowHeight / 2, WHITE);
+        ClearBackground(GREEN);
+        DrawTexture(TestTexture1, GlobalWindowWidth / 2, GlobalWindowHeight / 2, WHITE);
+        // TODO(martin): render textures to the screen to the left of the above texture
+        DrawTexture(TestTexture2, GlobalWindowWidth / 3, GlobalWindowHeight / 2, WHITE);
     }
     EndDrawing();
 }

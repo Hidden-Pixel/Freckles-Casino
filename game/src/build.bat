@@ -1,3 +1,4 @@
+IF EXIST ..\build RMDIR ..\build /S /Q
 IF NOT EXIST ..\build MKDIR ..\build
 PUSHD ..\build
 IF NOT EXIST .\win32 MKDIR win32

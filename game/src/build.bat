@@ -8,7 +8,7 @@ cl /MDd /Zi /FC /nologo ..\..\src\main.c /I ..\..\src\include /link /ignore:4099
 
 IF NOT EXIST .\assets mkdir .\assets
 
-XCOPY /S /I /Y ..\..\assets .\assets
+XCOPY /S /I /Y /Q ..\..\assets .\assets
 
 COPY /Y ..\..\src\libs\win32\msvc\OpenAL32.dll .\
 

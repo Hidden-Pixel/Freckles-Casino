@@ -21,8 +21,6 @@ global_variable Texture2D TestTexture1;
 global_variable int X1 = WIDTH / 2;
 global_variable int Y1 = HEIGHT / 2;
 
-global_variable Texture2D TestTexture2;
-
 void
 LoadTextures();
 
@@ -65,14 +63,9 @@ main(void)
 void
 LoadTextures()
 {
-    Image tempImage = LoadImage("assets/Cards/BackOfCard/BackOfCard.png");
-    ImageResizeNN(&tempImage, tempImage.width / 4, tempImage.height / 4);
+    Image tempImage = LoadImage("assets/textures/Cards/BackOfCard/BackOfCard.png");
+    ImageResizeNN(&tempImage, tempImage.width * 10 , tempImage.height * 10);
     TestTexture1 = LoadTextureFromImage(tempImage);
-    UnloadImage(tempImage);
-
-    tempImage = LoadImage("assets/Cards/Hearts/2_Hearts.png");
-    ImageResizeNN(&tempImage, tempImage.width / 4, tempImage.height / 4);
-    TestTexture2 = LoadTextureFromImage(tempImage);
     UnloadImage(tempImage);
 }
 
@@ -80,7 +73,6 @@ void
 UnloadTextures()
 {
     UnloadTexture(TestTexture1);
-    UnloadTexture(TestTexture2);
 }
 
 void
@@ -96,7 +88,6 @@ Render()
     {
         ClearBackground(GREEN);
         DrawTexture(TestTexture1, X1, Y1, WHITE);
-        //DrawTexture(TestTexture2, GlobalWindowWidth / 3, GlobalWindowHeight / 2, WHITE);
     }
     EndDrawing();
 }

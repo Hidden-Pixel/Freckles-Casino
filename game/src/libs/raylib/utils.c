@@ -16,16 +16,13 @@
 *       Show TraceLog() output messages
 *       NOTE: By default LOG_DEBUG traces not shown
 *
-*   #define SUPPORT_TRACELOG_DEBUG
-*       Show TraceLog() LOG_DEBUG messages
-*
 *   DEPENDENCIES:
 *       stb_image_write - BMP/PNG writting functions
 *
 *
 *   LICENSE: zlib/libpng
 *
-*   Copyright (c) 2014-2017 Ramon Santamaria (@raysan5)
+*   Copyright (c) 2014-2018 Ramon Santamaria (@raysan5)
 *
 *   This software is provided "as-is", without any express or implied warranty. In no event
 *   will the authors be held liable for any damages arising from the use of this software.
@@ -44,8 +41,7 @@
 *
 **********************************************************************************************/
 
-#define SUPPORT_TRACELOG            // Output tracelog messages
-//#define SUPPORT_TRACELOG_DEBUG     // Avoid LOG_DEBUG messages tracing
+#include "config.h"
 
 #include "raylib.h"                 // WARNING: Required for: LogType enum
 #include "utils.h"
@@ -61,17 +57,25 @@
 #include <stdarg.h>                 // Required for: va_list, va_start(), vfprintf(), va_end()
 #include <string.h>                 // Required for: strlen(), strrchr(), strcmp()
 
+/* This should be in <stdio.h>, but Travis doesn't find it... */
+FILE *funopen(const void *cookie, int (*readfn)(void *, char *, int),
+              int (*writefn)(void *, const char *, int),
+              fpos_t (*seekfn)(void *, fpos_t, int), int (*closefn)(void *));
+
+
 #if defined(PLATFORM_DESKTOP) || defined(PLATFORM_RPI)
     #define STB_IMAGE_WRITE_IMPLEMENTATION
-    #include "external/stb_image_write.h"    // Required for: stbi_write_bmp(), stbi_write_png()
+    #include "external/stb_image_write.h"   // Required for: stbi_write_bmp(), stbi_write_png()
 #endif
-
-#define RRES_IMPLEMENTATION
-#include "rres.h"
 
 //----------------------------------------------------------------------------------
 // Global Variables Definition
 //----------------------------------------------------------------------------------
+
+// Log types messages supported flags (bit based)
+static unsigned char logTypeFlags = LOG_INFO | LOG_WARNING | LOG_ERROR;
+static TraceLogCallback logCallback = NULL;
+
 #if defined(PLATFORM_ANDROID)
 AAssetManager *assetManager;
 #endif
@@ -90,16 +94,32 @@ static int android_close(void *cookie);
 // Module Functions Definition - Utilities
 //----------------------------------------------------------------------------------
 
+// Enable trace log message types (bit flags based)
+void SetTraceLog(unsigned char types)
+{
+    logTypeFlags = types;
+}
+
+// Set a trace log callback to enable custom logging bypassing raylib's one
+void SetTraceLogCallback(TraceLogCallback callback)
+{
+    logCallback = callback;
+}
+
 // Show trace log messages (LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_DEBUG)
 void TraceLog(int msgType, const char *text, ...)
 {
 #if defined(SUPPORT_TRACELOG)
     static char buffer[128];
-    int traceDebugMsgs = 0;
-    
-#if defined(SUPPORT_TRACELOG_DEBUG)
-    traceDebugMsgs = 1;
-#endif
+    va_list args;
+    va_start(args, text);
+
+    if (logCallback)
+    {
+        logCallback(msgType, text, args);
+        va_end(args);
+        return;
+    }
 
     switch(msgType)
     {
@@ -113,47 +133,50 @@ void TraceLog(int msgType, const char *text, ...)
     strcat(buffer, text);
     strcat(buffer, "\n");
 
-    va_list args;
-    va_start(args, text);
-
 #if defined(PLATFORM_ANDROID)
     switch(msgType)
     {
-        case LOG_INFO: __android_log_vprint(ANDROID_LOG_INFO, "raylib", buffer, args); break;
-        case LOG_ERROR: __android_log_vprint(ANDROID_LOG_ERROR, "raylib", buffer, args); break;
-        case LOG_WARNING: __android_log_vprint(ANDROID_LOG_WARN, "raylib", buffer, args); break;
-        case LOG_DEBUG: if (traceDebugMsgs) __android_log_vprint(ANDROID_LOG_DEBUG, "raylib", buffer, args); break;
+        case LOG_INFO: if (logTypeFlags & LOG_INFO) __android_log_vprint(ANDROID_LOG_INFO, "raylib", buffer, args); break;
+        case LOG_WARNING: if (logTypeFlags & LOG_WARNING) __android_log_vprint(ANDROID_LOG_WARN, "raylib", buffer, args); break;
+        case LOG_ERROR: if (logTypeFlags & LOG_ERROR) __android_log_vprint(ANDROID_LOG_ERROR, "raylib", buffer, args); break;
+        case LOG_DEBUG: if (logTypeFlags & LOG_DEBUG) __android_log_vprint(ANDROID_LOG_DEBUG, "raylib", buffer, args); break;
         default: break;
     }
 #else
-    if ((msgType != LOG_DEBUG) || ((msgType == LOG_DEBUG) && (traceDebugMsgs))) vprintf(buffer, args);
+    switch(msgType)
+    {
+        case LOG_INFO: if (logTypeFlags & LOG_INFO) vprintf(buffer, args); break;
+        case LOG_WARNING: if (logTypeFlags & LOG_WARNING) vprintf(buffer, args); break;
+        case LOG_ERROR: if (logTypeFlags & LOG_ERROR) vprintf(buffer, args); break;
+        case LOG_DEBUG: if (logTypeFlags & LOG_DEBUG) vprintf(buffer, args); break;
+        default: break;
+    }
 #endif
 
     va_end(args);
 
     if (msgType == LOG_ERROR) exit(1);  // If LOG_ERROR message, exit program
-    
+
 #endif  // SUPPORT_TRACELOG
 }
 
-#if defined(PLATFORM_DESKTOP) || defined(PLATFORM_RPI)
-
-#if defined(SUPPORT_SAVE_BMP)
 // Creates a BMP image file from an array of pixel data
 void SaveBMP(const char *fileName, unsigned char *imgData, int width, int height, int compSize)
 {
+#if defined(SUPPORT_SAVE_BMP) && (defined(PLATFORM_DESKTOP) || defined(PLATFORM_RPI))
     stbi_write_bmp(fileName, width, height, compSize, imgData);
-}
+    TraceLog(LOG_INFO, "BMP Image saved: %s", fileName);
 #endif
+}
 
-#if defined(SUPPORT_SAVE_PNG)
 // Creates a PNG image file from an array of pixel data
 void SavePNG(const char *fileName, unsigned char *imgData, int width, int height, int compSize)
 {
+#if defined(SUPPORT_SAVE_PNG) && (defined(PLATFORM_DESKTOP) || defined(PLATFORM_RPI))
     stbi_write_png(fileName, width, height, compSize, imgData, width*compSize);
+    TraceLog(LOG_INFO, "PNG Image saved: %s", fileName);
+#endif
 }
-#endif
-#endif
 
 // Keep track of memory allocated
 // NOTE: mallocType defines the type of data allocated

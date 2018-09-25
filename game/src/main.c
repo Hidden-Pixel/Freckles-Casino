@@ -5,6 +5,7 @@
 
 #include "raylib.h"
 #include "raymath.h"
+#include <FC/entities.h>
 
 #define global_variable static
 
@@ -20,7 +21,7 @@
 
 global_variable int GlobalWindowWidth   = WIDTH;
 global_variable int GlobalWindowHeight  = HEIGHT;
-global_variable char *GlobalWindowTitle = "Mr. Freckles Casino";
+global_variable const char *GlobalWindowTitle = "Mr. FC Casino";
 global_variable unsigned char GlobalRunning = 1;
 global_variable int GlobalTargetFPS = 60;
 
@@ -86,7 +87,7 @@ LoadTextures()
 
     tempImage = LoadImage("assets/textures/Background/CardSlot.png");
 
-    Vector2 image_vector = { tempImage.width * 1.25, tempImage.height * 1.25 };
+    Vector2 image_vector = { tempImage.width * 1.25f, tempImage.height * 1.25f };
     image_vector = Vector2Scale(image_vector, GameScreenUnit);
     ImageResizeNN(&tempImage, image_vector.x, image_vector.y);
 

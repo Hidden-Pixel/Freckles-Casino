@@ -46,4 +46,5 @@ add_custom_command(
         ${CMAKE_CURRENT_BINARY_DIR}/assets)
 
 target_sources(Freckles_Casino PRIVATE src/main.c)
+set_source_files_properties(src/main.c PROPERTIES LANGUAGE CXX)
 target_include_directories(Freckles_Casino PUBLIC src/include)

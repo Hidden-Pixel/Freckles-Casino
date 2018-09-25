@@ -7,18 +7,14 @@ if (WIN32)
     add_library(raylib STATIC IMPORTED)
 
     if(MINGW)
-        add_library(glfw3 STATIC IMPORTED)
-        add_library(OpenAL STATIC IMPORTED)
-
-        set_target_properties(glfw3 PROPERTIES
-                IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/src/libs/win32/mingw32/libglfw3.a"
-                INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/src/include/GLFW")
-        set_target_properties(OpenAL PROPERTIES
-                IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/src/libs/win32/mingw32/libOpenAL32.a"
-                INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/src/include/AL")
+        find_package(OpenAL REQUIRED)
+        find_package(glfw3 REQUIRED)
         set_target_properties(raylib PROPERTIES
-                IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/src/libs/win32/mingw32/libraylib.a"
+                IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/src/libs/win32/mingw32/libraylib_static.a"
                 INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/src/libs/raylib")
+
+        target_compile_definitions(Freckles_Casino PRIVATE _DEFAULT_SOURCE USE_GLFW=3)
+        target_link_libraries(Freckles_Casino raylib glfw OpenAL)
     elseif(MSVC)
         add_library(glfw3 SHARED IMPORTED)
         add_library(OpenAL SHARED IMPORTED)
@@ -32,9 +28,8 @@ if (WIN32)
         set_target_properties(raylib PROPERTIES
                 IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/src/libs/win32/msvc/raylib.lib"
                 INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/src/libs/raylib")
+        target_link_libraries(Freckles_Casino glfw raylib OpenAL)
     endif()
-
-    target_link_libraries(Freckles_Casino glfw raylib OpenAL)
 elseif(APPLE)
     target_compile_definitions(Freckles_Casino PRIVATE _DEFAULT_SOURCE USE_GLFW=3)
     target_compile_options(Freckles_Casino PRIVATE -fgnu89-inline -Wall -Wno-missing-braces -s)

@@ -1,0 +1,8 @@
+#ifndef FRECKLES_CASINO_GAME_ENTITIES_H
+#define FRECKLES_CASINO_GAME_ENTITIES_H
+
+namespace freckles {
+
+}
+
+#endif //FRECKLES_CASINO_GAME_ENTITIES_H

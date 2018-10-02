@@ -45,7 +45,6 @@ const char* CreditsText = "CREDITS";
 const char* JackpotText = "JACKPOT";
 const char* BetText = "BET";
 
-
 void
 LoadTextures();
 

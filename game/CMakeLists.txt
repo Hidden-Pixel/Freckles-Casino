@@ -32,11 +32,14 @@ if (WIN32)
     endif()
 elseif(APPLE)
     target_compile_definitions(Freckles_Casino PRIVATE _DEFAULT_SOURCE USE_GLFW=3)
-    target_compile_options(Freckles_Casino PRIVATE -fgnu89-inline -Wall -Wno-missing-braces -s)
+    target_compile_options(Freckles_Casino PRIVATE
+            -Wall -Wextra -Wpedantic -Wno-missing-braces -Wno-missing-field-initializers
+            -s)
     target_link_libraries(Freckles_Casino raylib)
 
     # if NOT debug
-    # target_compile_options(Freckles_Casino PRIVATE -O1)
+    # Os optimizes for cache efficiency
+    # target_compile_options(Freckles_Casino PRIVATE -O1 -Os)
 endif()
 
 add_custom_command(
@@ -45,6 +48,7 @@ add_custom_command(
         ${CMAKE_CURRENT_SOURCE_DIR}/assets
         ${CMAKE_CURRENT_BINARY_DIR}/assets)
 
-target_sources(Freckles_Casino PRIVATE src/main.c)
+target_sources(Freckles_Casino PRIVATE src/main.c src/game-screen.c)
 set_source_files_properties(src/main.c PROPERTIES LANGUAGE CXX)
+set_source_files_properties(src/game-screen.c PROPERTIES LANGUAGE CXX)
 target_include_directories(Freckles_Casino PUBLIC src/include)

@@ -103,7 +103,7 @@ LoadTextures()
     TableVector2.y = (GlobalWindowHeight - BlankGreenTableTexture.height);
     TableVector2.x = 0;
     CardAreaLeft.x = TableVector2.x + game_screen::LocalUnitsToScreen(10.f);
-    CardAreaLeft.y = TableVector2.y + game_screen::LocalUnitsToScreen(30.f);
+    CardAreaLeft.y = TableVector2.y + game_screen::LocalUnitsToScreen(25.f);
 
     tempImage = LoadImage("assets/textures/Background/CardSlot.png");
 
@@ -117,11 +117,17 @@ LoadTextures()
     CardAreaRight.x = GlobalWindowWidth - game_screen::LocalUnitsToScreen(15.f) - 2 * CardSlotTexture.width;
     CardAreaRight.y = CardAreaLeft.y;
 
+
+    // Distance formula for space between the two areas.
     float center_space = CardAreaRight.x - (CardAreaLeft.x + 2 * CardSlotTexture.width);
+
+    // Find padding to evenly space on each side
+    // We want to fit 5 cards in the space with two blank areas
+    // f(x) = ((avail_space/size - x) * size) / 2
     float center_padding = (((center_space / CardSlotTexture.width) - 5) * CardSlotTexture.width) / 2;
 
     CardAreaCenter.x = (CardAreaLeft.x + 2 * CardSlotTexture.width) + center_padding;
-    CardAreaCenter.y = CardAreaLeft.y + CardSlotTexture.height;
+    CardAreaCenter.y = CardAreaLeft.y + CardSlotTexture.height - game_screen::LocalUnitsToScreen(3.f);
 
     tempImage = LoadImage("assets/textures/Cards/BackOfCard/BackOfCard.png");
 

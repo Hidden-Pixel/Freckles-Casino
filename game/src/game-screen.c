@@ -1,12 +1,15 @@
 #include <FC/game-screen.h>
+#include <math.h>
 
 static float GameScreenUnit;
+static float ScreenToLocalUnit;
 static Vector2 GameScreenScale;
 
 void freckles::game_screen::Initialize(float screenWidth, float screenHeight, float gameWidth, float gameHeight) {
-    GameScreenUnit = (screenWidth * screenHeight) / (gameWidth * gameHeight);
     GameScreenScale.x = screenWidth / gameWidth;
     GameScreenScale.y = screenHeight / gameHeight;
+    GameScreenUnit = fmin(GameScreenScale.x, GameScreenScale.y);
+    ScreenToLocalUnit = (1/GameScreenUnit);
 }
 
 float
@@ -15,10 +18,10 @@ freckles::game_screen::LocalUnitsToScreen(float units)
     return (units * GameScreenUnit);
 }
 
-Vector2
-freckles::game_screen::LocalToScreen(Vector2 local)
+float
+ScreenToLocalUnits(float size)
 {
-    return Vector2 { local.x * GameScreenScale.x, local.y * GameScreenScale.y };
+    return (size * ScreenToLocalUnit);
 }
 
 float

@@ -10,8 +10,8 @@ namespace freckles {
         float
         LocalUnitsToScreen(float units);
 
-        Vector2
-        LocalToScreen(Vector2 local);
+        float
+        ScreenToLocalUnits(float size);
 
         float
         ScreenUnitScale();

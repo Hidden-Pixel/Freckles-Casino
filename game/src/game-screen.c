@@ -6,7 +6,8 @@ static float ScreenToLocalUnit;
 static Vector2 GameScreenScale;
 
 void
-GameScreen_Initialize(float screenWidth, float screenHeight, float gameWidth, float gameHeight) {
+GameScreen_Init(float screenWidth, float screenHeight, float gameWidth, float gameHeight)
+{
     GameScreenScale.x = screenWidth / gameWidth;
     GameScreenScale.y = screenHeight / gameHeight;
     GameScreenUnit = fmin(GameScreenScale.x, GameScreenScale.y);

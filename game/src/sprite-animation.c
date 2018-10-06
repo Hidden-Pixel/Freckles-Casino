@@ -3,6 +3,8 @@
  *
  */
 
+#include <FC/sprite-animation.h>
+
 /*
 typedef enum _spritesheetPosition
 {
@@ -11,19 +13,6 @@ typedef enum _spritesheetPosition
     Vertical    = 0x02,
 } SpritesheetPosition;
 */
-
-typedef struct _spriteAnimation 
-{
-    unsigned int    totalFrames;
-    unsigned int    totalVerticalFrames;
-    unsigned int    totalHorizontalFrames;
-    unsigned int    currentDrawFrameIndex;
-    unsigned int    frameCounter;
-    unsigned int    frameSpeed;
-    unsigned char   frameOrder;
-    Rectangle       currentFrameRect;
-} SpriteAnimation;
-
 
 void
 DrawAnimationFrame(Texture2D *spritesheet, SpriteAnimation *spriteAnimation, Vector2 *spritePosition, int gameFPS)
@@ -45,16 +34,16 @@ DrawAnimationFrame(Texture2D *spritesheet, SpriteAnimation *spriteAnimation, Vec
         .x = 0,
         .y = 0,
     };
-    int verticalOffset = floor(spriteAnimation->currentDrawFrameIndex / spriteAnimation->totalVerticalFrames);
-    spriteFramePosition.y = floor(verticalOffset * (spritesheet->height / spriteAnimation->totalVerticalFrames));
-    int horizontalOffset = floor((spriteAnimation->currentDrawFrameIndex % spriteAnimation->totalHorizontalFrames));
-    spriteFramePosition.x = floor(horizontalOffset * (spritesheet->width / spriteAnimation->totalHorizontalFrames));
+    int verticalOffset = (spriteAnimation->currentDrawFrameIndex / spriteAnimation->totalVerticalFrames);
+    spriteFramePosition.y = (verticalOffset * (spritesheet->height / spriteAnimation->totalVerticalFrames));
+    int horizontalOffset = ((spriteAnimation->currentDrawFrameIndex % spriteAnimation->totalHorizontalFrames));
+    spriteFramePosition.x = (horizontalOffset * (spritesheet->width / spriteAnimation->totalHorizontalFrames));
     spriteAnimation->currentFrameRect = (Rectangle)
     {
         .x = spriteFramePosition.x,
         .y = spriteFramePosition.y,
-        .width = floor(spritesheet->width / spriteAnimation->totalHorizontalFrames),
-        .height = floor(spritesheet->height / spriteAnimation->totalVerticalFrames),
+        .width = (spritesheet->width / spriteAnimation->totalHorizontalFrames),
+        .height = (spritesheet->height / spriteAnimation->totalVerticalFrames),
     };
     DrawTextureRec(*spritesheet, spriteAnimation->currentFrameRect, *spritePosition, WHITE);
     spriteAnimation->frameCounter++;

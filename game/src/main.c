@@ -8,6 +8,7 @@
 #include "raymath.h"
 
 #include "game-screen.c"
+#include "sprite-animation.c"
 
 #define global_variable static
 
@@ -25,6 +26,7 @@ global_variable int GlobalWindowWidth   = WIDTH;
 global_variable int GlobalWindowHeight  = HEIGHT;
 global_variable const char *GlobalWindowTitle = "Mr. FC Casino";
 global_variable unsigned char GlobalRunning = 1;
+global_variable int GlobalFrameCount = 0;
 global_variable int GlobalTargetFPS = 60;
 
 global_variable Texture2D BlankGreenTableTexture;
@@ -43,9 +45,12 @@ global_variable Vector2 CardAreaRight;
 global_variable Vector2 CardAreaCenter;
 global_variable Vector2 ChancesBillboardArea;
 
+global_variable Texture2D MrFrecklesSpritesheets[5];
+global_variable SpriteAnimation MrFrecklesSpriteAnimation[5];
+
 const char* CreditsText = "CREDITS";
 const char* JackpotText = "JACKPOT";
-const char* BetText = "BET";
+const char* BetText     = "BET";
 
 void
 LoadTextures();
@@ -94,13 +99,13 @@ void
 LoadTextures()
 {
     Image tempImage = LoadImage("assets/textures/Background/BlankTableGreen.png");
-    ImageResizeNN(&tempImage, GlobalWindowWidth, GlobalWindowHeight / 2);
+    ImageResizeNN(&tempImage, GlobalWindowWidth, GlobalWindowHeight / 2.0f);
     BlankGreenTableTexture = LoadTextureFromImage(tempImage);
     UnloadImage(tempImage);
     TableVector2.y = (GlobalWindowHeight - BlankGreenTableTexture.height);
     TableVector2.x = 0;
-    CardAreaLeft.x = TableVector2.x + GameScreen_LocalUnitsToScreen(10.f);
-    CardAreaLeft.y = TableVector2.y + GameScreen_LocalUnitsToScreen(25.f);
+    CardAreaLeft.x = TableVector2.x + GameScreen_LocalUnitsToScreen(10.0f);
+    CardAreaLeft.y = TableVector2.y + GameScreen_LocalUnitsToScreen(25.0f);
 
     tempImage = LoadImage("assets/textures/Background/CardSlot.png");
 
@@ -111,25 +116,25 @@ LoadTextures()
     CardSlotTexture = LoadTextureFromImage(tempImage);
     UnloadImage(tempImage);
 
-    CardAreaRight.x = GlobalWindowWidth - GameScreen_LocalUnitsToScreen(15.f) - 2 * CardSlotTexture.width;
+    CardAreaRight.x = GlobalWindowWidth - GameScreen_LocalUnitsToScreen(15.0f) - 2.0f * CardSlotTexture.width;
     CardAreaRight.y = CardAreaLeft.y;
 
 
     // Distance formula for space between the two areas.
-    float center_space = CardAreaRight.x - (CardAreaLeft.x + 2 * CardSlotTexture.width);
+    float center_space = CardAreaRight.x - (CardAreaLeft.x + 2.0f * CardSlotTexture.width);
 
     // Find padding to evenly space on each side
     // We want to fit 5 cards in the space with two blank areas
     // f(x) = ((avail_space/size - x) * size) / 2
-    float center_padding = (((center_space / CardSlotTexture.width) - 5) * CardSlotTexture.width) / 2;
+    float center_padding = (((center_space / CardSlotTexture.width) - 5.0f) * CardSlotTexture.width) / 2.0f;
 
-    CardAreaCenter.x = (CardAreaLeft.x + 2 * CardSlotTexture.width) + center_padding;
-    CardAreaCenter.y = CardAreaLeft.y + CardSlotTexture.height - GameScreen_LocalUnitsToScreen(3.f);
+    CardAreaCenter.x = (CardAreaLeft.x + 2.0f * CardSlotTexture.width) + center_padding;
+    CardAreaCenter.y = CardAreaLeft.y + CardSlotTexture.height - GameScreen_LocalUnitsToScreen(3.0f);
 
     tempImage = LoadImage("assets/textures/Cards/BackOfCard/BackOfCard.png");
 
-    image_vector.x = tempImage.width * 2.f;
-    image_vector.y = tempImage.height * 2.f;
+    image_vector.x = tempImage.width * 2.0f;
+    image_vector.y = tempImage.height * 2.0f;
     image_vector = Vector2Scale(image_vector, GameScreen_ScreenUnitScale());
 
     ImageResizeNN(&tempImage, image_vector.x, image_vector.y);
@@ -137,12 +142,29 @@ LoadTextures()
     UnloadImage(tempImage);
 
     tempImage = LoadImage("assets/textures/Background/BrassPlate.png");
-    image_vector.x = (CardSlotTexture.width * 2) + GameScreen_LocalUnitsToScreen(1.f);
+    image_vector.x = (CardSlotTexture.width * 2.0f) + GameScreen_LocalUnitsToScreen(1.0f);
     image_vector.y = CardSlotTexture.height;
 
     ImageResizeNN(&tempImage, image_vector.x, image_vector.y);
     ScoreFrameTexture = LoadTextureFromImage(tempImage);
     UnloadImage(tempImage);
+
+    tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/Idle.png");
+    image_vector.x = tempImage.width * 2.0f;
+    image_vector.y = tempImage.height * 2.0f;
+    image_vector = Vector2Scale(image_vector, GameScreen_ScreenUnitScale());
+
+    ImageResizeNN(&tempImage, image_vector.x, image_vector.y);
+    MrFrecklesSpritesheets[0] = LoadTextureFromImage(tempImage);
+    UnloadImage(tempImage);
+    MrFrecklesSpriteAnimation[0] = (SpriteAnimation)
+    {
+        .totalFrames            = 4,
+        .totalVerticalFrames    = 2,
+        .totalHorizontalFrames  = 2,
+        .frameSpeed             = 2,
+        //.frameOrder             = SpritesheetPosition.Horizontal | SpritesheetPosition.Vertical,
+    };
 }
 
 void
@@ -152,6 +174,8 @@ UnloadTextures()
     UnloadTexture(CardSlotTexture);
     UnloadTexture(BackOfCardTexture);
     UnloadTexture(ScoreFrameTexture);
+    // TODO(nick): replace with for loop ...
+    UnloadTexture(MrFrecklesSpritesheets[0]);
 }
 
 void
@@ -184,14 +208,23 @@ Render()
 
         DrawTexture(ScoreFrameTexture, CardAreaLeft.x, CardAreaLeft.y + CardSlotTexture.height, WHITE);
         DrawTexture(ScoreFrameTexture, CardAreaRight.x, CardAreaLeft.y + CardSlotTexture.height, WHITE);
+
+        Vector2 tempPosition = 
+        {
+            .x = 50,
+            .y = 50,
+        };
+        DrawAnimationFrame(&MrFrecklesSpritesheets[0], &MrFrecklesSpriteAnimation[0], &tempPosition, GlobalTargetFPS);
     }
     EndDrawing();
+    GlobalFrameCount++;
 }
 
 void
 DrawHorizontalCardArea(Texture2D texture, Vector2 area, int card_count, float x_shift)
 {
-    for (int i = 0; i < card_count; ++i) {
+    for (int i = 0; i < card_count; ++i) 
+    {
         DrawTexture(texture, area.x + (i * x_shift), area.y, WHITE);
     }
 }

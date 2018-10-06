@@ -7,6 +7,8 @@
 #include "raylib.h"
 #include "raymath.h"
 
+#include "game-screen.c"
+
 #define global_variable static
 
 // Our actual screen size
@@ -63,9 +65,7 @@ DrawHorizontalCardArea(Texture2D texture, Vector2 area, int card_count, float x_
 int
 main(void)
 {
-    using namespace freckles;
-
-    game_screen::Initialize(GlobalWindowWidth, GlobalWindowHeight, GAME_WIDTH, GAME_HEIGHT);
+    GameScreen_Initialize(GlobalWindowWidth, GlobalWindowHeight, GAME_WIDTH, GAME_HEIGHT);
     InitWindow(GlobalWindowWidth, GlobalWindowHeight, GlobalWindowTitle);
     SetTargetFPS(GlobalTargetFPS);
 
@@ -93,27 +93,25 @@ main(void)
 void
 LoadTextures()
 {
-    using namespace freckles;
-
     Image tempImage = LoadImage("assets/textures/Background/BlankTableGreen.png");
     ImageResizeNN(&tempImage, GlobalWindowWidth, GlobalWindowHeight / 2);
     BlankGreenTableTexture = LoadTextureFromImage(tempImage);
     UnloadImage(tempImage);
     TableVector2.y = (GlobalWindowHeight - BlankGreenTableTexture.height);
     TableVector2.x = 0;
-    CardAreaLeft.x = TableVector2.x + game_screen::LocalUnitsToScreen(10.f);
-    CardAreaLeft.y = TableVector2.y + game_screen::LocalUnitsToScreen(25.f);
+    CardAreaLeft.x = TableVector2.x + GameScreen_LocalUnitsToScreen(10.f);
+    CardAreaLeft.y = TableVector2.y + GameScreen_LocalUnitsToScreen(25.f);
 
     tempImage = LoadImage("assets/textures/Background/CardSlot.png");
 
     Vector2 image_vector = { tempImage.width * 2.5f, tempImage.height * 2.5f };
-    image_vector = Vector2Scale(image_vector, game_screen::ScreenUnitScale());
+    image_vector = Vector2Scale(image_vector, GameScreen_ScreenUnitScale());
     ImageResizeNN(&tempImage, image_vector.x, image_vector.y);
 
     CardSlotTexture = LoadTextureFromImage(tempImage);
     UnloadImage(tempImage);
 
-    CardAreaRight.x = GlobalWindowWidth - game_screen::LocalUnitsToScreen(15.f) - 2 * CardSlotTexture.width;
+    CardAreaRight.x = GlobalWindowWidth - GameScreen_LocalUnitsToScreen(15.f) - 2 * CardSlotTexture.width;
     CardAreaRight.y = CardAreaLeft.y;
 
 
@@ -126,20 +124,20 @@ LoadTextures()
     float center_padding = (((center_space / CardSlotTexture.width) - 5) * CardSlotTexture.width) / 2;
 
     CardAreaCenter.x = (CardAreaLeft.x + 2 * CardSlotTexture.width) + center_padding;
-    CardAreaCenter.y = CardAreaLeft.y + CardSlotTexture.height - game_screen::LocalUnitsToScreen(3.f);
+    CardAreaCenter.y = CardAreaLeft.y + CardSlotTexture.height - GameScreen_LocalUnitsToScreen(3.f);
 
     tempImage = LoadImage("assets/textures/Cards/BackOfCard/BackOfCard.png");
 
     image_vector.x = tempImage.width * 2.f;
     image_vector.y = tempImage.height * 2.f;
-    image_vector = Vector2Scale(image_vector, game_screen::ScreenUnitScale());
+    image_vector = Vector2Scale(image_vector, GameScreen_ScreenUnitScale());
 
     ImageResizeNN(&tempImage, image_vector.x, image_vector.y);
     BackOfCardTexture = LoadTextureFromImage(tempImage);
     UnloadImage(tempImage);
 
     tempImage = LoadImage("assets/textures/Background/BrassPlate.png");
-    image_vector.x = (CardSlotTexture.width * 2) + game_screen::LocalUnitsToScreen(1.f);
+    image_vector.x = (CardSlotTexture.width * 2) + GameScreen_LocalUnitsToScreen(1.f);
     image_vector.y = CardSlotTexture.height;
 
     ImageResizeNN(&tempImage, image_vector.x, image_vector.y);
@@ -165,8 +163,6 @@ ProcessInput()
 void
 Render()
 {
-    using namespace freckles;
-
     BeginDrawing();
     {
         ClearBackground(BLANK);
@@ -175,15 +171,16 @@ Render()
         DrawHorizontalCardArea(CardSlotTexture, CardAreaLeft, 2, CardSlotTexture.width);
         DrawHorizontalCardArea(CardSlotTexture, CardAreaRight, 2, CardSlotTexture.width);
         DrawHorizontalCardArea(CardSlotTexture, CardAreaCenter, 5, CardSlotTexture.width);
-        DrawHorizontalCardArea(BackOfCardTexture,
-                Vector2 { CardAreaLeft.x + game_screen::LocalUnitsToScreen(4.f),
-                          CardAreaLeft.y + game_screen::LocalUnitsToScreen(5.f) }, 2, CardSlotTexture.width);
-        DrawHorizontalCardArea(BackOfCardTexture,
-                     Vector2 { CardAreaRight.x + game_screen::LocalUnitsToScreen(4.f),
-                               CardAreaRight.y + game_screen::LocalUnitsToScreen(5.f) }, 2, CardSlotTexture.width);
-        DrawHorizontalCardArea(BackOfCardTexture,
-                     Vector2 { CardAreaCenter.x + game_screen::LocalUnitsToScreen(4.f),
-                               CardAreaCenter.y + game_screen::LocalUnitsToScreen(5.f) }, 5, CardSlotTexture.width);
+
+        Vector2 BackOfCardScreenV2 = 
+        {
+            .x = CardAreaLeft.x + GameScreen_LocalUnitsToScreen(4.0f),
+            .y = CardAreaLeft.y + GameScreen_LocalUnitsToScreen(5.0f)
+        };
+
+        DrawHorizontalCardArea(BackOfCardTexture, BackOfCardScreenV2, 2, CardSlotTexture.width);
+        DrawHorizontalCardArea(BackOfCardTexture, BackOfCardScreenV2, 2, CardSlotTexture.width);
+        DrawHorizontalCardArea(BackOfCardTexture, BackOfCardScreenV2, 5, CardSlotTexture.width);
 
         DrawTexture(ScoreFrameTexture, CardAreaLeft.x, CardAreaLeft.y + CardSlotTexture.height, WHITE);
         DrawTexture(ScoreFrameTexture, CardAreaRight.x, CardAreaLeft.y + CardSlotTexture.height, WHITE);

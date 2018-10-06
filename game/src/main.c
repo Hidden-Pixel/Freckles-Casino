@@ -4,11 +4,12 @@
  */
 
 #include <FC/game-screen.h>
+#include <FC/sprite-animation.h>
+#include <FC/poker.h>
+#include <FC/defines.h>
+
 #include "raylib.h"
 #include "raymath.h"
-
-#include "game-screen.c"
-#include "sprite-animation.c"
 
 #define global_variable static
 
@@ -30,23 +31,22 @@ global_variable int GlobalFrameCount = 0;
 global_variable int GlobalTargetFPS = 60;
 
 global_variable Texture2D BlankGreenTableTexture;
-global_variable Vector2 TableVector2;
-
 global_variable Texture2D CardSlotTexture;
-global_variable Vector2 CardSlotVector2[9];
-
 global_variable Texture2D BackOfCardTexture;
-global_variable Vector2 CardVector2[9];
-
 global_variable Texture2D ScoreFrameTexture;
+
+// TODO: Load face cards
+global_variable Texture2D CardTextures[52];
 
 global_variable Vector2 CardAreaLeft;
 global_variable Vector2 CardAreaRight;
 global_variable Vector2 CardAreaCenter;
+global_variable Vector2 TableVector2;
 global_variable Vector2 ChancesBillboardArea;
 
 global_variable Texture2D MrFrecklesSpritesheets[5];
 global_variable SpriteAnimation MrFrecklesSpriteAnimation[5];
+global_variable bool GameStarted = false;
 
 const char* CreditsText = "CREDITS";
 const char* JackpotText = "JACKPOT";
@@ -70,7 +70,8 @@ DrawHorizontalCardArea(Texture2D texture, Vector2 area, int card_count, float x_
 int
 main(void)
 {
-    GameScreen_Initialize(GlobalWindowWidth, GlobalWindowHeight, GAME_WIDTH, GAME_HEIGHT);
+    GameScreen_Init(GlobalWindowWidth, GlobalWindowHeight, GAME_WIDTH, GAME_HEIGHT);
+    Poker_Init();
     InitWindow(GlobalWindowWidth, GlobalWindowHeight, GlobalWindowTitle);
     SetTargetFPS(GlobalTargetFPS);
 
@@ -104,8 +105,8 @@ LoadTextures()
     UnloadImage(tempImage);
     TableVector2.y = (GlobalWindowHeight - BlankGreenTableTexture.height);
     TableVector2.x = 0;
-    CardAreaLeft.x = TableVector2.x + GameScreen_LocalUnitsToScreen(10.0f);
-    CardAreaLeft.y = TableVector2.y + GameScreen_LocalUnitsToScreen(25.0f);
+    CardAreaLeft.x = TableVector2.x + GameScreen_ScreenToLocalUnits(10.0f);
+    CardAreaLeft.y = TableVector2.y + GameScreen_ScreenToLocalUnits(25.0f);
 
     tempImage = LoadImage("assets/textures/Background/CardSlot.png");
 
@@ -116,7 +117,7 @@ LoadTextures()
     CardSlotTexture = LoadTextureFromImage(tempImage);
     UnloadImage(tempImage);
 
-    CardAreaRight.x = GlobalWindowWidth - GameScreen_LocalUnitsToScreen(15.0f) - 2.0f * CardSlotTexture.width;
+    CardAreaRight.x = GlobalWindowWidth - GameScreen_ScreenToLocalUnits(15.0f) - 2.0f * CardSlotTexture.width;
     CardAreaRight.y = CardAreaLeft.y;
 
 
@@ -129,7 +130,7 @@ LoadTextures()
     float center_padding = (((center_space / CardSlotTexture.width) - 5.0f) * CardSlotTexture.width) / 2.0f;
 
     CardAreaCenter.x = (CardAreaLeft.x + 2.0f * CardSlotTexture.width) + center_padding;
-    CardAreaCenter.y = CardAreaLeft.y + CardSlotTexture.height - GameScreen_LocalUnitsToScreen(3.0f);
+    CardAreaCenter.y = CardAreaLeft.y + CardSlotTexture.height - GameScreen_ScreenToLocalUnits(3.0f);
 
     tempImage = LoadImage("assets/textures/Cards/BackOfCard/BackOfCard.png");
 
@@ -142,7 +143,7 @@ LoadTextures()
     UnloadImage(tempImage);
 
     tempImage = LoadImage("assets/textures/Background/BrassPlate.png");
-    image_vector.x = (CardSlotTexture.width * 2.0f) + GameScreen_LocalUnitsToScreen(1.0f);
+    image_vector.x = (CardSlotTexture.width * 2.0f) + GameScreen_ScreenToLocalUnits(1.0f);
     image_vector.y = CardSlotTexture.height;
 
     ImageResizeNN(&tempImage, image_vector.x, image_vector.y);
@@ -181,7 +182,10 @@ UnloadTextures()
 void
 ProcessInput()
 {
-    // TODO(martin): add support for inputs
+    if (IsKeyDown(KEY_SPACE) && !GameStarted) {
+        Poker_StartNewRound();
+        GameStarted = true;
+    }
 }
 
 void
@@ -192,30 +196,26 @@ Render()
         ClearBackground(BLANK);
         DrawTexture(BlankGreenTableTexture, TableVector2.x, TableVector2.y, WHITE);
 
+        Vector2 leftArea = { .x = CardAreaLeft.x + GameScreen_ScreenToLocalUnits(4.f),
+                             .y = CardAreaLeft.y + GameScreen_ScreenToLocalUnits(5.f) };
+        Vector2 rightArea = { .x = CardAreaRight.x + GameScreen_ScreenToLocalUnits(4.f),
+                              .y = CardAreaRight.y + GameScreen_ScreenToLocalUnits(5.f) };
+        Vector2 centerArea = { .x = CardAreaCenter.x + GameScreen_ScreenToLocalUnits(4.f),
+                               .y = CardAreaCenter.y + GameScreen_ScreenToLocalUnits(5.f) };
+
         DrawHorizontalCardArea(CardSlotTexture, CardAreaLeft, 2, CardSlotTexture.width);
         DrawHorizontalCardArea(CardSlotTexture, CardAreaRight, 2, CardSlotTexture.width);
         DrawHorizontalCardArea(CardSlotTexture, CardAreaCenter, 5, CardSlotTexture.width);
-
-        Vector2 BackOfCardScreenV2 = 
-        {
-            .x = CardAreaLeft.x + GameScreen_LocalUnitsToScreen(4.0f),
-            .y = CardAreaLeft.y + GameScreen_LocalUnitsToScreen(5.0f)
-        };
-
-        DrawHorizontalCardArea(BackOfCardTexture, BackOfCardScreenV2, 2, CardSlotTexture.width);
-        DrawHorizontalCardArea(BackOfCardTexture, BackOfCardScreenV2, 2, CardSlotTexture.width);
-        DrawHorizontalCardArea(BackOfCardTexture, BackOfCardScreenV2, 5, CardSlotTexture.width);
+        DrawHorizontalCardArea(BackOfCardTexture, leftArea, 2, CardSlotTexture.width);
+        DrawHorizontalCardArea(BackOfCardTexture, rightArea, 2, CardSlotTexture.width);
+        DrawHorizontalCardArea(BackOfCardTexture, centerArea, 5, CardSlotTexture.width);
 
         DrawTexture(ScoreFrameTexture, CardAreaLeft.x, CardAreaLeft.y + CardSlotTexture.height, WHITE);
         DrawTexture(ScoreFrameTexture, CardAreaRight.x, CardAreaLeft.y + CardSlotTexture.height, WHITE);
 
-        Vector2 tempPosition = 
-        {
-            .x = 50,
-            .y = 50,
-        };
-        DrawAnimationFrame(&MrFrecklesSpritesheets[0], &MrFrecklesSpriteAnimation[0], &tempPosition, GlobalTargetFPS);
+        DrawAnimationFrame(&MrFrecklesSpritesheets[0], &MrFrecklesSpriteAnimation[0], &centerArea, GlobalTargetFPS);
     }
+
     EndDrawing();
     GlobalFrameCount++;
 }

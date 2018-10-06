@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 project(Freckles_Casino_Game)
 add_executable(Freckles_Casino "")
-target_compile_features(Freckles_Casino PUBLIC cxx_std_17)
+target_compile_features(Freckles_Casino PUBLIC c_std_11)
 
 if (WIN32)
     add_library(raylib STATIC IMPORTED)
@@ -48,7 +48,5 @@ add_custom_command(
         ${CMAKE_CURRENT_SOURCE_DIR}/assets
         ${CMAKE_CURRENT_BINARY_DIR}/assets)
 
-target_sources(Freckles_Casino PRIVATE src/main.c src/game-screen.c)
-set_source_files_properties(src/main.c PROPERTIES LANGUAGE CXX)
-set_source_files_properties(src/game-screen.c PROPERTIES LANGUAGE CXX)
+target_sources(Freckles_Casino PRIVATE src/main.c src/game-screen.c src/poker.c)
 target_include_directories(Freckles_Casino PUBLIC src/include)

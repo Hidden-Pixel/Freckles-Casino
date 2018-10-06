@@ -3,13 +3,13 @@
 #include <raylib.h>
 
 void
-Initialize(float screenWidth, float screenHeight, float localWidth, float localHeight);
+GameScreen_Init(float screenWidth, float screenHeight, float localWidth, float localHeight);
 
 float
-LocalUnitsToScreen(float units);
+GameScreen_LocalUnitsToScreen(float units);
 
 float
-ScreenToLocalUnits(float size);
+GameScreen_ScreenToLocalUnits(float size);
 
 float
-ScreenUnitScale();
+GameScreen_ScreenUnitScale();

@@ -8,6 +8,8 @@
 #include <FC/poker.h>
 #include <FC/defines.h>
 
+#include <stdio.h>
+
 #include "raylib.h"
 #include "raymath.h"
 
@@ -31,13 +33,13 @@ global_variable int GlobalFrameCount = 0;
 global_variable int GlobalTargetFPS = 60;
 
 global_variable Texture2D BlankGreenTableTexture;
-global_variable Texture2D RedCurtainTexutre;
+global_variable Texture2D RedCurtainTexture;
 global_variable Texture2D CardSlotTexture;
 global_variable Texture2D BackOfCardTexture;
 global_variable Texture2D ScoreFrameTexture;
 
 // TODO(nick): Load face cards
-global_variable Texture2D CardTextures[52];
+global_variable Texture2D CardTextures[CardSuit_Count * CardFace_Count];
 
 global_variable Vector2 RedCurtainVector2;
 global_variable Vector2 CardAreaLeft;
@@ -70,11 +72,16 @@ Render();
 void
 DrawHorizontalCardArea(Texture2D texture, Vector2 area, int card_count, float x_shift);
 
+void
+HandleConfirmButtonPress(Poker_Game* game_state);
+
 int
 main(void)
 {
+    local_variable Poker_Game game_state;
+
     GameScreen_Init(GlobalWindowWidth, GlobalWindowHeight, GAME_WIDTH, GAME_HEIGHT);
-    Poker_Init();
+    Poker_Init(&game_state);
     InitWindow(GlobalWindowWidth, GlobalWindowHeight, GlobalWindowTitle);
     SetTargetFPS(GlobalTargetFPS);
 
@@ -84,8 +91,8 @@ main(void)
     {
         while (GlobalRunning)
         {
-            ProcessInput();
-            Render();
+            ProcessInput(&game_state);
+            Render(&game_state);
             if (WindowShouldClose())
             {
                 GlobalRunning = 0;
@@ -117,7 +124,7 @@ LoadTextures()
     // NOTE: load Red Curtain Texture
     tempImage = LoadImage("assets/textures/Background/Curtain.png");
     ImageResizeNN(&tempImage, GlobalWindowWidth, GlobalWindowHeight / 2.0f);
-    RedCurtainTexutre = LoadTextureFromImage(tempImage);
+    RedCurtainTexture = LoadTextureFromImage(tempImage);
     UnloadImage(tempImage);
     RedCurtainVector2.x = 0;
     RedCurtainVector2.x = 0;
@@ -194,21 +201,21 @@ UnloadTextures()
 }
 
 void
-ProcessInput()
+ProcessInput(Poker_Game* game_state)
 {
-    if (IsKeyDown(KEY_SPACE) && !GameStarted) {
-        Poker_StartNewRound();
-        GameStarted = true;
+    if (IsKeyDown(KEY_SPACE))
+    {
+        HandleConfirmButtonPress(game_state);
     }
 }
 
 void
-Render()
+Render(Poker_Game* game_state)
 {
     BeginDrawing();
     {
         ClearBackground(BLACK);
-        DrawTexture(RedCurtainTexutre, RedCurtainVector2.x, RedCurtainVector2.y, WHITE);
+        DrawTexture(RedCurtainTexture, RedCurtainVector2.x, RedCurtainVector2.y, WHITE);
         DrawTexture(BlankGreenTableTexture, TableVector2.x, TableVector2.y, WHITE);
         Vector2 leftArea =
         { 
@@ -228,9 +235,49 @@ Render()
         DrawHorizontalCardArea(CardSlotTexture, CardAreaLeft, 2, CardSlotTexture.width);
         DrawHorizontalCardArea(CardSlotTexture, CardAreaRight, 2, CardSlotTexture.width);
         DrawHorizontalCardArea(CardSlotTexture, CardAreaCenter, 5, CardSlotTexture.width);
-        DrawHorizontalCardArea(BackOfCardTexture, leftArea, 2, CardSlotTexture.width);
-        DrawHorizontalCardArea(BackOfCardTexture, rightArea, 2, CardSlotTexture.width);
-        DrawHorizontalCardArea(BackOfCardTexture, centerArea, 5, CardSlotTexture.width);
+
+        // NOTE: A tiny optimization would be parallel arrays for cards and textures.
+        for (int i = 0; i < 2; ++i) {
+            float shift = CardSlotTexture.width * i;
+
+            if (game_state->player_hand[i].state == CardState_Hidden)
+            {
+                DrawTexture(BackOfCardTexture, leftArea.x + shift, leftArea.y, WHITE);
+            }
+
+            if (game_state->player_hand[i].state == CardState_Shown)
+            {
+                // TODO: Face cards.
+                DrawTexture(BackOfCardTexture, leftArea.x + shift, leftArea.y, WHITE);
+            }
+
+            if (game_state->dealer_hand[i].state == CardState_Hidden)
+            {
+                DrawTexture(BackOfCardTexture, rightArea.x + shift, rightArea.y, WHITE);
+            }
+
+            if (game_state->dealer_hand[i].state == CardState_Shown)
+            {
+                // TODO: Face cards.
+                DrawTexture(BackOfCardTexture, rightArea.x + shift, rightArea.y, WHITE);
+            }
+        }
+
+        for (int i = 0; i < 5; ++i) {
+            float shift = CardSlotTexture.width * i;
+
+            if (game_state->house_hand[i].state == CardState_Hidden)
+            {
+                DrawTexture(BackOfCardTexture, centerArea.x + shift, centerArea.y, WHITE);
+            }
+
+            if (game_state->house_hand[i].state == CardState_Shown)
+            {
+                // TODO: Face cards.
+                DrawTexture(BackOfCardTexture, centerArea.x + shift, centerArea.y, WHITE);
+            }
+        }
+
         DrawTexture(ScoreFrameTexture, CardAreaLeft.x, CardAreaLeft.y + CardSlotTexture.height, WHITE);
         DrawTexture(ScoreFrameTexture, CardAreaRight.x, CardAreaLeft.y + CardSlotTexture.height, WHITE);
         // TODO(nick): clean up this positioning
@@ -244,6 +291,74 @@ Render()
 
     EndDrawing();
     GlobalFrameCount++;
+}
+
+void
+HandleConfirmButtonPress(Poker_Game* game_state)
+{
+    switch (game_state->poker_state)
+    {
+        case PokerState_NotStarted: {
+            Poker_StartNewRound(game_state);
+            game_state->poker_state = PokerState_Shuffled;
+        }
+        break;
+
+        case PokerState_Shuffled: {
+            for(int i = 0; i < 2; ++i)
+            {
+                // TODO: Card dealing / flipping animation
+                game_state->player_hand[i] = Poker_DrawOne(CardState_Shown);
+                game_state->dealer_hand[i] = Poker_DrawOne(CardState_Shown);
+            }
+
+            game_state->poker_state = PokerState_PlayerCardsDealt;
+        }
+        break;
+
+        case PokerState_PlayerCardsDealt: {
+            for (int i = 0; i < 3; ++i)
+            {
+                game_state->house_hand[i] = Poker_DrawOne(CardState_Shown);
+            }
+
+            game_state->poker_state = PokerState_FlopCardsDealt;
+
+        }
+        break;
+
+        case PokerState_FlopCardsDealt: {
+            game_state->house_hand[3] = Poker_DrawOne(CardState_Shown);
+
+            game_state->poker_state = PokerState_RiverCardsDealt;
+        }
+        break;
+
+        case PokerState_RiverCardsDealt: {
+            game_state->house_hand[4] = Poker_DrawOne(CardState_Shown);
+
+            game_state->poker_state = PokerState_TurnCardsDealt;
+        }
+        break;
+
+        case PokerState_TurnCardsDealt: {
+            // TODO: Award / Deduct points.
+            // TODO: Lose / Win animations and sounds.
+
+            game_state->poker_state = PokerState_GameOver;
+        }
+        break;
+
+        case PokerState_GameOver: {
+            // TODO: Continue / New Game / Quit
+
+            game_state->poker_state = PokerState_NotStarted;
+        }
+        break;
+
+        default:
+            break;
+    }
 }
 
 void

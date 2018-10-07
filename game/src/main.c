@@ -111,8 +111,8 @@ LoadTextures()
     TableVector2.x = 0;
     TableAreaCenter.y = TableVector2.y;
     TableAreaCenter.x = (BlankGreenTableTexture.width / 2.0f);
-    CardAreaLeft.x = TableVector2.x + GameScreen_ScreenToLocalUnits(10.0f);
-    CardAreaLeft.y = TableVector2.y + GameScreen_ScreenToLocalUnits(25.0f);
+    CardAreaLeft.x = TableVector2.x + GameScreen_LocalUnitsToScreen(10.0f);
+    CardAreaLeft.y = TableVector2.y + GameScreen_LocalUnitsToScreen(25.0f);
 
     // NOTE: load Red Curtain Texture
     tempImage = LoadImage("assets/textures/Background/Curtain.png");
@@ -123,14 +123,14 @@ LoadTextures()
     RedCurtainVector2.x = 0;
 
 
-    // NOTE: load CardSlot texture
+    // NOTE: load CardSlot texture 15x20
     tempImage = LoadImage("assets/textures/Background/CardSlot.png");
     Vector2 image_vector = { tempImage.width * 2.5f, tempImage.height * 2.5f };
     image_vector = Vector2Scale(image_vector, GameScreen_ScreenUnitScale());
     ImageResizeNN(&tempImage, image_vector.x, image_vector.y);
     CardSlotTexture = LoadTextureFromImage(tempImage);
     UnloadImage(tempImage);
-    CardAreaRight.x = GlobalWindowWidth - GameScreen_ScreenToLocalUnits(15.0f) - 2.0f * CardSlotTexture.width;
+    CardAreaRight.x = GlobalWindowWidth - GameScreen_LocalUnitsToScreen(15.0f) - 2.0f * CardSlotTexture.width;
     CardAreaRight.y = CardAreaLeft.y;
 
 
@@ -143,8 +143,9 @@ LoadTextures()
     float center_padding = (((center_space / CardSlotTexture.width) - 5.0f) * CardSlotTexture.width) / 2.0f;
 
     CardAreaCenter.x = (CardAreaLeft.x + 2.0f * CardSlotTexture.width) + center_padding;
-    CardAreaCenter.y = CardAreaLeft.y + CardSlotTexture.height - GameScreen_ScreenToLocalUnits(3.0f);
+    CardAreaCenter.y = CardAreaLeft.y + CardSlotTexture.height - GameScreen_LocalUnitsToScreen(3.0f);
 
+    // NOTE: 15x19
     tempImage = LoadImage("assets/textures/Cards/BackOfCard/BackOfCard.png");
 
     image_vector.x = tempImage.width * 2.0f;
@@ -156,7 +157,7 @@ LoadTextures()
     UnloadImage(tempImage);
 
     tempImage = LoadImage("assets/textures/Background/BrassPlate.png");
-    image_vector.x = (CardSlotTexture.width * 2.0f) + GameScreen_ScreenToLocalUnits(1.0f);
+    image_vector.x = (CardSlotTexture.width * 2.0f) + GameScreen_LocalUnitsToScreen(1.0f);
     image_vector.y = CardSlotTexture.height;
 
     ImageResizeNN(&tempImage, image_vector.x, image_vector.y);
@@ -164,8 +165,8 @@ LoadTextures()
     UnloadImage(tempImage);
 
     tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/Idle.png");
-    image_vector.x = (tempImage.width * 3.0f) + GameScreen_ScreenToLocalUnits(1.0f);
-    image_vector.y = (tempImage.height * 3.0f) + GameScreen_ScreenToLocalUnits(1.0f);
+    image_vector.x = (tempImage.width * 3.0f) + GameScreen_LocalUnitsToScreen(1.0f);
+    image_vector.y = (tempImage.height * 3.0f) + GameScreen_LocalUnitsToScreen(1.0f);
     image_vector = Vector2Scale(image_vector, GameScreen_ScreenUnitScale());
 
     ImageResizeNN(&tempImage, image_vector.x, image_vector.y);
@@ -211,18 +212,18 @@ Render()
         DrawTexture(BlankGreenTableTexture, TableVector2.x, TableVector2.y, WHITE);
         Vector2 leftArea =
         { 
-            .x = CardAreaLeft.x + GameScreen_ScreenToLocalUnits(4.0f),
-            .y = CardAreaLeft.y + GameScreen_ScreenToLocalUnits(5.0f),
+            .x = CardAreaLeft.x + GameScreen_LocalUnitsToScreen(4.0f),
+            .y = CardAreaLeft.y + GameScreen_LocalUnitsToScreen(5.0f),
         };
         Vector2 rightArea =
         {
-            .x = CardAreaRight.x + GameScreen_ScreenToLocalUnits(4.f),
-            .y = CardAreaRight.y + GameScreen_ScreenToLocalUnits(5.f),
+            .x = CardAreaRight.x + GameScreen_LocalUnitsToScreen(4.f),
+            .y = CardAreaRight.y + GameScreen_LocalUnitsToScreen(5.f),
         };
         Vector2 centerArea =
         {
-            .x = CardAreaCenter.x + GameScreen_ScreenToLocalUnits(4.0f),
-            .y = CardAreaCenter.y + GameScreen_ScreenToLocalUnits(5.0f),
+            .x = CardAreaCenter.x + GameScreen_LocalUnitsToScreen(4.0f),
+            .y = CardAreaCenter.y + GameScreen_LocalUnitsToScreen(5.0f),
         };
         DrawHorizontalCardArea(CardSlotTexture, CardAreaLeft, 2, CardSlotTexture.width);
         DrawHorizontalCardArea(CardSlotTexture, CardAreaRight, 2, CardSlotTexture.width);

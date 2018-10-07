@@ -21,7 +21,7 @@ GameScreen_LocalUnitsToScreen(float units)
 }
 
 float
-GameScreen_ScreenToLocalUnits(float size)
+GameScreen_ScreenAreaToLocalUnits(float size)
 {
     return (size * ScreenToLocalUnit);
 }

@@ -60,6 +60,12 @@ void
 LoadTextures();
 
 void
+LoadCardTexture(char *filePath, Texture2D *texture);
+
+void
+LoadCardsTextures(Texture2D CardTextures[52], Texture2D* BackOfCardTexture);
+
+void
 UnloadTextures();
 
 void
@@ -125,23 +131,65 @@ LoadCardTexture(char *filePath, Texture2D *texture)
 }
 
 inline void
-LoadCardsTextures() 
+LoadCardsTextures(Texture2D CardTextures[52], Texture2D* BackOfCardTexture)
 {
     // NOTE: 15x12
-    LoadCardTexture("assets/textures/Cards/BackOfCard/BackOfCard.png", &BackOfCardTexture);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/2Clubs.png", &CardTextures[0]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/3Clubs.png", &CardTextures[1]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/4Clubs.png", &CardTextures[2]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/5Clubs.png", &CardTextures[3]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/6Clubs.png", &CardTextures[4]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/7Clubs.png", &CardTextures[5]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/8Clubs.png", &CardTextures[6]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/9Clubs.png", &CardTextures[7]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/10Clubs.png", &CardTextures[8]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/JackClubs.png", &CardTextures[9]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/QueenClubs.png", &CardTextures[10]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/KingClubs.png", &CardTextures[11]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/AceClubs.png", &CardTextures[12]);
+    LoadCardTexture("assets/textures/Cards/BackOfCard/BackOfCard.png", BackOfCardTexture);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/2Clubs.png", &CardTextures[CardFace_Two * CardSuit_Club]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/3Clubs.png", &CardTextures[CardFace_Three * CardSuit_Club]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/4Clubs.png", &CardTextures[CardFace_Four * CardSuit_Club]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/5Clubs.png", &CardTextures[CardFace_Five * CardSuit_Club]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/6Clubs.png", &CardTextures[CardFace_Six * CardSuit_Club]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/7Clubs.png", &CardTextures[CardFace_Seven * CardSuit_Club]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/8Clubs.png", &CardTextures[CardFace_Eight * CardSuit_Club]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/9Clubs.png", &CardTextures[CardFace_Nine * CardSuit_Club]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/10Clubs.png", &CardTextures[CardFace_Ten * CardSuit_Club]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/JackClubs.png", &CardTextures[CardFace_Jack * CardSuit_Club]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/QueenClubs.png", &CardTextures[CardFace_Queen * CardSuit_Club]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/KingClubs.png", &CardTextures[CardFace_King * CardSuit_Club]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/AceClubs.png", &CardTextures[CardFace_Ace * CardSuit_Club]);
+
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/2Hearts.png", &CardTextures[CardFace_Two * CardSuit_Heart]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/3Hearts.png", &CardTextures[CardFace_Three * CardSuit_Heart]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/4Hearts.png", &CardTextures[CardFace_Four * CardSuit_Heart]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/5Hearts.png", &CardTextures[CardFace_Five * CardSuit_Heart]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/6Hearts.png", &CardTextures[CardFace_Six * CardSuit_Heart]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/7Hearts.png", &CardTextures[CardFace_Seven * CardSuit_Heart]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/8Hearts.png", &CardTextures[CardFace_Eight * CardSuit_Heart]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/9Hearts.png", &CardTextures[CardFace_Nine * CardSuit_Heart]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/10Hearts.png", &CardTextures[CardFace_Ten * CardSuit_Heart]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/JackHearts.png", &CardTextures[CardFace_Jack * CardSuit_Heart]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/QueenHearts.png", &CardTextures[CardFace_Queen * CardSuit_Heart]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/KingHearts.png", &CardTextures[CardFace_King * CardSuit_Heart]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/AceHearts.png", &CardTextures[CardFace_Ace * CardSuit_Heart]);
+    
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/2Dia.png", &CardTextures[CardFace_Two * CardSuit_Diamond]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/3Dia.png", &CardTextures[CardFace_Three * CardSuit_Diamond]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/4Dia.png", &CardTextures[CardFace_Four * CardSuit_Diamond]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/5Dia.png", &CardTextures[CardFace_Five * CardSuit_Diamond]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/6Dia.png", &CardTextures[CardFace_Six * CardSuit_Diamond]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/7Dia.png", &CardTextures[CardFace_Seven * CardSuit_Diamond]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/8Dia.png", &CardTextures[CardFace_Eight * CardSuit_Diamond]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/9Dia.png", &CardTextures[CardFace_Nine * CardSuit_Diamond]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/10Dia.png", &CardTextures[CardFace_Ten * CardSuit_Diamond]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/JackDia.png", &CardTextures[CardFace_Jack * CardSuit_Diamond]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/QueenDia.png", &CardTextures[CardFace_Queen * CardSuit_Diamond]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/KingDia.png", &CardTextures[CardFace_King * CardSuit_Diamond]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/AceDia.png", &CardTextures[CardFace_Ace * CardSuit_Diamond]);
+
+    LoadCardTexture("assets/textures/Cards/Spades/Pngs/2Spades.png", &CardTextures[CardFace_Two * CardSuit_Spade]);
+    LoadCardTexture("assets/textures/Cards/Spades/Pngs/3Spades.png", &CardTextures[CardFace_Three * CardSuit_Spade]);
+    LoadCardTexture("assets/textures/Cards/Spades/Pngs/4Spades.png", &CardTextures[CardFace_Four * CardSuit_Spade]);
+    LoadCardTexture("assets/textures/Cards/Spades/Pngs/5Spades.png", &CardTextures[CardFace_Five * CardSuit_Spade]);
+    LoadCardTexture("assets/textures/Cards/Spades/Pngs/6Spades.png", &CardTextures[CardFace_Six * CardSuit_Spade]);
+    LoadCardTexture("assets/textures/Cards/Spades/Pngs/7Spades.png", &CardTextures[CardFace_Seven * CardSuit_Spade]);
+    LoadCardTexture("assets/textures/Cards/Spades/Pngs/8Spades.png", &CardTextures[CardFace_Eight * CardSuit_Spade]);
+    LoadCardTexture("assets/textures/Cards/Spades/Pngs/9Spades.png", &CardTextures[CardFace_Nine * CardSuit_Spade]);
+    LoadCardTexture("assets/textures/Cards/Spades/Pngs/10Spades.png", &CardTextures[CardFace_Ten * CardSuit_Spade]);
+    LoadCardTexture("assets/textures/Cards/Spades/Pngs/JackSpades.png", &CardTextures[CardFace_Jack * CardSuit_Spade]);
+    LoadCardTexture("assets/textures/Cards/Spades/Pngs/QueenSpades.png", &CardTextures[CardFace_Queen * CardSuit_Spade]);
+    LoadCardTexture("assets/textures/Cards/Spades/Pngs/KingSpades.png", &CardTextures[CardFace_King * CardSuit_Spade]);
+    LoadCardTexture("assets/textures/Cards/Spades/Pngs/AceSpades.png", &CardTextures[CardFace_Ace * CardSuit_Spade]);
 }
 
 void
@@ -215,7 +263,7 @@ LoadTextures()
         //.frameOrder             = SpritesheetPosition.Horizontal | SpritesheetPosition.Vertical,
     };
 
-    LoadCardsTextures();
+    LoadCardsTextures(CardTextures, &BackOfCardTexture);
 }
 
 void
@@ -276,8 +324,7 @@ Render(Poker_Game* game_state)
 
             if (game_state->player_hand[i].state == CardState_Shown)
             {
-                // TODO: Face cards.
-                DrawTexture(BackOfCardTexture, leftArea.x + shift, leftArea.y, WHITE);
+                DrawTexture(CardTextures[game_state->player_hand[i].face_value * game_state->player_hand[i].suit], leftArea.x + shift, leftArea.y, WHITE);
             }
 
             if (game_state->dealer_hand[i].state == CardState_Hidden)
@@ -287,8 +334,7 @@ Render(Poker_Game* game_state)
 
             if (game_state->dealer_hand[i].state == CardState_Shown)
             {
-                // TODO: Face cards.
-                DrawTexture(BackOfCardTexture, rightArea.x + shift, rightArea.y, WHITE);
+                DrawTexture(CardTextures[game_state->dealer_hand[i].face_value * game_state->dealer_hand[i].suit], leftArea.x + shift, leftArea.y, WHITE);
             }
         }
 
@@ -302,8 +348,7 @@ Render(Poker_Game* game_state)
 
             if (game_state->house_hand[i].state == CardState_Shown)
             {
-                // TODO: Face cards.
-                DrawTexture(BackOfCardTexture, centerArea.x + shift, centerArea.y, WHITE);
+                DrawTexture(CardTextures[game_state->house_hand[i].face_value * game_state->house_hand[i].suit], leftArea.x + shift, leftArea.y, WHITE);
             }
         }
 

@@ -36,7 +36,6 @@ global_variable Texture2D CardSlotTexture;
 global_variable Texture2D BackOfCardTexture;
 global_variable Texture2D ScoreFrameTexture;
 
-// TODO(nick): Load face cards
 global_variable Texture2D CardTextures[52];
 
 global_variable Vector2 RedCurtainVector2;
@@ -99,6 +98,44 @@ main(void)
     return 0;
 }
 
+inline void
+LoadCardTexture(char *filePath, Texture2D *texture) 
+{
+    float cardScale = 2.0f;
+    float vectorScale = 2.5f;
+    Vector2 image_vector =
+    { 
+        .x = 0.0f,
+        .y = 0.0f,
+    };
+    Image tempImage = LoadImage(filePath);
+    image_vector.x = tempImage.width * cardScale;
+    image_vector.y = tempImage.height * cardScale;
+    image_vector = Vector2Scale(image_vector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(&tempImage, image_vector.x, image_vector.y);
+    *texture = LoadTextureFromImage(tempImage);
+    UnloadImage(tempImage);
+}
+
+inline void
+LoadCardsTextures() 
+{
+    LoadCardTexture("assets/textures/Cards/BackOfCard/BackOfCard.png", &BackOfCardTexture);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/2Clubs.png", &CardTextures[0]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/3Clubs.png", &CardTextures[1]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/4Clubs.png", &CardTextures[2]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/5Clubs.png", &CardTextures[3]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/6Clubs.png", &CardTextures[4]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/7Clubs.png", &CardTextures[5]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/8Clubs.png", &CardTextures[6]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/9Clubs.png", &CardTextures[7]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/10Clubs.png", &CardTextures[8]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/JackClubs.png", &CardTextures[9]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/QueenClubs.png", &CardTextures[10]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/KingClubs.png", &CardTextures[11]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/AceClubs.png", &CardTextures[12]);
+}
+
 void
 LoadTextures()
 {
@@ -145,15 +182,7 @@ LoadTextures()
     CardAreaCenter.x = (CardAreaLeft.x + 2.0f * CardSlotTexture.width) + center_padding;
     CardAreaCenter.y = CardAreaLeft.y + CardSlotTexture.height - GameScreen_ScreenToLocalUnits(3.0f);
 
-    tempImage = LoadImage("assets/textures/Cards/BackOfCard/BackOfCard.png");
-
-    image_vector.x = tempImage.width * 2.0f;
-    image_vector.y = tempImage.height * 2.0f;
-    image_vector = Vector2Scale(image_vector, GameScreen_ScreenUnitScale());
-
-    ImageResizeNN(&tempImage, image_vector.x, image_vector.y);
-    BackOfCardTexture = LoadTextureFromImage(tempImage);
-    UnloadImage(tempImage);
+    
 
     tempImage = LoadImage("assets/textures/Background/BrassPlate.png");
     image_vector.x = (CardSlotTexture.width * 2.0f) + GameScreen_ScreenToLocalUnits(1.0f);
@@ -179,6 +208,8 @@ LoadTextures()
         .frameSpeed             = 2,
         //.frameOrder             = SpritesheetPosition.Horizontal | SpritesheetPosition.Vertical,
     };
+
+    LoadCardsTextures();
 }
 
 void

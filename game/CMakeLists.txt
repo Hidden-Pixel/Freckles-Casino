@@ -48,5 +48,5 @@ add_custom_command(
         ${CMAKE_CURRENT_SOURCE_DIR}/assets
         ${CMAKE_CURRENT_BINARY_DIR}/assets)
 
-target_sources(Freckles_Casino PRIVATE src/main.c src/game-screen.c src/poker.c)
+target_sources(Freckles_Casino PRIVATE src/main.c src/game-screen.c src/poker.c src/sprite-animation.c)
 target_include_directories(Freckles_Casino PUBLIC src/include)

@@ -39,6 +39,7 @@ global_variable Texture2D BackOfCardTexture;
 global_variable Texture2D ScoreFrameTexture;
 
 global_variable Texture2D CardTextures[CardSuit_Count * CardFace_Count];
+global_variable SpriteAnimation HighCardSpriteAnimation;
 
 global_variable Vector2 RedCurtainVector2;
 global_variable Vector2 CardAreaLeft;
@@ -140,10 +141,11 @@ LoadCardsTextures()
     LoadCardTexture("assets/textures/Cards/Hearts/Pngs/8Hearts.png", &CardTextures[6]);
     LoadCardTexture("assets/textures/Cards/Hearts/Pngs/9Hearts.png", &CardTextures[7]);
     LoadCardTexture("assets/textures/Cards/Hearts/Pngs/10Hearts.png", &CardTextures[8]);
-    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/JackHearts.png", &CardTextures[9]);
-    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/QueenHearts.png", &CardTextures[10]);
-    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/KingHearts.png", &CardTextures[11]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Spritesheets/JackHearts.png", &CardTextures[9]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Spritesheets/QueenHearts.png", &CardTextures[10]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Spritesheets/KingHearts.png", &CardTextures[11]);
     LoadCardTexture("assets/textures/Cards/Hearts/Pngs/AceHearts.png", &CardTextures[12]);
+
 
     // Clubs
     LoadCardTexture("assets/textures/Cards/Clubs/Pngs/2Clubs.png", &CardTextures[13]);
@@ -155,9 +157,9 @@ LoadCardsTextures()
     LoadCardTexture("assets/textures/Cards/Clubs/Pngs/8Clubs.png", &CardTextures[19]);
     LoadCardTexture("assets/textures/Cards/Clubs/Pngs/9Clubs.png", &CardTextures[20]);
     LoadCardTexture("assets/textures/Cards/Clubs/Pngs/10Clubs.png", &CardTextures[21]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/JackClubs.png", &CardTextures[22]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/QueenClubs.png", &CardTextures[23]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/KingClubs.png", &CardTextures[24]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Spritesheets/JackClubs.png", &CardTextures[22]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Spritesheets/QueenClubs.png", &CardTextures[23]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Spritesheets/KingClubs.png", &CardTextures[24]);
     LoadCardTexture("assets/textures/Cards/Clubs/Pngs/AceClubs.png", &CardTextures[25]);
 
     //Diamonds
@@ -170,9 +172,9 @@ LoadCardsTextures()
     LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/8Dia.png", &CardTextures[32]);
     LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/9Dia.png", &CardTextures[33]);
     LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/10Dia.png", &CardTextures[34]);
-    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/JackDia.png", &CardTextures[35]);
-    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/QueenDia.png", &CardTextures[36]);
-    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/KingDia.png", &CardTextures[37]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Spritesheets/JackDia.png", &CardTextures[35]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Spritesheets/QueenDia.png", &CardTextures[36]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Spritesheets/KingDia.png", &CardTextures[37]);
     LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/AceDia.png", &CardTextures[38]);
 
     // Spades
@@ -185,10 +187,18 @@ LoadCardsTextures()
     LoadCardTexture("assets/textures/Cards/Spades/Pngs/8Spades.png", &CardTextures[45]);
     LoadCardTexture("assets/textures/Cards/Spades/Pngs/9Spades.png", &CardTextures[46]);
     LoadCardTexture("assets/textures/Cards/Spades/Pngs/10Spades.png", &CardTextures[47]);
-    LoadCardTexture("assets/textures/Cards/Spades/Pngs/JackSpades.png", &CardTextures[48]);
-    LoadCardTexture("assets/textures/Cards/Spades/Pngs/QueenSpades.png", &CardTextures[49]);
-    LoadCardTexture("assets/textures/Cards/Spades/Pngs/KingSpades.png", &CardTextures[50]);
+    LoadCardTexture("assets/textures/Cards/Spades/Spritesheets/JackSpades.png", &CardTextures[48]);
+    LoadCardTexture("assets/textures/Cards/Spades/Spritesheets/QueenSpades.png", &CardTextures[49]);
+    LoadCardTexture("assets/textures/Cards/Spades/Spritesheets/KingSpades.png", &CardTextures[50]);
     LoadCardTexture("assets/textures/Cards/Spades/Pngs/AceSpades.png", &CardTextures[51]);
+
+    HighCardSpriteAnimation = (SpriteAnimation)
+    {
+        .totalFrames            = 12,
+        .totalVerticalFrames    = 4,
+        .totalHorizontalFrames  = 4,
+        .frameSpeed             = 2,
+    };
 }
 
 void
@@ -313,15 +323,15 @@ Render(Poker_Game* game_state)
         DrawHorizontalCardArea(CardSlotTexture, CardAreaCenter, 5, CardSlotTexture.width);
 
         // NOTE: A tiny optimization would be parallel arrays for cards and textures.
-        for (int i = 0; i < 2; ++i) {
+        for (int i = 0; i < 2; ++i)
+        {
             float shift = CardSlotTexture.width * i;
 
             if (game_state->player_hand[i].state == CardState_Hidden)
             {
                 DrawTexture(BackOfCardTexture, leftArea.x + shift, leftArea.y, WHITE);
             }
-
-            if (game_state->player_hand[i].state == CardState_Shown)
+            else if (game_state->player_hand[i].state == CardState_Shown)
             {
                 DrawFaceCard(game_state->player_hand[i], leftArea.x + shift, leftArea.y);
             }
@@ -330,22 +340,21 @@ Render(Poker_Game* game_state)
             {
                 DrawTexture(BackOfCardTexture, rightArea.x + shift, rightArea.y, WHITE);
             }
-
-            if (game_state->dealer_hand[i].state == CardState_Shown)
+            else if (game_state->dealer_hand[i].state == CardState_Shown)
             {
                 DrawFaceCard(game_state->dealer_hand[i], rightArea.x + shift, rightArea.y);
             }
         }
 
-        for (int i = 0; i < 5; ++i) {
+        for (int i = 0; i < 5; ++i)
+        {
             float shift = CardSlotTexture.width * i;
 
             if (game_state->house_hand[i].state == CardState_Hidden)
             {
                 DrawTexture(BackOfCardTexture, centerArea.x + shift, centerArea.y, WHITE);
             }
-
-            if (game_state->house_hand[i].state == CardState_Shown)
+            else if (game_state->house_hand[i].state == CardState_Shown)
             {
                 DrawFaceCard(game_state->house_hand[i], centerArea.x + shift, centerArea.y);
             }
@@ -457,7 +466,6 @@ DrawFaceCard(Poker_Card card, int x, int y)
         case CardSuit_Club:
         {
             cardIndex = 13;
-            
         } break;
 
         case CardSuit_Diamond:
@@ -474,5 +482,18 @@ DrawFaceCard(Poker_Card card, int x, int y)
     {
         cardIndex += (card.face_value - 2);
     }
-    DrawTexture(CardTextures[cardIndex], x, y, WHITE);
+    if (card.face_value > CardFace_Ten && card.face_value != CardFace_Ace)
+    {
+        // TODO(nick): if it is a high face card then draw animation.
+        Vector2 position = 
+        {
+            .x = x,
+            .y = y,
+        };
+        DrawAnimationFrame(&CardTextures[cardIndex], &HighCardSpriteAnimation, &position, GlobalTargetFPS);
+    }
+    else
+    {
+        DrawTexture(CardTextures[cardIndex], x, y, WHITE);
+    }
 }

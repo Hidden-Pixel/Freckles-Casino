@@ -61,6 +61,12 @@ void
 LoadTextures();
 
 void
+LoadCardTexture(char *filePath, Texture2D *texture);
+
+void
+LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture);
+
+void
 UnloadTextures();
 
 void
@@ -126,10 +132,10 @@ LoadCardTexture(char *filePath, Texture2D *texture)
 }
 
 inline void
-LoadCardsTextures() 
+LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
 {
     // NOTE: 15x12
-    LoadCardTexture("assets/textures/Cards/BackOfCard/BackOfCard.png", &BackOfCardTexture);
+    LoadCardTexture("assets/textures/Cards/BackOfCard/BackOfCard.png", BackOfCardTexture);
 
     // Hearts
     LoadCardTexture("assets/textures/Cards/Hearts/Pngs/2Hearts.png", &CardTextures[0]);
@@ -272,7 +278,7 @@ LoadTextures()
         //.frameOrder             = SpritesheetPosition.Horizontal | SpritesheetPosition.Vertical,
     };
 
-    LoadCardsTextures();
+    LoadCardsTextures(CardTextures, &BackOfCardTexture);
 }
 
 void

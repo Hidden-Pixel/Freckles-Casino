@@ -295,9 +295,17 @@ UnloadTextures()
 void
 ProcessInput(Poker_Game* game_state)
 {
-    if (IsKeyDown(KEY_SPACE))
+    static bool confirmPressed = false;
+
+    if (IsKeyDown(KEY_SPACE) && confirmPressed == false)
     {
+        confirmPressed = true;
         HandleConfirmButtonPress(game_state);
+    }
+    
+    if (IsKeyUp(KEY_SPACE) && confirmPressed == true)
+    {
+        confirmPressed = false;
     }
 }
 

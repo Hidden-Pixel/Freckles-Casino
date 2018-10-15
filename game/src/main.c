@@ -7,6 +7,7 @@
 #include <FC/sprite-animation.h>
 #include <FC/poker.h>
 #include <FC/defines.h>
+#include <FC/scene.h>
 
 #include <stdio.h>
 
@@ -25,8 +26,8 @@
 #define GAME_WIDTH 426
 #define GAME_HEIGHT 240
 
-global_variable int GlobalWindowWidth   = WIDTH;
-global_variable int GlobalWindowHeight  = HEIGHT;
+global_variable int GlobalWindowWidth = WIDTH;
+global_variable int GlobalWindowHeight = HEIGHT;
 global_variable const char *GlobalWindowTitle = "Mr. FC Casino";
 global_variable unsigned char GlobalRunning = 1;
 global_variable int GlobalFrameCount = 0;
@@ -37,6 +38,9 @@ global_variable Texture2D RedCurtainTexture;
 global_variable Texture2D CardSlotTexture;
 global_variable Texture2D BackOfCardTexture;
 global_variable Texture2D ScoreFrameTexture;
+
+global_variable Texture2D TitleScreen;
+global_variable SpriteAnimation TitleScreenAnimation;
 
 global_variable Texture2D CardTextures[CardSuit_Count * CardFace_Count];
 global_variable SpriteAnimation HighCardSpriteAnimation;
@@ -81,6 +85,9 @@ DrawHorizontalCardArea(Texture2D texture, Vector2 area, int card_count, float x_
 void
 HandleConfirmButtonPress(Poker_Game* game_state);
 
+void
+RenderScene(Poker_Game* game_state, unsigned int scene);
+
 int
 main(void)
 {
@@ -98,7 +105,7 @@ main(void)
         while (GlobalRunning)
         {
             ProcessInput(&game_state);
-            Render(&game_state);
+            RenderScene(&game_state, Scene_TitleScreen);
             if (WindowShouldClose())
             {
                 GlobalRunning = 0;
@@ -152,7 +159,6 @@ LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
     LoadCardTexture("assets/textures/Cards/Hearts/Spritesheets/KingHearts.png", &CardTextures[11]);
     LoadCardTexture("assets/textures/Cards/Hearts/Pngs/AceHearts.png", &CardTextures[12]);
 
-
     // Clubs
     LoadCardTexture("assets/textures/Cards/Clubs/Pngs/2Clubs.png", &CardTextures[13]);
     LoadCardTexture("assets/textures/Cards/Clubs/Pngs/3Clubs.png", &CardTextures[14]);
@@ -200,6 +206,8 @@ LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
 
     HighCardSpriteAnimation = (SpriteAnimation)
     {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
         .totalFrames            = 12,
         .totalVerticalFrames    = 4,
         .totalHorizontalFrames  = 4,
@@ -230,7 +238,6 @@ LoadTextures()
     RedCurtainVector2.x = 0;
     RedCurtainVector2.x = 0;
 
-
     // NOTE: load CardSlot texture 15x20
     tempImage = LoadImage("assets/textures/Background/CardSlot.png");
     Vector2 image_vector = { tempImage.width * 2.5f, tempImage.height * 2.5f };
@@ -240,7 +247,6 @@ LoadTextures()
     UnloadImage(tempImage);
     CardAreaRight.x = GlobalWindowWidth - GameScreen_LocalUnitsToScreen(15.0f) - 2.0f * CardSlotTexture.width;
     CardAreaRight.y = CardAreaLeft.y;
-
 
     // Distance formula for space between the two areas.
     float center_space = CardAreaRight.x - (CardAreaLeft.x + 2.0f * CardSlotTexture.width);
@@ -271,14 +277,33 @@ LoadTextures()
     UnloadImage(tempImage);
     MrFrecklesSpriteAnimation[0] = (SpriteAnimation)
     {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
         .totalFrames            = 4,
         .totalVerticalFrames    = 2,
         .totalHorizontalFrames  = 2,
         .frameSpeed             = 2,
-        //.frameOrder             = SpritesheetPosition.Horizontal | SpritesheetPosition.Vertical,
     };
 
     LoadCardsTextures(CardTextures, &BackOfCardTexture);
+
+    // NOTE: load title scene
+    tempImage = LoadImage("assets/textures/Titlescreen/Spritesheets/Titlescreen.png");
+    //image_vector.x = (tempImage.width) + GameScreen_ScreenUnitScale(1.0f);
+    //image_vector.y = (tempImage.height * 0.5f) + GameScreen_ScreenUnitScale(1.0f);
+    //image_vector = Vector2Scale(image_vector, GameScreen_ScreenUnitScale());
+    //ImageResizeNN(&tempImage, image_vector.x, image_vector.y);
+    TitleScreen = LoadTextureFromImage(tempImage);
+    UnloadImage(tempImage);
+    TitleScreenAnimation = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 70,
+        .totalVerticalFrames    = 10,
+        .totalHorizontalFrames  = 7,
+        .frameSpeed             = 2,
+    };
 }
 
 void
@@ -310,7 +335,23 @@ ProcessInput(Poker_Game* game_state)
 }
 
 void
-Render(Poker_Game* game_state)
+RenderTitleScreen()
+{
+    BeginDrawing();
+    {
+        ClearBackground(BLACK);
+        Vector2 testPosition = 
+        {
+            .x = 0,
+            .y = 0,
+        };
+        DrawAnimationFrame(&TitleScreen, &TitleScreenAnimation, &testPosition, GlobalTargetFPS);
+    }
+    EndDrawing();
+}
+
+void
+RenderGame(Poker_Game* game_state)
 {
     BeginDrawing();
     {
@@ -387,6 +428,23 @@ Render(Poker_Game* game_state)
 
     EndDrawing();
     GlobalFrameCount++;
+}
+
+void
+RenderScene(Poker_Game* game_state, unsigned int scene)
+{
+    switch (scene)
+    {
+        case Scene_MainPokerTable:
+        {
+            RenderGame(game_state);
+        } break;
+
+        default:
+        {
+            RenderTitleScreen();
+        } break;
+    }
 }
 
 void

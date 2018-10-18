@@ -455,6 +455,8 @@ HandleConfirmButtonPress(Poker_Game* game_state)
         default:
             break;
     }
+
+    Poker_ProcessNewState(game_state);
 }
 
 void

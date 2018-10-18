@@ -58,3 +58,22 @@ Poker_StartNewRound(Poker_Game* game_state)
         game_state->house_hand[i].state = CardState_Hidden;
     }
 }
+
+void
+Poker_ProcessNewState(Poker_Game* game_state) {
+    switch (game_state->poker_state) {
+        case PokerState_PlayerCardsDealt:
+        case PokerState_FlopCardsDealt:
+        case PokerState_RiverCardsDealt:
+        case PokerState_TurnCardsDealt:
+            // TODO: Process hand type
+            break;
+        default:
+            break;
+    }
+}
+
+void
+Poker_Update(Poker_Game* game_state) {
+
+}

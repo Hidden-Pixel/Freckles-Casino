@@ -44,6 +44,18 @@ typedef enum {
     PokerState_Count
 } Poker_GameState;
 
+typedef enum {
+    HighCard = 0,
+    Pair,
+    TwoPair,
+    ThreeOfAKind,
+    Straight,
+    Flush,
+    FullHouse,
+    FourOfAKind,
+    StraightFlush
+} Poker_Hand;
+
 typedef struct {
     Poker_CardSuit suit;
     Poker_CardFace face_value;
@@ -55,6 +67,8 @@ typedef struct {
     Poker_Card player_hand[2];
     Poker_Card dealer_hand[2];
     Poker_Card house_hand[5];
+    Poker_Hand player_hand_type;
+    Poker_Hand dealer_hand_type;
     int chances_left;
     int player_score;
     int dealer_score;
@@ -68,5 +82,11 @@ Poker_DrawOne(Poker_CardState state);
 
 void
 Poker_StartNewRound(Poker_Game* game_state);
+
+void
+Poker_ProcessNewState(Poker_Game* game_state);
+
+void
+Poker_Update(Poker_Game* game_state);
 
 

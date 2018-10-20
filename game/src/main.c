@@ -332,7 +332,7 @@ SetPositions()
 
     // NOTE: calculate one frame size and get one-half of one frame size
     int xOffset = (MrFrecklesSpritesheets[0].width / MrFrecklesSpriteAnimation[0].totalHorizontalFrames) * 0.5f;
-    int yOffset = (MrFrecklesSpritesheets[0].height / MrFrecklesSpriteAnimation[0].totalVerticalFrames) * 0.6f;
+    int yOffset = (MrFrecklesSpritesheets[0].height / MrFrecklesSpriteAnimation[0].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(35.0f);
 	MrFrecklesPosition[0].x = TableAreaCenter.x - xOffset;
     MrFrecklesPosition[0].y = TableAreaCenter.y - yOffset;
 }

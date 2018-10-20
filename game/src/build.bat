@@ -11,6 +11,5 @@ IF NOT EXIST .\assets mkdir .\assets
 XCOPY /S /I /Y /Q ..\..\assets .\assets
 
 COPY /Y ..\..\src\libs\win32\msvc\OpenAL32.dll .\
-XCOPY /S /I /Y /Q ..\..\src\libs\win32\msvc\vc .\
 
 PUSHD ..\..\src

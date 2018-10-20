@@ -54,10 +54,17 @@ global_variable Vector2 TableVector2;
 global_variable Vector2 TableAreaCenter;
 global_variable Vector2 ChancesBillboardArea;
 
+global_variable unsigned int CurrentCharacterId = MrFreckles;
+
 global_variable Texture2D MrFrecklesSpritesheets[5];
 global_variable SpriteAnimation MrFrecklesSpriteAnimation[5];
 global_variable Vector2 MrFrecklesPosition[5];
 global_variable unsigned int MrFrecklesActiveState = MrFrecklesIdle;
+
+global_variable Texture2D MrsFrecklesSpritesheets[4];
+global_variable SpriteAnimation MrsFrecklesSpriteAnimation[4];
+global_variable Vector2 MrsFrecklesPosition[4];
+global_variable unsigned int MrsFrecklesActiveState = MrsFrecklesIdle;
 
 global_variable bool GameStarted = false;
 
@@ -91,6 +98,15 @@ HandleConfirmButtonPress(Poker_Game* game_state);
 
 void
 RenderScene(Poker_Game* game_state, unsigned int scene);
+
+void
+RenderTitleScreen();
+
+void
+RenderGame(Poker_Game* game_state);
+
+void
+DrawFaceCard(Poker_Card card, int x, int y);
 
 int
 main(void)
@@ -265,6 +281,7 @@ LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
 inline
 LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
 {
+    // NOTE: Mr. Freckles Spritesheets Begin
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/Idle.png");
     imageVector->x = tempImage->width;
     imageVector->y = tempImage->height;
@@ -275,7 +292,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     MrFrecklesSpritesheets[MrFrecklesIdle] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrFrecklesSpriteAnimation[0] = (SpriteAnimation)
+    MrFrecklesSpriteAnimation[MrFrecklesIdle] = (SpriteAnimation)
     {
         .currentDrawFrameIndex  = 0,
         .frameCounter           = 0,
@@ -364,6 +381,29 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
         .totalHorizontalFrames  = 2,
         .frameSpeed             = 2,
     };
+    // NOTE: Mr. Freckles Spritesheets End
+    
+    // NOTE: Mrs. Freckles Spritesheets Begin
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrsFreckles/Idle.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    MrsFrecklesSpritesheets[MrsFrecklesIdle] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    MrsFrecklesSpriteAnimation[MrsFrecklesIdle] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 14,
+        .totalVerticalFrames    = 4,
+        .totalHorizontalFrames  = 4,
+        .frameSpeed             = 2,
+    };
+    // NOTE: Mrs. Freckles Spritesheets End
 }
 
 inline
@@ -456,8 +496,10 @@ UnloadTextures()
     UnloadTexture(CardSlotTexture);
     UnloadTexture(BackOfCardTexture);
     UnloadTexture(ScoreFrameTexture);
-    // TODO(nick): replace with for loop jkk...
-    UnloadTexture(MrFrecklesSpritesheets[0]);
+    for (int i = 0; i < len(MrFrecklesSpritesheets); i++)
+    {
+        UnloadTexture(MrFrecklesSpritesheets[i]);
+    }
 }
 
 void
@@ -480,6 +522,25 @@ ProcessInput(Poker_Game* game_state)
     }
 
     if (IsKeyUp(KEY_UP) && confirmPressed == true)
+    {
+        confirmPressed = false;
+    }
+
+    // TODO(nick): clean this up - just testing code
+    if (IsKeyPressed(KEY_RIGHT) && confirmPressed == false)
+    {
+        if (CurrentCharacterId >= MrsFreckles)
+        {
+            CurrentCharacterId = MrFreckles;
+        }
+        else
+        {
+            CurrentCharacterId++;
+        }
+        confirmPressed = true;
+    }
+
+    if (IsKeyUp(KEY_RIGHT) && confirmPressed == true)
     {
         confirmPressed = false;
     }
@@ -579,7 +640,29 @@ RenderGame(Poker_Game* game_state)
 
         DrawTexture(ScoreFrameTexture, CardAreaLeft.x, CardAreaLeft.y + CardSlotTexture.height, WHITE);
         DrawTexture(ScoreFrameTexture, CardAreaRight.x, CardAreaLeft.y + CardSlotTexture.height, WHITE);
-        DrawAnimationFrame(&MrFrecklesSpritesheets[MrFrecklesActiveState], &MrFrecklesSpriteAnimation[MrFrecklesActiveState], &MrFrecklesPosition[MrFrecklesActiveState], GlobalTargetFPS);
+
+    
+        Texture2D *currentCharacterSpritesheet = NULL;
+        SpriteAnimation *currentCharacterAnimation = NULL;
+        Vector2 *currentCharacterSpritePosition = NULL;
+
+        switch (CurrentCharacterId)
+        {
+            case MrFreckles:
+            {
+                currentCharacterSpritesheet = &MrFrecklesSpritesheets[MrFrecklesActiveState];
+                currentCharacterAnimation = &MrFrecklesSpriteAnimation[MrFrecklesActiveState];
+                currentCharacterSpritePosition = &MrFrecklesPosition[MrFrecklesActiveState];
+            } break;
+
+            case MrsFreckles:
+            {
+                currentCharacterSpritesheet = &MrsFrecklesSpritesheets[MrsFrecklesActiveState];
+                currentCharacterAnimation = &MrsFrecklesSpriteAnimation[MrsFrecklesActiveState];
+                currentCharacterSpritePosition = &MrsFrecklesPosition[MrsFrecklesActiveState];
+            } break;
+        }
+        DrawAnimationFrame(currentCharacterSpritesheet, currentCharacterAnimation, currentCharacterSpritePosition, GlobalTargetFPS);
     }
 
     EndDrawing();

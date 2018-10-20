@@ -34,10 +34,15 @@ DrawAnimationFrame(Texture2D *spritesheet, SpriteAnimation *spriteAnimation, Vec
         .x = 0,
         .y = 0,
     };
-    int verticalOffset = (spriteAnimation->currentDrawFrameIndex / spriteAnimation->totalVerticalFrames);
-    spriteFramePosition.y = (verticalOffset * (spritesheet->height / spriteAnimation->totalVerticalFrames));
-    int horizontalOffset = ((spriteAnimation->currentDrawFrameIndex % spriteAnimation->totalHorizontalFrames));
+
+    int verticalOffset = 0;
+    int horizontalOffset = 0;
+    verticalOffset = (spriteAnimation->currentDrawFrameIndex / spriteAnimation->totalHorizontalFrames);
+    horizontalOffset = (spriteAnimation->currentDrawFrameIndex % spriteAnimation->totalHorizontalFrames);
+
     spriteFramePosition.x = (horizontalOffset * (spritesheet->width / spriteAnimation->totalHorizontalFrames));
+    spriteFramePosition.y = (verticalOffset * (spritesheet->height / spriteAnimation->totalVerticalFrames));
+    
     spriteAnimation->currentFrameRect = (Rectangle)
     {
         .x = spriteFramePosition.x,
@@ -45,6 +50,7 @@ DrawAnimationFrame(Texture2D *spritesheet, SpriteAnimation *spriteAnimation, Vec
         .width = (spritesheet->width / spriteAnimation->totalHorizontalFrames),
         .height = (spritesheet->height / spriteAnimation->totalVerticalFrames),
     };
+
     DrawTextureRec(*spritesheet, spriteAnimation->currentFrameRect, *spritePosition, WHITE);
     spriteAnimation->frameCounter++;
 }

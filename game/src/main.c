@@ -302,7 +302,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
         .totalFrames            = 7,
         .totalVerticalFrames    = 4,
         .totalHorizontalFrames  = 2,
-        .frameSpeed             = 10,
+        .frameSpeed             = 15,
     };
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/TalkNormal.png");
@@ -340,9 +340,9 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
         .currentDrawFrameIndex  = 0,
         .frameCounter           = 0,
         .totalFrames            = 6,
-        .totalVerticalFrames    = 3,
+        .totalVerticalFrames    = 2,
         .totalHorizontalFrames  = 3,
-        .frameSpeed             = 2,
+        .frameSpeed             = 10,
     };
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/FrecklesWins.png");
@@ -415,11 +415,16 @@ SetPositions()
     CardAreaCenter.x = (CardAreaLeft.x + 2.0f * CardSlotTexture.width) + center_padding;
     CardAreaCenter.y = CardAreaLeft.y + CardSlotTexture.height - GameScreen_LocalUnitsToScreen(3.0f);
 
-    // NOTE: calculate one frame size and get one-half of one frame size
-    int xOffset = (MrFrecklesSpritesheets[MrFrecklesIdle].width / MrFrecklesSpriteAnimation[MrFrecklesIdle].totalHorizontalFrames) * 0.5f;
-    int yOffset = (MrFrecklesSpritesheets[MrFrecklesIdle].height / MrFrecklesSpriteAnimation[MrFrecklesIdle].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(35.0f);
-	MrFrecklesPosition[0].x = TableAreaCenter.x - xOffset;
-    MrFrecklesPosition[0].y = TableAreaCenter.y - yOffset;
+    int xOffset = 0;
+    int yOffset = 0;
+    for (unsigned int currentState = MrFrecklesIdle; currentState < len(MrFrecklesPosition); currentState++)
+    {
+        // NOTE: calculate one frame size and get one-half of one frame size
+        xOffset = (MrFrecklesSpritesheets[currentState].width / MrFrecklesSpriteAnimation[currentState].totalHorizontalFrames) * 0.5f;
+        yOffset = (MrFrecklesSpritesheets[currentState].height / MrFrecklesSpriteAnimation[currentState].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(35.0f);
+        MrFrecklesPosition[currentState].x = TableAreaCenter.x - xOffset;
+        MrFrecklesPosition[currentState].y = TableAreaCenter.y - yOffset;
+    }
 }
 
 void

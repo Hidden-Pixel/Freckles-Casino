@@ -8,6 +8,7 @@
 #include <FC/poker.h>
 #include <FC/defines.h>
 #include <FC/scene.h>
+#include <FC/character-state.h>
 
 #include <stdio.h>
 
@@ -56,6 +57,7 @@ global_variable Vector2 ChancesBillboardArea;
 global_variable Texture2D MrFrecklesSpritesheets[5];
 global_variable SpriteAnimation MrFrecklesSpriteAnimation[5];
 global_variable Vector2 MrFrecklesPosition[5];
+global_variable unsigned int MrFrecklesActiveState = MrFrecklesIdle;
 
 global_variable bool GameStarted = false;
 
@@ -93,7 +95,7 @@ RenderScene(Poker_Game* game_state, unsigned int scene);
 int
 main(void)
 {
-    local_variable Poker_Game game_state;
+    local_persist Poker_Game game_state;
 
     GameScreen_Init(GlobalWindowWidth, GlobalWindowHeight, GAME_WIDTH, GAME_HEIGHT);
     Poker_Init(&game_state);
@@ -264,13 +266,96 @@ inline
 LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
 {
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/Idle.png");
-    imageVector->x = (tempImage->width * 3.0f) + GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y = (tempImage->height * 3.0f) + GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    MrFrecklesSpritesheets[0] = LoadTextureFromImage(*tempImage);
+    MrFrecklesSpritesheets[MrFrecklesIdle] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
     MrFrecklesSpriteAnimation[0] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 4,
+        .totalVerticalFrames    = 2,
+        .totalHorizontalFrames  = 2,
+        .frameSpeed             = 2,
+    };
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/Deals.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    MrFrecklesSpritesheets[MrFrecklesDealing] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    MrFrecklesSpriteAnimation[MrFrecklesDealing] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 7,
+        .totalVerticalFrames    = 4,
+        .totalHorizontalFrames  = 2,
+        .frameSpeed             = 10,
+    };
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/TalkNormal.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    MrFrecklesSpritesheets[MrFrecklesTalkingNormal] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    MrFrecklesSpriteAnimation[MrFrecklesTalkingNormal] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 8,
+        .totalVerticalFrames    = 3,
+        .totalHorizontalFrames  = 3,
+        .frameSpeed             = 10,
+    };
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/TalkAngry.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    MrFrecklesSpritesheets[MrFrecklesTalkingAngry] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    MrFrecklesSpriteAnimation[MrFrecklesTalkingAngry] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 6,
+        .totalVerticalFrames    = 3,
+        .totalHorizontalFrames  = 3,
+        .frameSpeed             = 2,
+    };
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/FrecklesWins.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    MrFrecklesSpritesheets[MrFrecklesWinning] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    MrFrecklesSpriteAnimation[MrFrecklesWinning] = (SpriteAnimation)
     {
         .currentDrawFrameIndex  = 0,
         .frameCounter           = 0,
@@ -331,8 +416,8 @@ SetPositions()
     CardAreaCenter.y = CardAreaLeft.y + CardSlotTexture.height - GameScreen_LocalUnitsToScreen(3.0f);
 
     // NOTE: calculate one frame size and get one-half of one frame size
-    int xOffset = (MrFrecklesSpritesheets[0].width / MrFrecklesSpriteAnimation[0].totalHorizontalFrames) * 0.5f;
-    int yOffset = (MrFrecklesSpritesheets[0].height / MrFrecklesSpriteAnimation[0].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(35.0f);
+    int xOffset = (MrFrecklesSpritesheets[MrFrecklesIdle].width / MrFrecklesSpriteAnimation[MrFrecklesIdle].totalHorizontalFrames) * 0.5f;
+    int yOffset = (MrFrecklesSpritesheets[MrFrecklesIdle].height / MrFrecklesSpriteAnimation[MrFrecklesIdle].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(35.0f);
 	MrFrecklesPosition[0].x = TableAreaCenter.x - xOffset;
     MrFrecklesPosition[0].y = TableAreaCenter.y - yOffset;
 }
@@ -366,15 +451,34 @@ UnloadTextures()
     UnloadTexture(CardSlotTexture);
     UnloadTexture(BackOfCardTexture);
     UnloadTexture(ScoreFrameTexture);
-    // TODO(nick): replace with for loop ...
+    // TODO(nick): replace with for loop jkk...
     UnloadTexture(MrFrecklesSpritesheets[0]);
 }
 
 void
 ProcessInput(Poker_Game* game_state)
 {
-    static bool confirmPressed = false;
+    local_persist bool confirmPressed = false;
 
+    // TODO(nick): clean this up - just testing code
+    if (IsKeyPressed(KEY_UP) && confirmPressed == false)
+    {
+        if (MrFrecklesActiveState >= MrFrecklesWinning)
+        {
+            MrFrecklesActiveState = MrFrecklesIdle;
+        }
+        else
+        {
+            MrFrecklesActiveState++;
+        }
+        confirmPressed = true;
+    }
+
+    if (IsKeyUp(KEY_UP) && confirmPressed == true)
+    {
+        confirmPressed = false;
+    }
+    
     if (IsKeyDown(KEY_SPACE) && confirmPressed == false)
     {
         confirmPressed = true;
@@ -470,7 +574,7 @@ RenderGame(Poker_Game* game_state)
 
         DrawTexture(ScoreFrameTexture, CardAreaLeft.x, CardAreaLeft.y + CardSlotTexture.height, WHITE);
         DrawTexture(ScoreFrameTexture, CardAreaRight.x, CardAreaLeft.y + CardSlotTexture.height, WHITE);
-        DrawAnimationFrame(&MrFrecklesSpritesheets[0], &MrFrecklesSpriteAnimation[0], &MrFrecklesPosition[0], GlobalTargetFPS);
+        DrawAnimationFrame(&MrFrecklesSpritesheets[MrFrecklesActiveState], &MrFrecklesSpriteAnimation[MrFrecklesActiveState], &MrFrecklesPosition[MrFrecklesActiveState], GlobalTargetFPS);
     }
 
     EndDrawing();

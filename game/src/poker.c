@@ -6,9 +6,9 @@
 
 #define DECK_SIZE 52
 
-local_variable Poker_Card DealersDeck[DECK_SIZE] = { 0 };
-local_variable Poker_Card SampleDeck[DECK_SIZE] = { 0 };
-local_variable int deck_index = 0;
+local_persist Poker_Card DealersDeck[DECK_SIZE] = { 0 };
+local_persist Poker_Card SampleDeck[DECK_SIZE] = { 0 };
+local_persist int deck_index = 0;
 
 Poker_Card
 Poker_DrawOne(Poker_CardState state){

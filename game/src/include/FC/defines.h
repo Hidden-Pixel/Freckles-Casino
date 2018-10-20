@@ -6,5 +6,4 @@
 
 #define len(array)(sizeof(array)/sizeof(array[0]))
 
-void
-DrawFaceCard(Poker_Card card, int x, int y);
+

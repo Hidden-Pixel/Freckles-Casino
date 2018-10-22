@@ -88,6 +88,8 @@ global_variable unsigned int PyrellaActiveState = Idle;
 global_variable bool GameStarted = false;
 global_variable unsigned int GameScene = SceneTitleScreen;
 
+global_variable Music MrFrecklesThemeMusic;
+
 const char* CreditsText = "CREDITS";
 const char* JackpotText = "JACKPOT";
 const char* BetText     = "BET";
@@ -128,22 +130,42 @@ RenderGame(Poker_Game* game_state);
 void
 DrawFaceCard(Poker_Card card, int x, int y);
 
+void
+LoadSounds();
+
+void
+PlaySounds();
+
+void
+UpdateSounds();
+
+void
+ExitGame();
+
 int
 main(void)
 {
     local_persist Poker_Game game_state;
 
+    // TODO(nick): replace with init game function
     GameScreen_Init(GlobalWindowWidth, GlobalWindowHeight, GAME_WIDTH, GAME_HEIGHT);
     Poker_Init(&game_state);
     InitWindow(GlobalWindowWidth, GlobalWindowHeight, GlobalWindowTitle);
     SetTargetFPS(GlobalTargetFPS);
 
+    // NOTE: load all textures
     LoadTextures();
+
+    // NOTE: load all sounds
+    InitAudioDevice();
+    LoadSounds();
 
     if (IsWindowReady())
     {
+        PlaySounds();
         while (GlobalRunning)
         {
+            UpdateSounds();
             ProcessInput(&game_state);
             RenderScene(&game_state, GameScene);
             if (WindowShouldClose())
@@ -151,10 +173,9 @@ main(void)
                 GlobalRunning = 0;
             }
         }
-        CloseWindow();
     }
 
-    UnloadTextures();
+    ExitGame();
 
     return 0;
 }
@@ -1273,4 +1294,31 @@ DrawFaceCard(Poker_Card card, int x, int y)
     {
         DrawTexture(CardTextures[cardIndex], x, y, WHITE);
     }
+}
+
+void
+LoadSounds()
+{
+    MrFrecklesThemeMusic = LoadMusicStream("assets/sounds/ogg/Mr_Freckles.ogg");
+}
+
+void
+PlaySounds()
+{
+    PlayMusicStream(MrFrecklesThemeMusic);
+}
+
+void
+UpdateSounds()
+{
+    UpdateMusicStream(MrFrecklesThemeMusic);
+}
+
+void
+ExitGame()
+{
+    UnloadTextures();
+    UnloadMusicStream(MrFrecklesThemeMusic);
+    CloseAudioDevice();
+    CloseWindow();
 }

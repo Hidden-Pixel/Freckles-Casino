@@ -71,6 +71,16 @@ global_variable SpriteAnimation ColHindenburgerSpriteAnimation[4];
 global_variable Vector2 ColHindenburgerPosition[4];
 global_variable unsigned int ColHindenburgerActiveState = Idle;
 
+global_variable Texture2D GeneralGruntSpritesheets[4];
+global_variable SpriteAnimation GeneralGruntSpriteAnimation[4];
+global_variable Vector2 GeneralGruntPosition[4];
+global_variable unsigned int GeneralGruntActiveState = Idle;
+
+global_variable Texture2D PyrellaSpritesheets[4];
+global_variable SpriteAnimation PyrellaSpriteAnimation[4];
+global_variable Vector2 PyrellaPosition[4];
+global_variable unsigned int PyrellaActiveState = Idle;
+
 global_variable bool GameStarted = false;
 
 const char* CreditsText = "CREDITS";
@@ -531,6 +541,170 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
         .frameSpeed             = 2,
     };
     // NOTE: Col. Hindenburger End
+
+    // NOTE: Generalissimo Grunt Begin
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/GeneralissimoGrunt/Idle.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    GeneralGruntSpritesheets[Idle] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    GeneralGruntSpriteAnimation[Idle] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 10,
+        .totalVerticalFrames    = 1,
+        .totalHorizontalFrames  = 10,
+        .frameSpeed             = 4,
+    };
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/GeneralissimoGrunt/TalkNormal.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    GeneralGruntSpritesheets[TalkingNormal] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    GeneralGruntSpriteAnimation[TalkingNormal] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 8,
+        .totalVerticalFrames    = 1,
+        .totalHorizontalFrames  = 8,
+        .frameSpeed             = 4,
+    };
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/GeneralissimoGrunt/Win.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    GeneralGruntSpritesheets[Winning] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    GeneralGruntSpriteAnimation[Winning] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 4,
+        .totalVerticalFrames    = 1,
+        .totalHorizontalFrames  = 4,
+        .frameSpeed             = 2,
+    };
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/GeneralissimoGrunt/Lose.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    GeneralGruntSpritesheets[Losing] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    GeneralGruntSpriteAnimation[Losing] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 15,
+        .totalVerticalFrames    = 1,
+        .totalHorizontalFrames  = 15,
+        .frameSpeed             = 3,
+    };
+    // NOTE: Generalissimo Grunt End
+
+    // NOTE: Pyrella Begin
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/Pyrella/Idle.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    PyrellaSpritesheets[Idle] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    PyrellaSpriteAnimation[Idle] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 9,
+        .totalVerticalFrames    = 1,
+        .totalHorizontalFrames  = 9,
+        .frameSpeed             = 2,
+    };
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/Pyrella/TalkingNormal.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    PyrellaSpritesheets[TalkingNormal] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    PyrellaSpriteAnimation[TalkingNormal] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 4,
+        .totalVerticalFrames    = 1,
+        .totalHorizontalFrames  = 4,
+        .frameSpeed             = 2,
+    };
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/Pyrella/Win.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    PyrellaSpritesheets[Winning] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    PyrellaSpriteAnimation[Winning] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 17,
+        .totalVerticalFrames    = 1,
+        .totalHorizontalFrames  = 17,
+        .frameSpeed             = 2,
+    };
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/Pyrella/Lose.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    PyrellaSpritesheets[Losing] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    PyrellaSpriteAnimation[Losing] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 4,
+        .totalVerticalFrames    = 1,
+        .totalHorizontalFrames  = 4,
+        .frameSpeed             = 2,
+    };
+    // NOTE: Pyrella End
 }
 
 inline
@@ -609,6 +783,24 @@ SetPositions()
         yOffset = (ColHindenburgerSpritesheets[currentState].height / ColHindenburgerSpriteAnimation[currentState].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(35.0f);
         ColHindenburgerPosition[currentState].x = TableAreaCenter.x - xOffset;
         ColHindenburgerPosition[currentState].y = TableAreaCenter.y - yOffset;
+    }
+
+    for (unsigned int currentState = Idle; currentState < len(GeneralGruntPosition); currentState++)
+    {
+        // NOTE: calculate one frame size and get one-half of one frame size
+        xOffset = (GeneralGruntSpritesheets[currentState].width / GeneralGruntSpriteAnimation[currentState].totalHorizontalFrames) * 0.5f;
+        yOffset = (GeneralGruntSpritesheets[currentState].height / GeneralGruntSpriteAnimation[currentState].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(35.0f);
+        GeneralGruntPosition[currentState].x = TableAreaCenter.x - xOffset;
+        GeneralGruntPosition[currentState].y = TableAreaCenter.y - yOffset;
+    }
+
+    for (unsigned int currentState = Idle; currentState < len(PyrellaPosition); currentState++)
+    {
+        // NOTE: calculate one frame size and get one-half of one frame size
+        xOffset = (PyrellaSpritesheets[currentState].width / PyrellaSpriteAnimation[currentState].totalHorizontalFrames) * 0.5f;
+        yOffset = (PyrellaSpritesheets[currentState].height / PyrellaSpriteAnimation[currentState].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(35.0f);
+        PyrellaPosition[currentState].x = TableAreaCenter.x - xOffset;
+        PyrellaPosition[currentState].y = TableAreaCenter.y - yOffset;
     }
 }
 
@@ -693,6 +885,39 @@ ProcessInput(Poker_Game* game_state)
                 ColHindenburgerActiveState++;
             }
         }
+        else if (CurrentCharacterId == ColHinderburger)
+        {
+            if (ColHindenburgerActiveState >= Losing)
+            {
+                ColHindenburgerActiveState = Idle;
+            } 
+            else
+            {
+                ColHindenburgerActiveState++;
+            }
+        }
+        else if (CurrentCharacterId == GeneralGrunt)
+        {
+            if (GeneralGruntActiveState >= Losing)
+            {
+                GeneralGruntActiveState = Idle;
+            } 
+            else
+            {
+                GeneralGruntActiveState++;
+            }
+        }
+        else if (CurrentCharacterId == Pyrella)
+        {
+            if (PyrellaActiveState >= Losing)
+            {
+                PyrellaActiveState = Idle;
+            } 
+            else
+            {
+                PyrellaActiveState++; 
+            }
+        }
         confirmPressed = true;
     }
 
@@ -704,7 +929,7 @@ ProcessInput(Poker_Game* game_state)
     // TODO(nick): clean this up - just testing code
     if (IsKeyPressed(KEY_RIGHT) && confirmPressed == false)
     {
-        if (CurrentCharacterId >= ColHinderburger)
+        if (CurrentCharacterId >= Pyrella)
         {
             CurrentCharacterId = MrFreckles;
         }
@@ -842,6 +1067,20 @@ RenderGame(Poker_Game* game_state)
                 currentCharacterSpritesheet = &ColHindenburgerSpritesheets[ColHindenburgerActiveState];
                 currentCharacterAnimation = &ColHindenburgerSpriteAnimation[ColHindenburgerActiveState];
                 currentCharacterSpritePosition = &ColHindenburgerPosition[ColHindenburgerActiveState];
+            } break;
+
+            case GeneralGrunt:
+            {
+                currentCharacterSpritesheet = &GeneralGruntSpritesheets[GeneralGruntActiveState];
+                currentCharacterAnimation = &GeneralGruntSpriteAnimation[GeneralGruntActiveState];
+                currentCharacterSpritePosition = &GeneralGruntPosition[GeneralGruntActiveState];
+            } break;
+
+            case Pyrella:
+            {
+                currentCharacterSpritesheet = &PyrellaSpritesheets[PyrellaActiveState];
+                currentCharacterAnimation = &PyrellaSpriteAnimation[PyrellaActiveState];
+                currentCharacterSpritePosition = &PyrellaPosition[PyrellaActiveState];
             } break;
         }
         DrawAnimationFrame(currentCharacterSpritesheet, currentCharacterAnimation, currentCharacterSpritePosition, GlobalTargetFPS);

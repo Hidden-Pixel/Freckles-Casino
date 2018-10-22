@@ -5,5 +5,3 @@
 #define internal        static
 
 #define len(array)(sizeof(array)/sizeof(array[0]))
-
-

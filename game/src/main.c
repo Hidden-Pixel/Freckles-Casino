@@ -56,15 +56,20 @@ global_variable Vector2 ChancesBillboardArea;
 
 global_variable unsigned int CurrentCharacterId = MrFreckles;
 
-global_variable Texture2D MrFrecklesSpritesheets[5];
-global_variable SpriteAnimation MrFrecklesSpriteAnimation[5];
-global_variable Vector2 MrFrecklesPosition[5];
-global_variable unsigned int MrFrecklesActiveState = MrFrecklesIdle;
+global_variable Texture2D MrFrecklesSpritesheets[4];
+global_variable SpriteAnimation MrFrecklesSpriteAnimation[4];
+global_variable Vector2 MrFrecklesPosition[4];
+global_variable unsigned int MrFrecklesActiveState = Idle;
 
 global_variable Texture2D MrsFrecklesSpritesheets[4];
 global_variable SpriteAnimation MrsFrecklesSpriteAnimation[4];
 global_variable Vector2 MrsFrecklesPosition[4];
-global_variable unsigned int MrsFrecklesActiveState = MrsFrecklesIdle;
+global_variable unsigned int MrsFrecklesActiveState = Idle;
+
+global_variable Texture2D ColHindenburgerSpritesheets[4];
+global_variable SpriteAnimation ColHindenburgerSpriteAnimation[4];
+global_variable Vector2 ColHindenburgerPosition[4];
+global_variable unsigned int ColHindenburgerActiveState = Idle;
 
 global_variable bool GameStarted = false;
 
@@ -290,36 +295,16 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    MrFrecklesSpritesheets[MrFrecklesIdle] = LoadTextureFromImage(*tempImage);
+    MrFrecklesSpritesheets[Idle] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrFrecklesSpriteAnimation[MrFrecklesIdle] = (SpriteAnimation)
+    MrFrecklesSpriteAnimation[Idle] = (SpriteAnimation)
     {
         .currentDrawFrameIndex  = 0,
         .frameCounter           = 0,
-        .totalFrames            = 4,
-        .totalVerticalFrames    = 2,
-        .totalHorizontalFrames  = 2,
-        .frameSpeed             = 2,
-    };
-
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/Deals.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    MrFrecklesSpritesheets[MrFrecklesDealing] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    MrFrecklesSpriteAnimation[MrFrecklesDealing] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 7,
-        .totalVerticalFrames    = 4,
-        .totalHorizontalFrames  = 2,
-        .frameSpeed             = 15,
+        .totalFrames            = 19,
+        .totalVerticalFrames    = 1,
+        .totalHorizontalFrames  = 19,
+        .frameSpeed             = 5,
     };
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/TalkNormal.png");
@@ -330,19 +315,19 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    MrFrecklesSpritesheets[MrFrecklesTalkingNormal] = LoadTextureFromImage(*tempImage);
+    MrFrecklesSpritesheets[TalkingNormal] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrFrecklesSpriteAnimation[MrFrecklesTalkingNormal] = (SpriteAnimation)
+    MrFrecklesSpriteAnimation[TalkingNormal] = (SpriteAnimation)
     {
         .currentDrawFrameIndex  = 0,
         .frameCounter           = 0,
         .totalFrames            = 8,
-        .totalVerticalFrames    = 3,
-        .totalHorizontalFrames  = 3,
+        .totalVerticalFrames    = 1,
+        .totalHorizontalFrames  = 8,
         .frameSpeed             = 10,
     };
 
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/TalkAngry.png");
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/Wins.png");
     imageVector->x = tempImage->width;
     imageVector->y = tempImage->height;
     *imageVector = Vector2Scale(*imageVector, 3.0f);
@@ -350,36 +335,36 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    MrFrecklesSpritesheets[MrFrecklesTalkingAngry] = LoadTextureFromImage(*tempImage);
+    MrFrecklesSpritesheets[Winning] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrFrecklesSpriteAnimation[MrFrecklesTalkingAngry] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 6,
-        .totalVerticalFrames    = 2,
-        .totalHorizontalFrames  = 3,
-        .frameSpeed             = 10,
-    };
-
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/FrecklesWins.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    MrFrecklesSpritesheets[MrFrecklesWinning] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    MrFrecklesSpriteAnimation[MrFrecklesWinning] = (SpriteAnimation)
+    MrFrecklesSpriteAnimation[Winning] = (SpriteAnimation)
     {
         .currentDrawFrameIndex  = 0,
         .frameCounter           = 0,
         .totalFrames            = 4,
-        .totalVerticalFrames    = 2,
-        .totalHorizontalFrames  = 2,
+        .totalVerticalFrames    = 1,
+        .totalHorizontalFrames  = 4,
         .frameSpeed             = 2,
+    };
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/Losing.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    MrFrecklesSpritesheets[Losing] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    MrFrecklesSpriteAnimation[Losing] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 6,
+        .totalVerticalFrames    = 1,
+        .totalHorizontalFrames  = 6,
+        .frameSpeed             = 10,
     };
     // NOTE: Mr. Freckles Spritesheets End
     
@@ -392,9 +377,9 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    MrsFrecklesSpritesheets[MrsFrecklesIdle] = LoadTextureFromImage(*tempImage);
+    MrsFrecklesSpritesheets[Idle] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrsFrecklesSpriteAnimation[MrsFrecklesIdle] = (SpriteAnimation)
+    MrsFrecklesSpriteAnimation[Idle] = (SpriteAnimation)
     {
         .currentDrawFrameIndex  = 0,
         .frameCounter           = 0,
@@ -412,34 +397,14 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    MrsFrecklesSpritesheets[MrsFrecklesTalking] = LoadTextureFromImage(*tempImage);
+    MrsFrecklesSpritesheets[TalkingNormal] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrsFrecklesSpriteAnimation[MrsFrecklesTalking] = (SpriteAnimation)
+    MrsFrecklesSpriteAnimation[TalkingNormal] = (SpriteAnimation)
     {
         .currentDrawFrameIndex  = 0,
         .frameCounter           = 0,
         .totalFrames            = 5,
         .totalVerticalFrames    = 3,
-        .totalHorizontalFrames  = 2,
-        .frameSpeed             = 5,
-    };
-
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrsFreckles/Lose.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    MrsFrecklesSpritesheets[MrsFrecklesLosing] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    MrsFrecklesSpriteAnimation[MrsFrecklesLosing] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 4,
-        .totalVerticalFrames    = 2,
         .totalHorizontalFrames  = 2,
         .frameSpeed             = 5,
     };
@@ -452,9 +417,9 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    MrsFrecklesSpritesheets[MrsFrecklesWinning] = LoadTextureFromImage(*tempImage);
+    MrsFrecklesSpritesheets[Winning] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrsFrecklesSpriteAnimation[MrsFrecklesWinning] = (SpriteAnimation)
+    MrsFrecklesSpriteAnimation[Winning] = (SpriteAnimation)
     {
         .currentDrawFrameIndex  = 0,
         .frameCounter           = 0,
@@ -463,7 +428,109 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
         .totalHorizontalFrames  = 3,
         .frameSpeed             = 5,
     };
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrsFreckles/Lose.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    MrsFrecklesSpritesheets[Losing] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    MrsFrecklesSpriteAnimation[Losing] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 4,
+        .totalVerticalFrames    = 2,
+        .totalHorizontalFrames  = 2,
+        .frameSpeed             = 5,
+    };
     // NOTE: Mrs. Freckles Spritesheets End
+    
+    // NOTE: Col. Hindenburger Begin
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/ColHindenburger/Idle.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    ColHindenburgerSpritesheets[Idle] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    ColHindenburgerSpriteAnimation[Idle] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 9,
+        .totalVerticalFrames    = 1,
+        .totalHorizontalFrames  = 9,
+        .frameSpeed             = 5,
+    };
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/ColHindenburger/TalkNormal.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    ColHindenburgerSpritesheets[TalkingNormal] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    ColHindenburgerSpriteAnimation[TalkingNormal] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 4,
+        .totalVerticalFrames    = 1,
+        .totalHorizontalFrames  = 4,
+        .frameSpeed             = 2,
+    };
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/ColHindenburger/Win.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    ColHindenburgerSpritesheets[Winning] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    ColHindenburgerSpriteAnimation[Winning] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 4,
+        .totalVerticalFrames    = 1,
+        .totalHorizontalFrames  = 4,
+        .frameSpeed             = 2,
+    };
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/ColHindenburger/Lose.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    ColHindenburgerSpritesheets[Losing] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    ColHindenburgerSpriteAnimation[Losing] = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFrames            = 4,
+        .totalVerticalFrames    = 1,
+        .totalHorizontalFrames  = 4,
+        .frameSpeed             = 2,
+    };
+    // NOTE: Col. Hindenburger End
 }
 
 inline
@@ -517,7 +584,7 @@ SetPositions()
 
     int xOffset = 0;
     int yOffset = 0;
-    for (unsigned int currentState = MrFrecklesIdle; currentState < len(MrFrecklesPosition); currentState++)
+    for (unsigned int currentState = Idle; currentState < len(MrFrecklesPosition); currentState++)
     {
         // NOTE: calculate one frame size and get one-half of one frame size
         xOffset = (MrFrecklesSpritesheets[currentState].width / MrFrecklesSpriteAnimation[currentState].totalHorizontalFrames) * 0.5f;
@@ -526,13 +593,22 @@ SetPositions()
         MrFrecklesPosition[currentState].y = TableAreaCenter.y - yOffset;
     }
 
-    for (unsigned int currentState = MrsFrecklesIdle; currentState < len(MrsFrecklesPosition); currentState++)
+    for (unsigned int currentState = Idle; currentState < len(MrsFrecklesPosition); currentState++)
     {
         // NOTE: calculate one frame size and get one-half of one frame size
         xOffset = (MrsFrecklesSpritesheets[currentState].width / MrsFrecklesSpriteAnimation[currentState].totalHorizontalFrames) * 0.5f;
         yOffset = (MrsFrecklesSpritesheets[currentState].height / MrsFrecklesSpriteAnimation[currentState].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(35.0f);
         MrsFrecklesPosition[currentState].x = TableAreaCenter.x - xOffset;
         MrsFrecklesPosition[currentState].y = TableAreaCenter.y - yOffset;
+    }
+
+    for (unsigned int currentState = Idle; currentState < len(ColHindenburgerPosition); currentState++)
+    {
+        // NOTE: calculate one frame size and get one-half of one frame size
+        xOffset = (ColHindenburgerSpritesheets[currentState].width / ColHindenburgerSpriteAnimation[currentState].totalHorizontalFrames) * 0.5f;
+        yOffset = (ColHindenburgerSpritesheets[currentState].height / ColHindenburgerSpriteAnimation[currentState].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(35.0f);
+        ColHindenburgerPosition[currentState].x = TableAreaCenter.x - xOffset;
+        ColHindenburgerPosition[currentState].y = TableAreaCenter.y - yOffset;
     }
 }
 
@@ -569,6 +645,11 @@ UnloadTextures()
     {
         UnloadTexture(MrFrecklesSpritesheets[i]);
     }
+
+    for (int i = 0; i < len(MrsFrecklesSpritesheets); i++)
+    {
+        UnloadTexture(MrsFrecklesSpritesheets[i]);
+    }
 }
 
 void
@@ -581,9 +662,9 @@ ProcessInput(Poker_Game* game_state)
     {
         if (CurrentCharacterId == MrFreckles)
         {
-            if (MrFrecklesActiveState >= MrFrecklesWinning)
+            if (MrFrecklesActiveState >= Losing)
             {
-                MrFrecklesActiveState = MrFrecklesIdle;
+                MrFrecklesActiveState = Idle;
             }
             else
             {
@@ -592,16 +673,26 @@ ProcessInput(Poker_Game* game_state)
         }
         else if (CurrentCharacterId == MrsFreckles)
         {
-            if (MrsFrecklesActiveState >= MrsFrecklesWinning)
+            if (MrsFrecklesActiveState >= Losing)
             {
-                MrsFrecklesActiveState = MrsFrecklesIdle;
+                MrsFrecklesActiveState = Idle;
             }
             else
             {
                 MrsFrecklesActiveState++;
             }
         }
-        
+        else if (CurrentCharacterId == ColHinderburger)
+        {
+            if (ColHindenburgerActiveState >= Losing)
+            {
+                ColHindenburgerActiveState = Idle;
+            } 
+            else
+            {
+                ColHindenburgerActiveState++;
+            }
+        }
         confirmPressed = true;
     }
 
@@ -613,7 +704,7 @@ ProcessInput(Poker_Game* game_state)
     // TODO(nick): clean this up - just testing code
     if (IsKeyPressed(KEY_RIGHT) && confirmPressed == false)
     {
-        if (CurrentCharacterId >= MrsFreckles)
+        if (CurrentCharacterId >= ColHinderburger)
         {
             CurrentCharacterId = MrFreckles;
         }
@@ -744,6 +835,13 @@ RenderGame(Poker_Game* game_state)
                 currentCharacterSpritesheet = &MrsFrecklesSpritesheets[MrsFrecklesActiveState];
                 currentCharacterAnimation = &MrsFrecklesSpriteAnimation[MrsFrecklesActiveState];
                 currentCharacterSpritePosition = &MrsFrecklesPosition[MrsFrecklesActiveState];
+            } break;
+
+            case ColHinderburger:
+            {
+                currentCharacterSpritesheet = &ColHindenburgerSpritesheets[ColHindenburgerActiveState];
+                currentCharacterAnimation = &ColHindenburgerSpriteAnimation[ColHindenburgerActiveState];
+                currentCharacterSpritePosition = &ColHindenburgerPosition[ColHindenburgerActiveState];
             } break;
         }
         DrawAnimationFrame(currentCharacterSpritesheet, currentCharacterAnimation, currentCharacterSpritePosition, GlobalTargetFPS);

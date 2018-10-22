@@ -296,9 +296,9 @@ LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
     {
         .currentDrawFrameIndex  = 0,
         .frameCounter           = 0,
-        .totalFrames            = 12,
-        .totalVerticalFrames    = 4,
-        .totalHorizontalFrames  = 4,
+        .totalFrames            = 13,
+        .totalVerticalFrames    = 1,
+        .totalHorizontalFrames  = 13,
         .frameSpeed             = 2,
     };
 }
@@ -854,14 +854,31 @@ UnloadTextures()
     UnloadTexture(CardSlotTexture);
     UnloadTexture(BackOfCardTexture);
     UnloadTexture(ScoreFrameTexture);
-    for (int i = 0; i < len(MrFrecklesSpritesheets); i++)
+
+    int i = 0;
+    for (i = 0; i < len(MrFrecklesSpritesheets); i++)
     {
         UnloadTexture(MrFrecklesSpritesheets[i]);
     }
 
-    for (int i = 0; i < len(MrsFrecklesSpritesheets); i++)
+    for (i = 0; i < len(MrsFrecklesSpritesheets); i++)
     {
         UnloadTexture(MrsFrecklesSpritesheets[i]);
+    }
+
+    for (i = 0; i < len(ColHindenburgerSpritesheets); i++)
+    {
+        UnloadTexture(ColHindenburgerSpritesheets[i]);
+    }
+
+    for (i = 0; i < len(GeneralGruntSpritesheets); i++)
+    {
+        UnloadTexture(GeneralGruntSpritesheets[i]);
+    }
+
+    for (i = 0; i < len(PyrellaSpritesheets); i++)
+    {
+        UnloadTexture(PyrellaSpritesheets[i]);
     }
 }
 

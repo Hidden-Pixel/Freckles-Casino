@@ -35,13 +35,17 @@ global_variable int GlobalFrameCount = 0;
 global_variable int GlobalTargetFPS = 60;
 
 global_variable Texture2D BlankGreenTableTexture;
-global_variable Texture2D RedCurtainTexture;
+global_variable Texture2D RedCurtainTextureHalf;
+global_variable Texture2D RedCurtainTextureFull;
 global_variable Texture2D CardSlotTexture;
 global_variable Texture2D BackOfCardTexture;
 global_variable Texture2D ScoreFrameTexture;
 
-global_variable Texture2D TitleScreen;
-global_variable SpriteAnimation TitleScreenAnimation;
+global_variable Texture2D TitleScreenLogo;
+global_variable Vector2 TitleScreenLogoPosition;
+
+global_variable Texture2D TitleScreenPressStart;
+global_variable Vector2 TitleScreenPressStartPosition;
 
 global_variable Texture2D CardTextures[CardSuit_Count * CardFace_Count];
 global_variable SpriteAnimation HighCardSpriteAnimation;
@@ -82,6 +86,7 @@ global_variable Vector2 PyrellaPosition[4];
 global_variable unsigned int PyrellaActiveState = Idle;
 
 global_variable bool GameStarted = false;
+global_variable unsigned int GameScene = SceneTitleScreen;
 
 const char* CreditsText = "CREDITS";
 const char* JackpotText = "JACKPOT";
@@ -140,9 +145,7 @@ main(void)
         while (GlobalRunning)
         {
             ProcessInput(&game_state);
-            // TODO(nick): switch this titlescreen whenever that is completed
-            //RenderScene(&game_state, Scene_TitleScreen);
-            RenderScene(&game_state, Scene_MainPokerTable);
+            RenderScene(&game_state, GameScene);
             if (WindowShouldClose())
             {
                 GlobalRunning = 0;
@@ -185,11 +188,18 @@ LoadTableAndBackgroundTextures(Image *tempImage, Vector2 *imageVector)
     BlankGreenTableTexture = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
 
-    // NOTE: load red curtain texture
+    // NOTE: load red curtain texture - half it
     // @Size: 
     *tempImage = LoadImage("assets/textures/Background/Curtain.png");
     ImageResizeNN(tempImage, GlobalWindowWidth, GlobalWindowHeight / 2.0f);
-    RedCurtainTexture = LoadTextureFromImage(*tempImage);
+    RedCurtainTextureHalf = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+
+    // NOTE: load red curtain texture - full
+    // @Size: 
+    *tempImage = LoadImage("assets/textures/Background/Curtain.png");
+    ImageResizeNN(tempImage, GlobalWindowWidth, GlobalWindowHeight);
+    RedCurtainTextureFull = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
 
     // NOTE: load card slot texture
@@ -710,21 +720,25 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
 inline
 LoadTitleScreen(Image *tempImage, Vector2 *imageVector)
 {
-    *tempImage = LoadImage("assets/textures/Titlescreen/Spritesheets/Titlescreen.png");
-    imageVector->x = (tempImage->width) + GameScreen_ScreenUnitScale(1.0f);
-    imageVector->y = (tempImage->height) + GameScreen_ScreenUnitScale(1.0f);
+    *tempImage = LoadImage("assets/textures/Titlescreen/Pngs/TitleLogo.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 2.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    TitleScreen = LoadTextureFromImage(*tempImage);
+    TitleScreenLogo = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    TitleScreenAnimation = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 63,
-        .totalVerticalFrames    = 9,
-        .totalHorizontalFrames  = 7,
-        .frameSpeed             = 5,
-    };
+
+    *tempImage = LoadImage("assets/textures/Titlescreen/Pngs/PressStart.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    TitleScreenPressStart = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
 }
 
 inline
@@ -755,6 +769,13 @@ SetPositions()
 
     CardAreaCenter.x = (CardAreaLeft.x + 2.0f * CardSlotTexture.width) + center_padding;
     CardAreaCenter.y = CardAreaLeft.y + CardSlotTexture.height - GameScreen_LocalUnitsToScreen(3.0f);
+
+    TitleScreenLogoPosition.x = TableAreaCenter.x - (TitleScreenLogo.width / 2.0f);
+    TitleScreenLogoPosition.y = 0;
+
+    // TODO(nick): iron out these positions
+    TitleScreenPressStartPosition.x = TableAreaCenter.x - (TitleScreenPressStart.width / 2.0f);
+    TitleScreenPressStartPosition.y = TableAreaCenter.y + TitleScreenPressStart.height + GameScreen_LocalUnitsToScreen(35.0f);
 
     int xOffset = 0;
     int yOffset = 0;
@@ -921,6 +942,16 @@ ProcessInput(Poker_Game* game_state)
         confirmPressed = true;
     }
 
+    if (IsKeyDown(KEY_S) && confirmPressed == false && GameScene == SceneTitleScreen)
+    {
+        GameScene = SceneMainPokerTable;
+    }
+
+    if (IsKeyUp(KEY_S) && confirmPressed == true)
+    {
+        confirmPressed = false;
+    }
+
     if (IsKeyUp(KEY_UP) && confirmPressed == true)
     {
         confirmPressed = false;
@@ -963,12 +994,10 @@ RenderTitleScreen()
     BeginDrawing();
     {
         ClearBackground(BLACK);
-        Vector2 testPosition = 
-        {
-            .x = 0,
-            .y = 0,
-        };
-        DrawAnimationFrame(&TitleScreen, &TitleScreenAnimation, &testPosition, GlobalTargetFPS);
+        DrawTexture(RedCurtainTextureFull, RedCurtainVector2.x, RedCurtainVector2.y, WHITE);
+        // TODO(nick): add slide in animation code.
+        DrawTexture(TitleScreenLogo, TitleScreenLogoPosition.x, TitleScreenLogoPosition.y, WHITE);
+        DrawTexture(TitleScreenPressStart, TitleScreenPressStartPosition.x, TitleScreenPressStartPosition.y, WHITE);
     }
     EndDrawing();
 }
@@ -979,7 +1008,7 @@ RenderGame(Poker_Game* game_state)
     BeginDrawing();
     {
         ClearBackground(BLACK);
-        DrawTexture(RedCurtainTexture, RedCurtainVector2.x, RedCurtainVector2.y, WHITE);
+        DrawTexture(RedCurtainTextureHalf, RedCurtainVector2.x, RedCurtainVector2.y, WHITE);
         DrawTexture(BlankGreenTableTexture, TableVector2.x, TableVector2.y, WHITE);
         Vector2 leftArea =
         { 
@@ -1040,7 +1069,6 @@ RenderGame(Poker_Game* game_state)
 
         DrawTexture(ScoreFrameTexture, CardAreaLeft.x, CardAreaLeft.y + CardSlotTexture.height, WHITE);
         DrawTexture(ScoreFrameTexture, CardAreaRight.x, CardAreaLeft.y + CardSlotTexture.height, WHITE);
-
     
         Texture2D *currentCharacterSpritesheet = NULL;
         SpriteAnimation *currentCharacterAnimation = NULL;
@@ -1095,7 +1123,7 @@ RenderScene(Poker_Game* game_state, unsigned int scene)
 {
     switch (scene)
     {
-        case Scene_MainPokerTable:
+        case SceneMainPokerTable:
         {
             RenderGame(game_state);
         } break;

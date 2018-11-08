@@ -17,12 +17,18 @@ local_variable int deck_index = 0;
  */
 Poker_Hand
 Poker_FindBestHand(Poker_Card* player_hand, Poker_Card* house_cards, int house_card_count) {
-    // Create all the possible hands
-    int maxCombinations = pow(2, house_card_count);
-    Poker_Card hands[maxCombinations][maxCombinations];
-    for (int i = 0; i < maxCombinations; ++i) {
+    int card_count_squared = pow(2, house_card_count);
 
-    }
+    // combinations: f(x) = h(h-x), where h is the house count and x is the size of picks
+    int two_combinations = house_card_count > 3 ? card_count_squared - house_card_count * 3 : 1;
+
+    // We'll pre-calculate these, at least until we decide we want to support Omaha
+    int one_combinations = house_card_count > 4 ? 5 : 0;
+    int zero_combinations = house_card_count > 4 ? 1 : 0;
+    int max_combinations = two_combinations + one_combinations + zero_combinations;
+
+    // Create all the possible hands
+    Poker_Card hands[max_combinations][house_card_count + 2];
 
     return PokerHand_HighCard;
 }

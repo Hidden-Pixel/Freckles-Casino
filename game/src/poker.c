@@ -3,12 +3,29 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <time.h>
+#include <tgmath.h>
 
+// There's 52 cards in a deck and we're NOT counting jokers, folks.
 #define DECK_SIZE 52
 
-local_variable Poker_Card DealersDeck[DECK_SIZE] = { 0 };
-local_variable Poker_Card SampleDeck[DECK_SIZE] = { 0 };
+local_variable Poker_Card DealersDeck[DECK_SIZE] = { };
+local_variable Poker_Card SampleDeck[DECK_SIZE] = { };
 local_variable int deck_index = 0;
+
+/*
+ * @remark We're assuming that player_hand is length 2
+ */
+Poker_Hand
+Poker_FindBestHand(Poker_Card* player_hand, Poker_Card* house_cards, int house_card_count) {
+    // Create all the possible hands
+    int maxCombinations = pow(2, house_card_count);
+    Poker_Card hands[maxCombinations][maxCombinations];
+    for (int i = 0; i < maxCombinations; ++i) {
+
+    }
+
+    return PokerHand_HighCard;
+}
 
 Poker_Card
 Poker_DrawOne(Poker_CardState state){
@@ -23,8 +40,8 @@ void
 Poker_Init()
 {
     for (int i = 0; i < CardSuit_Count * CardFace_Count; ++i) {
-            SampleDeck[i].face_value = (i % CardFace_Count) + 2;
-            SampleDeck[i].suit = i % CardSuit_Count;
+            SampleDeck[i].face_value = (Poker_CardFace)((i % CardFace_Count) + 2);
+            SampleDeck[i].suit = (Poker_CardSuit)(i % CardSuit_Count);
             SampleDeck[i].state = CardState_Hidden;
     }
     srand(time(NULL));

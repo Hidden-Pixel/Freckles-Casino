@@ -45,15 +45,15 @@ typedef enum {
 } Poker_GameState;
 
 typedef enum {
-    HighCard = 0,
-    Pair,
-    TwoPair,
-    ThreeOfAKind,
-    Straight,
-    Flush,
-    FullHouse,
-    FourOfAKind,
-    StraightFlush
+    PokerHand_HighCard = 0,
+    PokerHand_Pair,
+    PokerHand_TwoPair,
+    PokerHand_ThreeOfAKind,
+    PokerHand_Straight,
+    PokerHand_Flush,
+    PokerHand_FullHouse,
+    PokerHand_FourOfAKind,
+    PokerHand_StraightFlush
 } Poker_Hand;
 
 typedef struct {
@@ -73,6 +73,9 @@ typedef struct {
     int player_score;
     int dealer_score;
 } Poker_Game;
+
+Poker_Hand
+Poker_FindBestHand(Poker_Card* player_hand, Poker_Card* house_cards, int house_card_count);
 
 void
 Poker_Init();

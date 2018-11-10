@@ -89,14 +89,11 @@ global_variable unsigned int PyrellaActiveState = Idle;
 global_variable bool GameStarted = false;
 global_variable unsigned int GameScene = SceneTitleScreen;
 
-// TODO(nick): place in array with #defines
-global_variable Music MrFrecklesThemeMusic;
-global_variable Music MrsFrecklesThemeMusic;
-global_variable Music ColHindenburgerThemeMusic;
-global_variable Music GeneralGruntThemeMusic;
-global_variable Music PyrellaThemeMusic;
+global_variable Music CharacterThemeMusic[5];
+global_variable SoundMeta CharacterThemeMusicMeta[5];
 
 global_variable Music MrFrecklesDialogue[26];
+global_variable SoundMeta MrFrecklesDialogueMeta[26];
 
 const char* CreditsText = "CREDITS";
 const char* JackpotText = "JACKPOT";
@@ -940,7 +937,7 @@ ProcessInput(Poker_Game* game_state)
                 MrsFrecklesActiveState++;
             }
         }
-        else if (CurrentCharacterId == ColHinderburger)
+        else if (CurrentCharacterId == ColHindenburger)
         {
             if (ColHindenburgerActiveState >= Losing)
             {
@@ -951,7 +948,7 @@ ProcessInput(Poker_Game* game_state)
                 ColHindenburgerActiveState++;
             }
         }
-        else if (CurrentCharacterId == ColHinderburger)
+        else if (CurrentCharacterId == ColHindenburger)
         {
             if (ColHindenburgerActiveState >= Losing)
             {
@@ -1135,7 +1132,7 @@ RenderGame(Poker_Game* game_state)
                 currentCharacterSpritePosition = &MrsFrecklesPosition[MrsFrecklesActiveState];
             } break;
 
-            case ColHinderburger:
+            case ColHindenburger:
             {
                 currentCharacterSpritesheet = &ColHindenburgerSpritesheets[ColHindenburgerActiveState];
                 currentCharacterAnimation = &ColHindenburgerSpriteAnimation[ColHindenburgerActiveState];
@@ -1307,11 +1304,17 @@ void
 LoadSounds()
 {
     // NOTE: load theme music
-    MrFrecklesThemeMusic = LoadMusicStream("assets/sounds/music/ogg/Mr_Freckles.ogg");
-    MrsFrecklesThemeMusic = LoadMusicStream("assets/sounds/music/ogg/Mrs_Freckles.ogg");
-    ColHindenburgerThemeMusic = LoadMusicStream("assets/sounds/music/ogg/Col_Von_HindenBurger.ogg");
-    GeneralGruntThemeMusic = LoadMusicStream("assets/sounds/music/ogg/Generalissimo_Grunt.ogg");
-    PyrellaThemeMusic = LoadMusicStream("assets/sounds/music/ogg/Pyrella.ogg");
+    CharacterThemeMusic[MrFreckles] = LoadMusicStream("assets/sounds/music/ogg/Mr_Freckles.ogg");
+    CharacterThemeMusic[MrsFreckles] = LoadMusicStream("assets/sounds/music/ogg/Mrs_Freckles.ogg");
+    CharacterThemeMusic[ColHindenburger] = LoadMusicStream("assets/sounds/music/ogg/Col_Von_HindenBurger.ogg");
+    CharacterThemeMusic[GeneralGrunt] = LoadMusicStream("assets/sounds/music/ogg/Generalissimo_Grunt.ogg");
+    CharacterThemeMusic[Pyrella] = LoadMusicStream("assets/sounds/music/ogg/Pyrella.ogg");
+
+    // TODO(nick): create function that will load all meta given array.
+    for (int i = 0; i < len(CharacterThemeMusic); i++)
+    {
+        CharacterThemeMusicMeta[i] = CreateSoundMeta(&CharacterThemeMusic[i]);
+    }
 
     // NOTE: load Mr. Freckles dialogue
     MrFrecklesDialogue[0] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Laugh/Laugh1.ogg");
@@ -1340,26 +1343,33 @@ LoadSounds()
     MrFrecklesDialogue[23] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Win/FrecklesWin0_4.ogg");
     MrFrecklesDialogue[24] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Win/FrecklesWin0_5.ogg");
     MrFrecklesDialogue[25] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Win/FrecklesWin0_6.ogg");
+
+    for (int i = 0; i < len(MrFrecklesDialogue); i++)
+    {
+        MrFrecklesDialogueMeta[i] = CreateSoundMeta(&MrFrecklesDialogue[i]);
+    }
 }
 
 void
 UnloadSounds()
 {
-    UnloadMusicStream(MrFrecklesThemeMusic);
-    UnloadMusicStream(MrsFrecklesThemeMusic);
-    UnloadMusicStream(ColHindenburgerThemeMusic);
-    UnloadMusicStream(GeneralGruntThemeMusic);
-    UnloadMusicStream(PyrellaThemeMusic);
+    int i;
+    for (i = 0; i < len(CharacterThemeMusic); i++)
+    {
+        UnloadMusicStream(CharacterThemeMusic[i]);
+    }
+    
+    for (i = 0; i < len(MrFrecklesDialogue); i++)
+    {
+        UnloadMusicStream(MrFrecklesDialogue[i]);
+    }
 }
 
 void
 InitSounds()
 {
-    // TODO(nick): more robust audio handling
-    AddSoundToBuffer(&MrFrecklesThemeMusic);
-    AddSoundToBuffer(&MrFrecklesDialogue[0]);
+    AddSoundToBuffer(&CharacterThemeMusic[MrFreckles]);
 }
-
 
 void
 ExitGame()

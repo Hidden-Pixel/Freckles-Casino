@@ -88,7 +88,17 @@ global_variable unsigned int PyrellaActiveState = Idle;
 global_variable bool GameStarted = false;
 global_variable unsigned int GameScene = SceneTitleScreen;
 
+global_variable unsigned int SoundBufferSize = 0;
+global_variable Music *SoundBuffer[10];
+
+// TODO(nick): place in array with #defines
 global_variable Music MrFrecklesThemeMusic;
+global_variable Music MrsFrecklesThemeMusic;
+global_variable Music ColHindenburgerThemeMusic;
+global_variable Music GeneralGruntThemeMusic;
+global_variable Music PyrellaThemeMusic;
+
+global_variable Music MrFrecklesDialogue[26];
 
 const char* CreditsText = "CREDITS";
 const char* JackpotText = "JACKPOT";
@@ -134,6 +144,18 @@ void
 LoadSounds();
 
 void
+UnloadSounds();
+
+void
+InitSounds();
+
+void
+AddSoundToBuffer(Music *sound);
+
+void
+RemoveSoundFromBuffer();
+
+void
 PlaySounds();
 
 void
@@ -159,6 +181,7 @@ main(void)
     // NOTE: load all sounds
     InitAudioDevice();
     LoadSounds();
+    InitSounds();
 
     if (IsWindowReady())
     {
@@ -1299,26 +1322,104 @@ DrawFaceCard(Poker_Card card, int x, int y)
 void
 LoadSounds()
 {
-    MrFrecklesThemeMusic = LoadMusicStream("assets/sounds/ogg/Mr_Freckles.ogg");
+    // NOTE: load theme music
+    MrFrecklesThemeMusic = LoadMusicStream("assets/sounds/music/ogg/Mr_Freckles.ogg");
+    MrsFrecklesThemeMusic = LoadMusicStream("assets/sounds/music/ogg/Mrs_Freckles.ogg");
+    ColHindenburgerThemeMusic = LoadMusicStream("assets/sounds/music/ogg/Col_Von_HindenBurger.ogg");
+    GeneralGruntThemeMusic = LoadMusicStream("assets/sounds/music/ogg/Generalissimo_Grunt.ogg");
+    PyrellaThemeMusic = LoadMusicStream("assets/sounds/music/ogg/Pyrella.ogg");
+
+    // NOTE: load Mr. Freckles dialogue
+    MrFrecklesDialogue[0] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Laugh/Laugh1.ogg");
+    MrFrecklesDialogue[1] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Laugh/Laugh2.ogg");
+    MrFrecklesDialogue[2] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_1.ogg");
+    MrFrecklesDialogue[3] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_2.ogg");
+    MrFrecklesDialogue[4] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_3.ogg");
+    MrFrecklesDialogue[5] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_4.ogg");
+    MrFrecklesDialogue[6] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_5.ogg");
+    MrFrecklesDialogue[7] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_6.ogg");
+    MrFrecklesDialogue[8] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_7.ogg");
+    MrFrecklesDialogue[9] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_8.ogg");
+    MrFrecklesDialogue[10] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_9.ogg");
+    MrFrecklesDialogue[11] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_10.ogg");
+    MrFrecklesDialogue[12] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_11.ogg");
+    MrFrecklesDialogue[13] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Start/FrecklesStart0_1.ogg");
+    MrFrecklesDialogue[14] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Start/FrecklesStart0_2.ogg");
+    MrFrecklesDialogue[15] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Start/FrecklesStart0_3.ogg");
+    MrFrecklesDialogue[16] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Start/FrecklesStart0_4.ogg");
+    MrFrecklesDialogue[17] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Start/FrecklesStart0_5.ogg");
+    MrFrecklesDialogue[18] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Start/FrecklesStart0_6.ogg");
+    MrFrecklesDialogue[19] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Start/FrecklesStart0_7.ogg");
+    MrFrecklesDialogue[20] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Win/FrecklesWin0_1.ogg");
+    MrFrecklesDialogue[21] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Win/FrecklesWin0_2.ogg");
+    MrFrecklesDialogue[22] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Win/FrecklesWin0_3.ogg");
+    MrFrecklesDialogue[23] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Win/FrecklesWin0_4.ogg");
+    MrFrecklesDialogue[24] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Win/FrecklesWin0_5.ogg");
+    MrFrecklesDialogue[25] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Win/FrecklesWin0_6.ogg");
+}
+
+void
+UnloadSounds()
+{
+    UnloadMusicStream(MrFrecklesThemeMusic);
+    UnloadMusicStream(MrsFrecklesThemeMusic);
+    UnloadMusicStream(ColHindenburgerThemeMusic);
+    UnloadMusicStream(GeneralGruntThemeMusic);
+    UnloadMusicStream(PyrellaThemeMusic);
+}
+
+void
+InitSounds()
+{
+    // TODO(nick): more robust audio handling
+    AddSoundToBuffer(&MrFrecklesThemeMusic);
+    AddSoundToBuffer(&MrFrecklesDialogue[0]);
+}
+
+void
+AddSoundToBuffer(Music *sound)
+{
+    // TODO(nick): handle overflow of add request by removing first
+    SoundBuffer[SoundBufferSize] = sound;
+    SoundBufferSize++;
+}
+
+void
+RemoveSoundFromBuffer()
+{
+    // TODO(nick):
+    // NOTE: for now, always remove from the front
 }
 
 void
 PlaySounds()
 {
-    PlayMusicStream(MrFrecklesThemeMusic);
+    for (int i = 0; i < len(SoundBuffer); i++)
+    {
+        if (SoundBuffer[i] != NULL)
+        {
+            PlayMusicStream(*SoundBuffer[i]);
+        }
+    }
 }
 
 void
 UpdateSounds()
 {
-    UpdateMusicStream(MrFrecklesThemeMusic);
+    for (int i = 0; i < len(SoundBuffer); i++)
+    {
+        if (SoundBuffer[i] != NULL)
+        {
+            UpdateMusicStream(*SoundBuffer[i]);
+        }
+    }
 }
 
 void
 ExitGame()
 {
     UnloadTextures();
-    UnloadMusicStream(MrFrecklesThemeMusic);
+    UnloadSounds();
     CloseAudioDevice();
     CloseWindow();
 }

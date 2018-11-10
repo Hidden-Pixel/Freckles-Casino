@@ -9,6 +9,7 @@
 #include <FC/defines.h>
 #include <FC/scene.h>
 #include <FC/character-state.h>
+#include <FC/sound.h>
 
 #include <stdio.h>
 
@@ -88,9 +89,6 @@ global_variable unsigned int PyrellaActiveState = Idle;
 global_variable bool GameStarted = false;
 global_variable unsigned int GameScene = SceneTitleScreen;
 
-global_variable unsigned int SoundBufferSize = 0;
-global_variable Music *SoundBuffer[10];
-
 // TODO(nick): place in array with #defines
 global_variable Music MrFrecklesThemeMusic;
 global_variable Music MrsFrecklesThemeMusic;
@@ -148,18 +146,6 @@ UnloadSounds();
 
 void
 InitSounds();
-
-void
-AddSoundToBuffer(Music *sound);
-
-void
-RemoveSoundFromBuffer();
-
-void
-PlaySounds();
-
-void
-UpdateSounds();
 
 void
 ExitGame();
@@ -1374,44 +1360,6 @@ InitSounds()
     AddSoundToBuffer(&MrFrecklesDialogue[0]);
 }
 
-void
-AddSoundToBuffer(Music *sound)
-{
-    // TODO(nick): handle overflow of add request by removing first
-    SoundBuffer[SoundBufferSize] = sound;
-    SoundBufferSize++;
-}
-
-void
-RemoveSoundFromBuffer()
-{
-    // TODO(nick):
-    // NOTE: for now, always remove from the front
-}
-
-void
-PlaySounds()
-{
-    for (int i = 0; i < len(SoundBuffer); i++)
-    {
-        if (SoundBuffer[i] != NULL)
-        {
-            PlayMusicStream(*SoundBuffer[i]);
-        }
-    }
-}
-
-void
-UpdateSounds()
-{
-    for (int i = 0; i < len(SoundBuffer); i++)
-    {
-        if (SoundBuffer[i] != NULL)
-        {
-            UpdateMusicStream(*SoundBuffer[i]);
-        }
-    }
-}
 
 void
 ExitGame()

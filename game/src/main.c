@@ -168,7 +168,6 @@ int
 main(void)
 {
     local_persist Poker_Game game_state;
-
     // TODO(nick): replace with init game function
     GameScreen_Init(GlobalWindowWidth, GlobalWindowHeight, GAME_WIDTH, GAME_HEIGHT);
     Poker_Init(&game_state);
@@ -898,7 +897,6 @@ UnloadTextures()
     UnloadTexture(CardSlotTexture);
     UnloadTexture(BackOfCardTexture);
     UnloadTexture(ScoreFrameTexture);
-
     int i = 0;
     for (i = 0; i < len(MrFrecklesSpritesheets); i++)
     {

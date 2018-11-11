@@ -11,6 +11,15 @@
 internal unsigned int SoundBufferSize = 0;
 internal Music *SoundBuffer[SOUND_BUFFER_MAX];
 
+void
+InitializeSoundMeta(Music *soundArray, SoundMeta *soundMetaArray, int length)
+{
+    for (int i = 0; i < length; i++)
+    {
+        soundMetaArray[i] = CreateSoundMeta(&soundArray[i]);
+    }
+}
+
 SoundMeta
 CreateSoundMeta(Music *sound)
 {

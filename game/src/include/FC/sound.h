@@ -13,6 +13,9 @@ typedef struct _soundMeta
     float           lastPlayTime;
 } SoundMeta;
 
+void
+InitializeSoundMeta(Music *soundArray, SoundMeta *soundMetaArray, int length);
+
 SoundMeta
 CreateSoundMeta(Music *sound);
 

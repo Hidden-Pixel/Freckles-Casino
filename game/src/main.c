@@ -1310,11 +1310,7 @@ LoadSounds()
     CharacterThemeMusic[GeneralGrunt] = LoadMusicStream("assets/sounds/music/ogg/Generalissimo_Grunt.ogg");
     CharacterThemeMusic[Pyrella] = LoadMusicStream("assets/sounds/music/ogg/Pyrella.ogg");
 
-    // TODO(nick): create function that will load all meta given array.
-    for (int i = 0; i < len(CharacterThemeMusic); i++)
-    {
-        CharacterThemeMusicMeta[i] = CreateSoundMeta(&CharacterThemeMusic[i]);
-    }
+    InitializeSoundMeta(CharacterThemeMusic, CharacterThemeMusicMeta, len(CharacterThemeMusic));
 
     // NOTE: load Mr. Freckles dialogue
     MrFrecklesDialogue[0] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Laugh/Laugh1.ogg");
@@ -1343,11 +1339,8 @@ LoadSounds()
     MrFrecklesDialogue[23] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Win/FrecklesWin0_4.ogg");
     MrFrecklesDialogue[24] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Win/FrecklesWin0_5.ogg");
     MrFrecklesDialogue[25] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Win/FrecklesWin0_6.ogg");
-
-    for (int i = 0; i < len(MrFrecklesDialogue); i++)
-    {
-        MrFrecklesDialogueMeta[i] = CreateSoundMeta(&MrFrecklesDialogue[i]);
-    }
+    
+    InitializeSoundMeta(MrFrecklesDialogue, MrFrecklesDialogueMeta, len(MrFrecklesDialogue));
 }
 
 void
@@ -1369,6 +1362,7 @@ void
 InitSounds()
 {
     AddSoundToBuffer(&CharacterThemeMusic[MrFreckles]);
+    AddSoundToBuffer(&MrFrecklesDialogue[18]);
 }
 
 void

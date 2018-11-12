@@ -9,6 +9,7 @@
 #include <FC/defines.h>
 #include <FC/scene.h>
 #include <FC/character-state.h>
+#include <FC/sound.h>
 
 #include <stdio.h>
 
@@ -88,6 +89,12 @@ global_variable unsigned int PyrellaActiveState = Idle;
 global_variable bool GameStarted = false;
 global_variable unsigned int GameScene = SceneTitleScreen;
 
+global_variable Music CharacterThemeMusic[5];
+global_variable SoundMeta CharacterThemeMusicMeta[5];
+
+global_variable Music MrFrecklesDialogue[26];
+global_variable SoundMeta MrFrecklesDialogueMeta[26];
+
 const char* CreditsText = "CREDITS";
 const char* JackpotText = "JACKPOT";
 const char* BetText     = "BET";
@@ -128,22 +135,42 @@ RenderGame(Poker_Game* game_state);
 void
 DrawFaceCard(Poker_Card card, int x, int y);
 
+void
+LoadSounds();
+
+void
+UnloadSounds();
+
+void
+InitSounds();
+
+void
+ExitGame();
+
 int
 main(void)
 {
     local_persist Poker_Game game_state;
-
+    // TODO(nick): replace with init game function
     GameScreen_Init(GlobalWindowWidth, GlobalWindowHeight, GAME_WIDTH, GAME_HEIGHT);
     Poker_Init(&game_state);
     InitWindow(GlobalWindowWidth, GlobalWindowHeight, GlobalWindowTitle);
     SetTargetFPS(GlobalTargetFPS);
 
+    // NOTE: load all textures
     LoadTextures();
+
+    // NOTE: load all sounds
+    InitAudioDevice();
+    LoadSounds();
+    InitSounds();
 
     if (IsWindowReady())
     {
+        PlaySounds();
         while (GlobalRunning)
         {
+            UpdateSounds();
             ProcessInput(&game_state);
             RenderScene(&game_state, GameScene);
             if (WindowShouldClose())
@@ -151,10 +178,9 @@ main(void)
                 GlobalRunning = 0;
             }
         }
-        CloseWindow();
     }
 
-    UnloadTextures();
+    ExitGame();
 
     return 0;
 }
@@ -296,9 +322,9 @@ LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
     {
         .currentDrawFrameIndex  = 0,
         .frameCounter           = 0,
-        .totalFrames            = 12,
-        .totalVerticalFrames    = 4,
-        .totalHorizontalFrames  = 4,
+        .totalFrames            = 13,
+        .totalVerticalFrames    = 1,
+        .totalHorizontalFrames  = 13,
         .frameSpeed             = 2,
     };
 }
@@ -854,14 +880,30 @@ UnloadTextures()
     UnloadTexture(CardSlotTexture);
     UnloadTexture(BackOfCardTexture);
     UnloadTexture(ScoreFrameTexture);
-    for (int i = 0; i < len(MrFrecklesSpritesheets); i++)
+    int i = 0;
+    for (i = 0; i < len(MrFrecklesSpritesheets); i++)
     {
         UnloadTexture(MrFrecklesSpritesheets[i]);
     }
 
-    for (int i = 0; i < len(MrsFrecklesSpritesheets); i++)
+    for (i = 0; i < len(MrsFrecklesSpritesheets); i++)
     {
         UnloadTexture(MrsFrecklesSpritesheets[i]);
+    }
+
+    for (i = 0; i < len(ColHindenburgerSpritesheets); i++)
+    {
+        UnloadTexture(ColHindenburgerSpritesheets[i]);
+    }
+
+    for (i = 0; i < len(GeneralGruntSpritesheets); i++)
+    {
+        UnloadTexture(GeneralGruntSpritesheets[i]);
+    }
+
+    for (i = 0; i < len(PyrellaSpritesheets); i++)
+    {
+        UnloadTexture(PyrellaSpritesheets[i]);
     }
 }
 
@@ -895,7 +937,7 @@ ProcessInput(Poker_Game* game_state)
                 MrsFrecklesActiveState++;
             }
         }
-        else if (CurrentCharacterId == ColHinderburger)
+        else if (CurrentCharacterId == ColHindenburger)
         {
             if (ColHindenburgerActiveState >= Losing)
             {
@@ -906,7 +948,7 @@ ProcessInput(Poker_Game* game_state)
                 ColHindenburgerActiveState++;
             }
         }
-        else if (CurrentCharacterId == ColHinderburger)
+        else if (CurrentCharacterId == ColHindenburger)
         {
             if (ColHindenburgerActiveState >= Losing)
             {
@@ -1090,7 +1132,7 @@ RenderGame(Poker_Game* game_state)
                 currentCharacterSpritePosition = &MrsFrecklesPosition[MrsFrecklesActiveState];
             } break;
 
-            case ColHinderburger:
+            case ColHindenburger:
             {
                 currentCharacterSpritesheet = &ColHindenburgerSpritesheets[ColHindenburgerActiveState];
                 currentCharacterAnimation = &ColHindenburgerSpriteAnimation[ColHindenburgerActiveState];
@@ -1256,4 +1298,81 @@ DrawFaceCard(Poker_Card card, int x, int y)
     {
         DrawTexture(CardTextures[cardIndex], x, y, WHITE);
     }
+}
+
+void
+LoadSounds()
+{
+    // NOTE: load theme music
+    CharacterThemeMusic[MrFreckles] = LoadMusicStream("assets/sounds/music/ogg/Mr_Freckles.ogg");
+    CharacterThemeMusic[MrsFreckles] = LoadMusicStream("assets/sounds/music/ogg/Mrs_Freckles.ogg");
+    CharacterThemeMusic[ColHindenburger] = LoadMusicStream("assets/sounds/music/ogg/Col_Von_HindenBurger.ogg");
+    CharacterThemeMusic[GeneralGrunt] = LoadMusicStream("assets/sounds/music/ogg/Generalissimo_Grunt.ogg");
+    CharacterThemeMusic[Pyrella] = LoadMusicStream("assets/sounds/music/ogg/Pyrella.ogg");
+
+    InitializeSoundMeta(CharacterThemeMusic, CharacterThemeMusicMeta, len(CharacterThemeMusic));
+
+    // NOTE: load Mr. Freckles dialogue
+    MrFrecklesDialogue[0] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Laugh/Laugh1.ogg");
+    MrFrecklesDialogue[1] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Laugh/Laugh2.ogg");
+    MrFrecklesDialogue[2] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_1.ogg");
+    MrFrecklesDialogue[3] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_2.ogg");
+    MrFrecklesDialogue[4] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_3.ogg");
+    MrFrecklesDialogue[5] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_4.ogg");
+    MrFrecklesDialogue[6] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_5.ogg");
+    MrFrecklesDialogue[7] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_6.ogg");
+    MrFrecklesDialogue[8] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_7.ogg");
+    MrFrecklesDialogue[9] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_8.ogg");
+    MrFrecklesDialogue[10] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_9.ogg");
+    MrFrecklesDialogue[11] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_10.ogg");
+    MrFrecklesDialogue[12] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Lose/FrecklesLose0_11.ogg");
+    MrFrecklesDialogue[13] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Start/FrecklesStart0_1.ogg");
+    MrFrecklesDialogue[14] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Start/FrecklesStart0_2.ogg");
+    MrFrecklesDialogue[15] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Start/FrecklesStart0_3.ogg");
+    MrFrecklesDialogue[16] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Start/FrecklesStart0_4.ogg");
+    MrFrecklesDialogue[17] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Start/FrecklesStart0_5.ogg");
+    MrFrecklesDialogue[18] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Start/FrecklesStart0_6.ogg");
+    MrFrecklesDialogue[19] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Start/FrecklesStart0_7.ogg");
+    MrFrecklesDialogue[20] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Win/FrecklesWin0_1.ogg");
+    MrFrecklesDialogue[21] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Win/FrecklesWin0_2.ogg");
+    MrFrecklesDialogue[22] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Win/FrecklesWin0_3.ogg");
+    MrFrecklesDialogue[23] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Win/FrecklesWin0_4.ogg");
+    MrFrecklesDialogue[24] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Win/FrecklesWin0_5.ogg");
+    MrFrecklesDialogue[25] = LoadMusicStream("assets/sounds/dialogue/MrFreckles/Win/FrecklesWin0_6.ogg");
+    
+    InitializeSoundMeta(MrFrecklesDialogue, MrFrecklesDialogueMeta, len(MrFrecklesDialogue));
+}
+
+void
+UnloadSounds()
+{
+    int i;
+    for (i = 0; i < len(CharacterThemeMusic); i++)
+    {
+        UnloadMusicStream(CharacterThemeMusic[i]);
+    }
+    
+    for (i = 0; i < len(MrFrecklesDialogue); i++)
+    {
+        UnloadMusicStream(MrFrecklesDialogue[i]);
+    }
+}
+
+void
+InitSounds()
+{
+    CharacterThemeMusicMeta[MrFreckles].playLimit = INFINITE_PLAY;
+    AddSoundToBuffer(&CharacterThemeMusic[MrFreckles], &CharacterThemeMusicMeta[MrFreckles]);
+
+    MrFrecklesDialogueMeta[18].playLimit = 1;
+    AddSoundToBuffer(&MrFrecklesDialogue[18], &MrFrecklesDialogueMeta[18]);
+}
+
+void
+ExitGame()
+{
+    UnloadTextures();
+    UnloadSounds();
+    CloseAudioDevice();
+    CloseWindow();
 }

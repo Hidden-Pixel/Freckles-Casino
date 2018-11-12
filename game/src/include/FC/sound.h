@@ -5,10 +5,13 @@
 
 #include "raylib.h"
 
+#define INFINITE_PLAY -1
+#define KILL_IMMEDIATELY -2
+
 typedef struct _soundMeta
 {
     unsigned int    totalPlays;
-    unsigned int    playLimit;
+    int             playLimit;
     float           entirePlayLength;
     float           lastPlayTime;
 } SoundMeta;
@@ -20,10 +23,10 @@ SoundMeta
 CreateSoundMeta(Music *sound);
 
 void
-AddSoundToBuffer(Music *Sound);
+AddSoundToBuffer(Music *sound, SoundMeta *soundMeta);
 
 void
-RemoveSoundFromBuffer();
+RemoveSoundFromBufferByIndex(int index);
 
 void
 PlaySounds();

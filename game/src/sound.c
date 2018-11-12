@@ -10,6 +10,7 @@
 
 internal unsigned int SoundBufferSize = 0;
 internal Music *SoundBuffer[SOUND_BUFFER_MAX];
+internal SoundMeta *SoundMetaBuffer[SOUND_BUFFER_MAX];
 
 void
 InitializeSoundMeta(Music *soundArray, SoundMeta *soundMetaArray, int length)
@@ -25,41 +26,54 @@ CreateSoundMeta(Music *sound)
 {
     SoundMeta s = (SoundMeta)
     {
-        .totalPlays         = 0,
-        .playLimit          = 0,
-        .entirePlayLength   = GetMusicTimeLength(*sound),
-        .lastPlayTime       = 0,
+        .totalPlays             = 0,
+        .playLimit              = 0,
+        .entirePlayLength       = GetMusicTimeLength(*sound),
+        .lastPlayTime           = 0.0f,
     };
     return s;
 }
 
 void
-AddSoundToBuffer(Music *sound)
+UpdateSoundMeta(Music *sound, SoundMeta *soundMeta)
 {
-    // TODO(nick): handle overflow of add request by removing first
-    if (len(SoundBuffer) >= SOUND_BUFFER_MAX)
+    float currentPlayTime = GetMusicTimePlayed(*sound);
+    float deltaPlayTime = currentPlayTime - soundMeta->lastPlayTime;
+    if (deltaPlayTime < 0.0f)
     {
-        RemoveSoundFromBuffer();
+        soundMeta->totalPlays++;
     }
+    soundMeta->lastPlayTime = currentPlayTime;
+}
+
+// TODO(nick): handle overflow of add request by removing
+void
+AddSoundToBuffer(Music *sound, SoundMeta *soundMeta)
+{
     SoundBuffer[SoundBufferSize] = sound;
+    SoundMetaBuffer[SoundBufferSize] = soundMeta;
     SoundBufferSize++;
 }
 
 void
-RemoveSoundFromBuffer()
+RemoveSoundFromBufferByIndex(int index)
 {
-    // TODO(nick):
+    if (index <= SOUND_BUFFER_MAX)
+    {
+        SoundBuffer[index] = NULL;
+        SoundMetaBuffer[index] = NULL;
+    }
 }
 
 void
 PlaySounds()
 {
-    // TODO(nick): add meta data checking here ...
     for (int i = 0; i < len(SoundBuffer); i++)
     {
         if (SoundBuffer[i] != NULL)
         {
             PlayMusicStream(*SoundBuffer[i]);
+            UpdateSoundMeta(SoundBuffer[i], SoundMetaBuffer[i]);
         }
     }
 }
@@ -67,12 +81,18 @@ PlaySounds()
 void
 UpdateSounds()
 {
-    // TODO(nick): add meta data checking here ...
     for (int i = 0; i < len(SoundBuffer); i++)
     {
         if (SoundBuffer[i] != NULL)
         {
             UpdateMusicStream(*SoundBuffer[i]);
+            UpdateSoundMeta(SoundBuffer[i], SoundMetaBuffer[i]);
+            if ((SoundMetaBuffer[i]->playLimit <= SoundMetaBuffer[i]->totalPlays) &&
+                (SoundMetaBuffer[i]->playLimit != INFINITE_PLAY) ||
+                (SoundMetaBuffer[i]->playLimit == KILL_IMMEDIATELY))
+            {
+                RemoveSoundFromBufferByIndex(i);
+            }
         }
     }
 }

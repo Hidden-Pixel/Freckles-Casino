@@ -1361,8 +1361,11 @@ UnloadSounds()
 void
 InitSounds()
 {
-    AddSoundToBuffer(&CharacterThemeMusic[MrFreckles]);
-    AddSoundToBuffer(&MrFrecklesDialogue[18]);
+    CharacterThemeMusicMeta[MrFreckles].playLimit = INFINITE_PLAY;
+    AddSoundToBuffer(&CharacterThemeMusic[MrFreckles], &CharacterThemeMusicMeta[MrFreckles]);
+
+    MrFrecklesDialogueMeta[18].playLimit = 1;
+    AddSoundToBuffer(&MrFrecklesDialogue[18], &MrFrecklesDialogueMeta[18]);
 }
 
 void

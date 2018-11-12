@@ -8,9 +8,9 @@
 // There's 52 cards in a deck and we're NOT counting jokers, folks.
 #define DECK_SIZE 52
 
-local_variable Poker_Card DealersDeck[DECK_SIZE] = { };
-local_variable Poker_Card SampleDeck[DECK_SIZE] = { };
-local_variable int deck_index = 0;
+local_persist Poker_Card DealersDeck[DECK_SIZE] = { 0 };
+local_persist Poker_Card SampleDeck[DECK_SIZE] = { 0 };
+local_persist int deck_index = 0;
 
 /*
  * @remark We're assuming that player_hand is length 2

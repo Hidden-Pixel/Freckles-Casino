@@ -3,7 +3,6 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <time.h>
-#include <tgmath.h>
 
 // There's 52 cards in a deck and we're NOT counting jokers, folks.
 #define DECK_SIZE 52
@@ -28,7 +27,11 @@ Poker_FindBestHand(Poker_Card* player_hand, Poker_Card* house_cards, int house_c
     int max_combinations = two_combinations + one_combinations + zero_combinations;
 
     // Create all the possible hands
-    Poker_Card hands[max_combinations][house_card_count + 2];
+    // TODO(nick): add link link struct and functions
+    // variable length arrays are not supported by all c / c++ compilers :(
+    // https://msdn.microsoft.com/en-us/library/zb1574zs.aspx
+    //Poker_Card hands[max_combinations][house_card_count + 2];
+    Poker_Card hands[100][100];
 
     return PokerHand_HighCard;
 }

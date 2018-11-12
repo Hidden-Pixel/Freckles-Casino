@@ -121,6 +121,9 @@ void
 DrawHorizontalCardArea(Texture2D texture, Vector2 area, int card_count, float x_shift);
 
 void
+DrawFaceCard(Poker_Card card, int x, int y);
+
+void
 HandleConfirmButtonPress(Poker_Game* game_state);
 
 void

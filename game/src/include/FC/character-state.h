@@ -7,7 +7,7 @@ typedef enum _characterId
 {
     MrFreckles           = 0x00,
     MrsFreckles          = 0x01,
-    ColHinderburger      = 0x02,
+    ColHindenburger      = 0x02,
     GeneralGrunt         = 0x03,
     Pyrella              = 0x04,
 } CharcterId;

@@ -75,7 +75,7 @@ typedef struct {
 } Poker_Game;
 
 Poker_Hand
-Poker_FindBestHand(Poker_Card* player_hand, Poker_Card* house_cards, int house_card_count);
+Poker_FindAllHands(Poker_Card* player_hand, Poker_Card* house_cards, int house_card_count);
 
 void
 Poker_Init();
@@ -92,4 +92,25 @@ Poker_ProcessNewState(Poker_Game* game_state);
 void
 Poker_Update(Poker_Game* game_state);
 
+/* Linked list */
+struct node {
+  Poker_Card value;
+  struct node* next;
+};
+
+typedef struct node Poker_LinkedListNode;
+
+typedef struct {
+    Poker_LinkedListNode* first;
+    Poker_LinkedListNode* last;
+} Poker_CardList;
+
+Poker_CardList*
+Poker_CreateCardList(Poker_Card first_card);
+
+void
+Poker_AddCardToList(Poker_CardList* card_list, Poker_Card card);
+
+void
+Poker_DestroyCardList(Poker_CardList* card_list);
 

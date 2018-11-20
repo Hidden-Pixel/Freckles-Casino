@@ -1,5 +1,6 @@
 #include <FC/poker.h>
 #include <FC/defines.h>
+#include <FC/buffer.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <time.h>
@@ -28,12 +29,11 @@ Poker_FindAllHands(Poker_Card* player_hand, Poker_Card* house_cards, int house_c
         int four_house_cards = house_card_count > 4 ? 5 : 0;
         int five_house_cards = house_card_count > 4 ? 1 : 0;
         int total_combinations = three_house_cards + four_house_cards + five_house_cards;
-
         // Create all the possible hands
+        // TODO(nick): replace with list - IMPORTANT
         Poker_CardList* hands[MAX_HAND_COMBOS];
 
         // TODO: Create all possible hands
-        
 
     } else {
       // TODO: Just process the player's hand.

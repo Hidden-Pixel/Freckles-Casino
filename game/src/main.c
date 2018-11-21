@@ -321,15 +321,7 @@ LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
     LoadCardTexture("assets/textures/Cards/Spades/Spritesheets/KingSpades.png", &CardTextures[50]);
     LoadCardTexture("assets/textures/Cards/Spades/Pngs/AceSpades.png", &CardTextures[51]);
 
-    HighCardSpriteAnimation = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 13,
-        .totalVerticalFrames    = 1,
-        .totalHorizontalFrames  = 13,
-        .frameSpeed             = 2,
-    };
+    HighCardSpriteAnimation = CreateSpriteAnimation(13, 1, 13, 2, CardTextures[51].width, CardTextures[51].height);
 }
 
 inline
@@ -346,15 +338,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     MrFrecklesSpritesheets[Idle] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrFrecklesSpriteAnimation[Idle] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 19,
-        .totalVerticalFrames    = 1,
-        .totalHorizontalFrames  = 19,
-        .frameSpeed             = 5,
-    };
+    MrFrecklesSpriteAnimation[Idle] = CreateSpriteAnimation(19, 1, 19, 5, MrFrecklesSpritesheets[Idle].width, MrFrecklesSpritesheets[Idle].height);
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/TalkNormal.png");
     imageVector->x = tempImage->width;
@@ -366,15 +350,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     MrFrecklesSpritesheets[TalkingNormal] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrFrecklesSpriteAnimation[TalkingNormal] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 8,
-        .totalVerticalFrames    = 1,
-        .totalHorizontalFrames  = 8,
-        .frameSpeed             = 10,
-    };
+    MrFrecklesSpriteAnimation[TalkingNormal] = CreateSpriteAnimation(8, 1, 8, 10, MrFrecklesSpritesheets[TalkingNormal].width, MrFrecklesSpritesheets[TalkingNormal].height);
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/Wins.png");
     imageVector->x = tempImage->width;
@@ -386,15 +362,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     MrFrecklesSpritesheets[Winning] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrFrecklesSpriteAnimation[Winning] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 4,
-        .totalVerticalFrames    = 1,
-        .totalHorizontalFrames  = 4,
-        .frameSpeed             = 2,
-    };
+    MrFrecklesSpriteAnimation[Winning] = CreateSpriteAnimation(4, 1, 4, 2, MrFrecklesSpritesheets[Winning].width, MrFrecklesSpritesheets[Winning].height);
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/Losing.png");
     imageVector->x = tempImage->width;
@@ -406,15 +374,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     MrFrecklesSpritesheets[Losing] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrFrecklesSpriteAnimation[Losing] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 6,
-        .totalVerticalFrames    = 1,
-        .totalHorizontalFrames  = 6,
-        .frameSpeed             = 10,
-    };
+    MrFrecklesSpriteAnimation[Losing] = CreateSpriteAnimation(6, 1, 6, 10, MrFrecklesSpritesheets[Losing].width, MrFrecklesSpritesheets[Losing].height);
     // NOTE: Mr. Freckles Spritesheets End
     
     // NOTE: Mrs. Freckles Spritesheets Begin
@@ -428,15 +388,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     MrsFrecklesSpritesheets[Idle] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrsFrecklesSpriteAnimation[Idle] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 14,
-        .totalVerticalFrames    = 4,
-        .totalHorizontalFrames  = 4,
-        .frameSpeed             = 5,
-    };
+    MrsFrecklesSpriteAnimation[Idle] = CreateSpriteAnimation(14, 4, 4, 5, MrsFrecklesSpritesheets[Idle].width, MrsFrecklesSpritesheets[Idle].height);
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrsFreckles/Talking.png");
     imageVector->x = tempImage->width;
@@ -448,15 +400,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     MrsFrecklesSpritesheets[TalkingNormal] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrsFrecklesSpriteAnimation[TalkingNormal] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 5,
-        .totalVerticalFrames    = 3,
-        .totalHorizontalFrames  = 2,
-        .frameSpeed             = 5,
-    };
+    MrsFrecklesSpriteAnimation[TalkingNormal] = CreateSpriteAnimation(5, 3, 2, 5, MrsFrecklesSpritesheets[TalkingNormal].width, MrsFrecklesSpritesheets[TalkingNormal].height);
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrsFreckles/Win.png");
     imageVector->x = tempImage->width;
@@ -468,15 +412,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     MrsFrecklesSpritesheets[Winning] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrsFrecklesSpriteAnimation[Winning] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 10,
-        .totalVerticalFrames    = 4,
-        .totalHorizontalFrames  = 3,
-        .frameSpeed             = 5,
-    };
+    MrsFrecklesSpriteAnimation[Winning] = CreateSpriteAnimation(10, 4, 3, 5, MrsFrecklesSpritesheets[Winning].width, MrsFrecklesSpritesheets[Winning].height);
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrsFreckles/Lose.png");
     imageVector->x = tempImage->width;
@@ -488,15 +424,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     MrsFrecklesSpritesheets[Losing] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrsFrecklesSpriteAnimation[Losing] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 4,
-        .totalVerticalFrames    = 2,
-        .totalHorizontalFrames  = 2,
-        .frameSpeed             = 5,
-    };
+    MrsFrecklesSpriteAnimation[Losing] = CreateSpriteAnimation(4, 2, 2, 2, MrsFrecklesSpritesheets[Losing].width, MrsFrecklesSpritesheets[Losing].height);
     // NOTE: Mrs. Freckles Spritesheets End
     
     // NOTE: Col. Hindenburger Begin
@@ -510,15 +438,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     ColHindenburgerSpritesheets[Idle] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    ColHindenburgerSpriteAnimation[Idle] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 9,
-        .totalVerticalFrames    = 1,
-        .totalHorizontalFrames  = 9,
-        .frameSpeed             = 5,
-    };
+    ColHindenburgerSpriteAnimation[Idle] = CreateSpriteAnimation(9, 1, 9, 5, ColHindenburgerSpritesheets[Idle].width, ColHindenburgerSpritesheets[Idle].height);
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/ColHindenburger/TalkNormal.png");
     imageVector->x = tempImage->width;
@@ -530,15 +450,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     ColHindenburgerSpritesheets[TalkingNormal] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    ColHindenburgerSpriteAnimation[TalkingNormal] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 4,
-        .totalVerticalFrames    = 1,
-        .totalHorizontalFrames  = 4,
-        .frameSpeed             = 2,
-    };
+    ColHindenburgerSpriteAnimation[TalkingNormal] = CreateSpriteAnimation(4, 1, 4, 2, ColHindenburgerSpritesheets[TalkingNormal].width, ColHindenburgerSpritesheets[TalkingNormal].height);
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/ColHindenburger/Win.png");
     imageVector->x = tempImage->width;
@@ -550,15 +462,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     ColHindenburgerSpritesheets[Winning] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    ColHindenburgerSpriteAnimation[Winning] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 4,
-        .totalVerticalFrames    = 1,
-        .totalHorizontalFrames  = 4,
-        .frameSpeed             = 2,
-    };
+    ColHindenburgerSpriteAnimation[Winning] = CreateSpriteAnimation(4, 1, 4, 2, ColHindenburgerSpritesheets[Winning].width, ColHindenburgerSpritesheets[Winning].height);
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/ColHindenburger/Lose.png");
     imageVector->x = tempImage->width;
@@ -570,15 +474,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     ColHindenburgerSpritesheets[Losing] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    ColHindenburgerSpriteAnimation[Losing] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 4,
-        .totalVerticalFrames    = 1,
-        .totalHorizontalFrames  = 4,
-        .frameSpeed             = 2,
-    };
+    ColHindenburgerSpriteAnimation[Losing] = CreateSpriteAnimation(4, 1, 4, 2, ColHindenburgerSpritesheets[Losing].width, ColHindenburgerSpritesheets[Losing].height);
     // NOTE: Col. Hindenburger End
 
     // NOTE: Generalissimo Grunt Begin
@@ -592,15 +488,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     GeneralGruntSpritesheets[Idle] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    GeneralGruntSpriteAnimation[Idle] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 10,
-        .totalVerticalFrames    = 1,
-        .totalHorizontalFrames  = 10,
-        .frameSpeed             = 4,
-    };
+    GeneralGruntSpriteAnimation[Idle] = CreateSpriteAnimation(10, 1, 10, 4, GeneralGruntSpritesheets[Idle].width, GeneralGruntSpritesheets[Idle].height);
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/GeneralissimoGrunt/TalkNormal.png");
     imageVector->x = tempImage->width;
@@ -612,15 +500,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     GeneralGruntSpritesheets[TalkingNormal] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    GeneralGruntSpriteAnimation[TalkingNormal] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 8,
-        .totalVerticalFrames    = 1,
-        .totalHorizontalFrames  = 8,
-        .frameSpeed             = 4,
-    };
+    GeneralGruntSpriteAnimation[TalkingNormal] = CreateSpriteAnimation(8, 1, 8, 4, GeneralGruntSpritesheets[TalkingNormal].width, GeneralGruntSpritesheets[TalkingNormal].height);
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/GeneralissimoGrunt/Win.png");
     imageVector->x = tempImage->width;
@@ -632,15 +512,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     GeneralGruntSpritesheets[Winning] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    GeneralGruntSpriteAnimation[Winning] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 4,
-        .totalVerticalFrames    = 1,
-        .totalHorizontalFrames  = 4,
-        .frameSpeed             = 2,
-    };
+    GeneralGruntSpriteAnimation[Winning] = CreateSpriteAnimation(8, 1, 8, 4, GeneralGruntSpritesheets[Winning].width, GeneralGruntSpritesheets[Winning].height);
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/GeneralissimoGrunt/Lose.png");
     imageVector->x = tempImage->width;
@@ -652,15 +524,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     GeneralGruntSpritesheets[Losing] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    GeneralGruntSpriteAnimation[Losing] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 15,
-        .totalVerticalFrames    = 1,
-        .totalHorizontalFrames  = 15,
-        .frameSpeed             = 3,
-    };
+    GeneralGruntSpriteAnimation[Losing] = CreateSpriteAnimation(15, 1, 15, 3, GeneralGruntSpritesheets[Winning].width, GeneralGruntSpritesheets[Winning].height);
     // NOTE: Generalissimo Grunt End
 
     // NOTE: Pyrella Begin
@@ -674,15 +538,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     PyrellaSpritesheets[Idle] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    PyrellaSpriteAnimation[Idle] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 9,
-        .totalVerticalFrames    = 1,
-        .totalHorizontalFrames  = 9,
-        .frameSpeed             = 2,
-    };
+    PyrellaSpriteAnimation[Idle] = CreateSpriteAnimation(9, 1, 9, 2, PyrellaSpritesheets[Idle].width, PyrellaSpritesheets[Idle].height);
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/Pyrella/TalkingNormal.png");
     imageVector->x = tempImage->width;
@@ -694,15 +550,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     PyrellaSpritesheets[TalkingNormal] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    PyrellaSpriteAnimation[TalkingNormal] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 4,
-        .totalVerticalFrames    = 1,
-        .totalHorizontalFrames  = 4,
-        .frameSpeed             = 2,
-    };
+    PyrellaSpriteAnimation[TalkingNormal] = CreateSpriteAnimation(4, 1, 4, 2, PyrellaSpritesheets[TalkingNormal].width, PyrellaSpritesheets[TalkingNormal].height);
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/Pyrella/Win.png");
     imageVector->x = tempImage->width;
@@ -714,15 +562,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     PyrellaSpritesheets[Winning] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    PyrellaSpriteAnimation[Winning] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 17,
-        .totalVerticalFrames    = 1,
-        .totalHorizontalFrames  = 17,
-        .frameSpeed             = 2,
-    };
+    PyrellaSpriteAnimation[Winning] = CreateSpriteAnimation(17, 1, 17, 2, PyrellaSpritesheets[Winning].width, PyrellaSpritesheets[Winning].height);
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/Pyrella/Lose.png");
     imageVector->x = tempImage->width;
@@ -734,15 +574,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     PyrellaSpritesheets[Losing] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    PyrellaSpriteAnimation[Losing] = (SpriteAnimation)
-    {
-        .currentDrawFrameIndex  = 0,
-        .frameCounter           = 0,
-        .totalFrames            = 4,
-        .totalVerticalFrames    = 1,
-        .totalHorizontalFrames  = 4,
-        .frameSpeed             = 2,
-    };
+    PyrellaSpriteAnimation[Losing] = CreateSpriteAnimation(4, 1, 4, 2, PyrellaSpritesheets[Losing].width, PyrellaSpritesheets[Losing].height);
     // NOTE: Pyrella End
 }
 

@@ -25,7 +25,7 @@
 // Our target game size
 // This gives us 102240 (240p) units to work with
 // Classic old-school resolution.
-#define GAME_WIDTH 426
+#define GAME_WIDTH 320
 #define GAME_HEIGHT 240
 
 global_variable int GlobalWindowWidth = WIDTH;
@@ -65,26 +65,6 @@ global_variable Texture2D MrFrecklesSpritesheets[4];
 global_variable SpriteAnimation MrFrecklesSpriteAnimation[4];
 global_variable Vector2 MrFrecklesPosition[4];
 global_variable unsigned int MrFrecklesActiveState = Idle;
-
-global_variable Texture2D MrsFrecklesSpritesheets[4];
-global_variable SpriteAnimation MrsFrecklesSpriteAnimation[4];
-global_variable Vector2 MrsFrecklesPosition[4];
-global_variable unsigned int MrsFrecklesActiveState = Idle;
-
-global_variable Texture2D ColHindenburgerSpritesheets[4];
-global_variable SpriteAnimation ColHindenburgerSpriteAnimation[4];
-global_variable Vector2 ColHindenburgerPosition[4];
-global_variable unsigned int ColHindenburgerActiveState = Idle;
-
-global_variable Texture2D GeneralGruntSpritesheets[4];
-global_variable SpriteAnimation GeneralGruntSpriteAnimation[4];
-global_variable Vector2 GeneralGruntPosition[4];
-global_variable unsigned int GeneralGruntActiveState = Idle;
-
-global_variable Texture2D PyrellaSpritesheets[4];
-global_variable SpriteAnimation PyrellaSpriteAnimation[4];
-global_variable Vector2 PyrellaPosition[4];
-global_variable unsigned int PyrellaActiveState = Idle;
 
 global_variable bool GameStarted = false;
 global_variable unsigned int GameScene = SceneTitleScreen;
@@ -268,9 +248,9 @@ LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
     LoadCardTexture("assets/textures/Cards/Hearts/Pngs/8Hearts.png", &CardTextures[6]);
     LoadCardTexture("assets/textures/Cards/Hearts/Pngs/9Hearts.png", &CardTextures[7]);
     LoadCardTexture("assets/textures/Cards/Hearts/Pngs/10Hearts.png", &CardTextures[8]);
-    LoadCardTexture("assets/textures/Cards/Hearts/Spritesheets/JackHearts.png", &CardTextures[9]);
-    LoadCardTexture("assets/textures/Cards/Hearts/Spritesheets/QueenHearts.png", &CardTextures[10]);
-    LoadCardTexture("assets/textures/Cards/Hearts/Spritesheets/KingHearts.png", &CardTextures[11]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/JackHearts.png", &CardTextures[9]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/QueenHearts.png", &CardTextures[10]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/KingHearts.png", &CardTextures[11]);
     LoadCardTexture("assets/textures/Cards/Hearts/Pngs/AceHearts.png", &CardTextures[12]);
 
     // Clubs
@@ -284,9 +264,9 @@ LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
     LoadCardTexture("assets/textures/Cards/Clubs/Pngs/8Clubs.png", &CardTextures[19]);
     LoadCardTexture("assets/textures/Cards/Clubs/Pngs/9Clubs.png", &CardTextures[20]);
     LoadCardTexture("assets/textures/Cards/Clubs/Pngs/10Clubs.png", &CardTextures[21]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Spritesheets/JackClubs.png", &CardTextures[22]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Spritesheets/QueenClubs.png", &CardTextures[23]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Spritesheets/KingClubs.png", &CardTextures[24]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/JackClubs.png", &CardTextures[22]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/QueenClubs.png", &CardTextures[23]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/KingClubs.png", &CardTextures[24]);
     LoadCardTexture("assets/textures/Cards/Clubs/Pngs/AceClubs.png", &CardTextures[25]);
 
     // Diamonds
@@ -300,9 +280,9 @@ LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
     LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/8Dia.png", &CardTextures[32]);
     LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/9Dia.png", &CardTextures[33]);
     LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/10Dia.png", &CardTextures[34]);
-    LoadCardTexture("assets/textures/Cards/Diamonds/Spritesheets/JackDia.png", &CardTextures[35]);
-    LoadCardTexture("assets/textures/Cards/Diamonds/Spritesheets/QueenDia.png", &CardTextures[36]);
-    LoadCardTexture("assets/textures/Cards/Diamonds/Spritesheets/KingDia.png", &CardTextures[37]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/JackDia.png", &CardTextures[35]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/QueenDia.png", &CardTextures[36]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/KingDia.png", &CardTextures[37]);
     LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/AceDia.png", &CardTextures[38]);
 
     // Spades
@@ -316,12 +296,10 @@ LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
     LoadCardTexture("assets/textures/Cards/Spades/Pngs/8Spades.png", &CardTextures[45]);
     LoadCardTexture("assets/textures/Cards/Spades/Pngs/9Spades.png", &CardTextures[46]);
     LoadCardTexture("assets/textures/Cards/Spades/Pngs/10Spades.png", &CardTextures[47]);
-    LoadCardTexture("assets/textures/Cards/Spades/Spritesheets/JackSpades.png", &CardTextures[48]);
-    LoadCardTexture("assets/textures/Cards/Spades/Spritesheets/QueenSpades.png", &CardTextures[49]);
-    LoadCardTexture("assets/textures/Cards/Spades/Spritesheets/KingSpades.png", &CardTextures[50]);
+    LoadCardTexture("assets/textures/Cards/Spades/Pngs/JackSpades.png", &CardTextures[48]);
+    LoadCardTexture("assets/textures/Cards/Spades/Pngs/QueenSpades.png", &CardTextures[49]);
+    LoadCardTexture("assets/textures/Cards/Spades/Pngs/KingSpades.png", &CardTextures[50]);
     LoadCardTexture("assets/textures/Cards/Spades/Pngs/AceSpades.png", &CardTextures[51]);
-
-    HighCardSpriteAnimation = CreateSpriteAnimation(13, 1, 13, 2, CardTextures[51].width, CardTextures[51].height);
 }
 
 inline
@@ -332,250 +310,50 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     imageVector->x = tempImage->width;
     imageVector->y = tempImage->height;
     *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(2.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(2.0f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     MrFrecklesSpritesheets[Idle] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrFrecklesSpriteAnimation[Idle] = CreateSpriteAnimation(19, 1, 19, 5, MrFrecklesSpritesheets[Idle].width, MrFrecklesSpritesheets[Idle].height);
+    MrFrecklesSpriteAnimation[Idle] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[Idle].width, MrFrecklesSpritesheets[Idle].height);
 
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/TalkNormal.png");
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/PlayingCards.png");
     imageVector->x = tempImage->width;
     imageVector->y = tempImage->height;
     *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(2.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(2.0f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    MrFrecklesSpritesheets[TalkingNormal] = LoadTextureFromImage(*tempImage);
+    MrFrecklesSpritesheets[PlayingCards] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrFrecklesSpriteAnimation[TalkingNormal] = CreateSpriteAnimation(8, 1, 8, 10, MrFrecklesSpritesheets[TalkingNormal].width, MrFrecklesSpritesheets[TalkingNormal].height);
+    MrFrecklesSpriteAnimation[PlayingCards] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[PlayingCards].width, MrFrecklesSpritesheets[PlayingCards].height);
 
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/Wins.png");
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/Winning.png");
     imageVector->x = tempImage->width;
     imageVector->y = tempImage->height;
     *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(2.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(2.0f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     MrFrecklesSpritesheets[Winning] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrFrecklesSpriteAnimation[Winning] = CreateSpriteAnimation(4, 1, 4, 2, MrFrecklesSpritesheets[Winning].width, MrFrecklesSpritesheets[Winning].height);
+    MrFrecklesSpriteAnimation[Winning] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[Winning].width, MrFrecklesSpritesheets[Winning].height);
 
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/Losing.png");
     imageVector->x = tempImage->width;
     imageVector->y = tempImage->height;
     *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
+    imageVector->x += GameScreen_LocalUnitsToScreen(2.0f);
+    imageVector->y += GameScreen_LocalUnitsToScreen(2.0f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     MrFrecklesSpritesheets[Losing] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrFrecklesSpriteAnimation[Losing] = CreateSpriteAnimation(6, 1, 6, 10, MrFrecklesSpritesheets[Losing].width, MrFrecklesSpritesheets[Losing].height);
+    MrFrecklesSpriteAnimation[Losing] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[Losing].width, MrFrecklesSpritesheets[Losing].height);
     // NOTE: Mr. Freckles Spritesheets End
-    
-    // NOTE: Mrs. Freckles Spritesheets Begin
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrsFreckles/Idle.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    MrsFrecklesSpritesheets[Idle] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    MrsFrecklesSpriteAnimation[Idle] = CreateSpriteAnimation(14, 4, 4, 5, MrsFrecklesSpritesheets[Idle].width, MrsFrecklesSpritesheets[Idle].height);
-
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrsFreckles/Talking.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    MrsFrecklesSpritesheets[TalkingNormal] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    MrsFrecklesSpriteAnimation[TalkingNormal] = CreateSpriteAnimation(5, 3, 2, 5, MrsFrecklesSpritesheets[TalkingNormal].width, MrsFrecklesSpritesheets[TalkingNormal].height);
-
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrsFreckles/Win.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    MrsFrecklesSpritesheets[Winning] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    MrsFrecklesSpriteAnimation[Winning] = CreateSpriteAnimation(10, 4, 3, 5, MrsFrecklesSpritesheets[Winning].width, MrsFrecklesSpritesheets[Winning].height);
-
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrsFreckles/Lose.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    MrsFrecklesSpritesheets[Losing] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    MrsFrecklesSpriteAnimation[Losing] = CreateSpriteAnimation(4, 2, 2, 2, MrsFrecklesSpritesheets[Losing].width, MrsFrecklesSpritesheets[Losing].height);
-    // NOTE: Mrs. Freckles Spritesheets End
-    
-    // NOTE: Col. Hindenburger Begin
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/ColHindenburger/Idle.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    ColHindenburgerSpritesheets[Idle] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    ColHindenburgerSpriteAnimation[Idle] = CreateSpriteAnimation(9, 1, 9, 5, ColHindenburgerSpritesheets[Idle].width, ColHindenburgerSpritesheets[Idle].height);
-
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/ColHindenburger/TalkNormal.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    ColHindenburgerSpritesheets[TalkingNormal] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    ColHindenburgerSpriteAnimation[TalkingNormal] = CreateSpriteAnimation(4, 1, 4, 2, ColHindenburgerSpritesheets[TalkingNormal].width, ColHindenburgerSpritesheets[TalkingNormal].height);
-
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/ColHindenburger/Win.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    ColHindenburgerSpritesheets[Winning] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    ColHindenburgerSpriteAnimation[Winning] = CreateSpriteAnimation(4, 1, 4, 2, ColHindenburgerSpritesheets[Winning].width, ColHindenburgerSpritesheets[Winning].height);
-
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/ColHindenburger/Lose.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    ColHindenburgerSpritesheets[Losing] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    ColHindenburgerSpriteAnimation[Losing] = CreateSpriteAnimation(4, 1, 4, 2, ColHindenburgerSpritesheets[Losing].width, ColHindenburgerSpritesheets[Losing].height);
-    // NOTE: Col. Hindenburger End
-
-    // NOTE: Generalissimo Grunt Begin
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/GeneralissimoGrunt/Idle.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    GeneralGruntSpritesheets[Idle] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    GeneralGruntSpriteAnimation[Idle] = CreateSpriteAnimation(10, 1, 10, 4, GeneralGruntSpritesheets[Idle].width, GeneralGruntSpritesheets[Idle].height);
-
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/GeneralissimoGrunt/TalkNormal.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    GeneralGruntSpritesheets[TalkingNormal] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    GeneralGruntSpriteAnimation[TalkingNormal] = CreateSpriteAnimation(8, 1, 8, 4, GeneralGruntSpritesheets[TalkingNormal].width, GeneralGruntSpritesheets[TalkingNormal].height);
-
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/GeneralissimoGrunt/Win.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    GeneralGruntSpritesheets[Winning] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    GeneralGruntSpriteAnimation[Winning] = CreateSpriteAnimation(8, 1, 8, 4, GeneralGruntSpritesheets[Winning].width, GeneralGruntSpritesheets[Winning].height);
-
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/GeneralissimoGrunt/Lose.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    GeneralGruntSpritesheets[Losing] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    GeneralGruntSpriteAnimation[Losing] = CreateSpriteAnimation(15, 1, 15, 3, GeneralGruntSpritesheets[Winning].width, GeneralGruntSpritesheets[Winning].height);
-    // NOTE: Generalissimo Grunt End
-
-    // NOTE: Pyrella Begin
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/Pyrella/Idle.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    PyrellaSpritesheets[Idle] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    PyrellaSpriteAnimation[Idle] = CreateSpriteAnimation(9, 1, 9, 2, PyrellaSpritesheets[Idle].width, PyrellaSpritesheets[Idle].height);
-
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/Pyrella/TalkingNormal.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    PyrellaSpritesheets[TalkingNormal] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    PyrellaSpriteAnimation[TalkingNormal] = CreateSpriteAnimation(4, 1, 4, 2, PyrellaSpritesheets[TalkingNormal].width, PyrellaSpritesheets[TalkingNormal].height);
-
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/Pyrella/Win.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    PyrellaSpritesheets[Winning] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    PyrellaSpriteAnimation[Winning] = CreateSpriteAnimation(17, 1, 17, 2, PyrellaSpritesheets[Winning].width, PyrellaSpritesheets[Winning].height);
-
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/Pyrella/Lose.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    PyrellaSpritesheets[Losing] = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
-    PyrellaSpriteAnimation[Losing] = CreateSpriteAnimation(4, 1, 4, 2, PyrellaSpritesheets[Losing].width, PyrellaSpritesheets[Losing].height);
-    // NOTE: Pyrella End
 }
 
 inline
@@ -643,46 +421,13 @@ SetPositions()
     for (unsigned int currentState = Idle; currentState < len(MrFrecklesPosition); currentState++)
     {
         // NOTE: calculate one frame size and get one-half of one frame size
-        xOffset = (MrFrecklesSpritesheets[currentState].width / MrFrecklesSpriteAnimation[currentState].totalHorizontalFrames) * 0.5f;
-        yOffset = (MrFrecklesSpritesheets[currentState].height / MrFrecklesSpriteAnimation[currentState].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(35.0f);
-        MrFrecklesPosition[currentState].x = TableAreaCenter.x - xOffset;
-        MrFrecklesPosition[currentState].y = TableAreaCenter.y - yOffset;
-    }
-
-    for (unsigned int currentState = Idle; currentState < len(MrsFrecklesPosition); currentState++)
-    {
-        // NOTE: calculate one frame size and get one-half of one frame size
-        xOffset = (MrsFrecklesSpritesheets[currentState].width / MrsFrecklesSpriteAnimation[currentState].totalHorizontalFrames) * 0.5f;
-        yOffset = (MrsFrecklesSpritesheets[currentState].height / MrsFrecklesSpriteAnimation[currentState].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(35.0f);
-        MrsFrecklesPosition[currentState].x = TableAreaCenter.x - xOffset;
-        MrsFrecklesPosition[currentState].y = TableAreaCenter.y - yOffset;
-    }
-
-    for (unsigned int currentState = Idle; currentState < len(ColHindenburgerPosition); currentState++)
-    {
-        // NOTE: calculate one frame size and get one-half of one frame size
-        xOffset = (ColHindenburgerSpritesheets[currentState].width / ColHindenburgerSpriteAnimation[currentState].totalHorizontalFrames) * 0.5f;
-        yOffset = (ColHindenburgerSpritesheets[currentState].height / ColHindenburgerSpriteAnimation[currentState].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(35.0f);
-        ColHindenburgerPosition[currentState].x = TableAreaCenter.x - xOffset;
-        ColHindenburgerPosition[currentState].y = TableAreaCenter.y - yOffset;
-    }
-
-    for (unsigned int currentState = Idle; currentState < len(GeneralGruntPosition); currentState++)
-    {
-        // NOTE: calculate one frame size and get one-half of one frame size
-        xOffset = (GeneralGruntSpritesheets[currentState].width / GeneralGruntSpriteAnimation[currentState].totalHorizontalFrames) * 0.5f;
-        yOffset = (GeneralGruntSpritesheets[currentState].height / GeneralGruntSpriteAnimation[currentState].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(35.0f);
-        GeneralGruntPosition[currentState].x = TableAreaCenter.x - xOffset;
-        GeneralGruntPosition[currentState].y = TableAreaCenter.y - yOffset;
-    }
-
-    for (unsigned int currentState = Idle; currentState < len(PyrellaPosition); currentState++)
-    {
-        // NOTE: calculate one frame size and get one-half of one frame size
-        xOffset = (PyrellaSpritesheets[currentState].width / PyrellaSpriteAnimation[currentState].totalHorizontalFrames) * 0.5f;
-        yOffset = (PyrellaSpritesheets[currentState].height / PyrellaSpriteAnimation[currentState].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(35.0f);
-        PyrellaPosition[currentState].x = TableAreaCenter.x - xOffset;
-        PyrellaPosition[currentState].y = TableAreaCenter.y - yOffset;
+        if (MrFrecklesSpriteAnimation[currentState].totalFrames > 0) 
+        {
+            xOffset = (MrFrecklesSpritesheets[currentState].width / MrFrecklesSpriteAnimation[currentState].totalHorizontalFrames) * 0.5f;
+            yOffset = (MrFrecklesSpritesheets[currentState].height / MrFrecklesSpriteAnimation[currentState].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(35.0f);
+            MrFrecklesPosition[currentState].x = TableAreaCenter.x - xOffset;
+            MrFrecklesPosition[currentState].y = TableAreaCenter.y - yOffset;
+        }
     }
 }
 
@@ -720,26 +465,6 @@ UnloadTextures()
     {
         UnloadTexture(MrFrecklesSpritesheets[i]);
     }
-
-    for (i = 0; i < len(MrsFrecklesSpritesheets); i++)
-    {
-        UnloadTexture(MrsFrecklesSpritesheets[i]);
-    }
-
-    for (i = 0; i < len(ColHindenburgerSpritesheets); i++)
-    {
-        UnloadTexture(ColHindenburgerSpritesheets[i]);
-    }
-
-    for (i = 0; i < len(GeneralGruntSpritesheets); i++)
-    {
-        UnloadTexture(GeneralGruntSpritesheets[i]);
-    }
-
-    for (i = 0; i < len(PyrellaSpritesheets); i++)
-    {
-        UnloadTexture(PyrellaSpritesheets[i]);
-    }
 }
 
 void
@@ -761,61 +486,6 @@ ProcessInput(Poker_Game* game_state)
                 MrFrecklesActiveState++;
             }
         }
-        else if (CurrentCharacterId == MrsFreckles)
-        {
-            if (MrsFrecklesActiveState >= Losing)
-            {
-                MrsFrecklesActiveState = Idle;
-            }
-            else
-            {
-                MrsFrecklesActiveState++;
-            }
-        }
-        else if (CurrentCharacterId == ColHindenburger)
-        {
-            if (ColHindenburgerActiveState >= Losing)
-            {
-                ColHindenburgerActiveState = Idle;
-            } 
-            else
-            {
-                ColHindenburgerActiveState++;
-            }
-        }
-        else if (CurrentCharacterId == ColHindenburger)
-        {
-            if (ColHindenburgerActiveState >= Losing)
-            {
-                ColHindenburgerActiveState = Idle;
-            } 
-            else
-            {
-                ColHindenburgerActiveState++;
-            }
-        }
-        else if (CurrentCharacterId == GeneralGrunt)
-        {
-            if (GeneralGruntActiveState >= Losing)
-            {
-                GeneralGruntActiveState = Idle;
-            } 
-            else
-            {
-                GeneralGruntActiveState++;
-            }
-        }
-        else if (CurrentCharacterId == Pyrella)
-        {
-            if (PyrellaActiveState >= Losing)
-            {
-                PyrellaActiveState = Idle;
-            } 
-            else
-            {
-                PyrellaActiveState++; 
-            }
-        }
         confirmPressed = true;
     }
 
@@ -830,25 +500,6 @@ ProcessInput(Poker_Game* game_state)
     }
 
     if (IsKeyUp(KEY_UP) && confirmPressed == true)
-    {
-        confirmPressed = false;
-    }
-
-    // TODO(nick): clean this up - just testing code
-    if (IsKeyPressed(KEY_RIGHT) && confirmPressed == false)
-    {
-        if (CurrentCharacterId >= Pyrella)
-        {
-            CurrentCharacterId = MrFreckles;
-        }
-        else
-        {
-            CurrentCharacterId++;
-        }
-        confirmPressed = true;
-    }
-
-    if (IsKeyUp(KEY_RIGHT) && confirmPressed == true)
     {
         confirmPressed = false;
     }
@@ -959,34 +610,6 @@ RenderGame(Poker_Game* game_state)
                 currentCharacterAnimation = &MrFrecklesSpriteAnimation[MrFrecklesActiveState];
                 currentCharacterSpritePosition = &MrFrecklesPosition[MrFrecklesActiveState];
             } break;
-
-            case MrsFreckles:
-            {
-                currentCharacterSpritesheet = &MrsFrecklesSpritesheets[MrsFrecklesActiveState];
-                currentCharacterAnimation = &MrsFrecklesSpriteAnimation[MrsFrecklesActiveState];
-                currentCharacterSpritePosition = &MrsFrecklesPosition[MrsFrecklesActiveState];
-            } break;
-
-            case ColHindenburger:
-            {
-                currentCharacterSpritesheet = &ColHindenburgerSpritesheets[ColHindenburgerActiveState];
-                currentCharacterAnimation = &ColHindenburgerSpriteAnimation[ColHindenburgerActiveState];
-                currentCharacterSpritePosition = &ColHindenburgerPosition[ColHindenburgerActiveState];
-            } break;
-
-            case GeneralGrunt:
-            {
-                currentCharacterSpritesheet = &GeneralGruntSpritesheets[GeneralGruntActiveState];
-                currentCharacterAnimation = &GeneralGruntSpriteAnimation[GeneralGruntActiveState];
-                currentCharacterSpritePosition = &GeneralGruntPosition[GeneralGruntActiveState];
-            } break;
-
-            case Pyrella:
-            {
-                currentCharacterSpritesheet = &PyrellaSpritesheets[PyrellaActiveState];
-                currentCharacterAnimation = &PyrellaSpriteAnimation[PyrellaActiveState];
-                currentCharacterSpritePosition = &PyrellaPosition[PyrellaActiveState];
-            } break;
         }
         DrawAnimationFrame(currentCharacterSpritesheet, currentCharacterAnimation, currentCharacterSpritePosition, GlobalTargetFPS);
     }
@@ -1017,13 +640,14 @@ HandleConfirmButtonPress(Poker_Game* game_state)
 {
     switch (game_state->poker_state)
     {
-        case PokerState_NotStarted: {
+        case PokerState_NotStarted: 
+        {
             Poker_StartNewRound(game_state);
             game_state->poker_state = PokerState_Shuffled;
-        }
-        break;
+        } break;
 
-        case PokerState_Shuffled: {
+        case PokerState_Shuffled: 
+        {
             for(int i = 0; i < 2; ++i)
             {
                 // TODO: Card dealing / flipping animation
@@ -1032,8 +656,7 @@ HandleConfirmButtonPress(Poker_Game* game_state)
             }
 
             game_state->poker_state = PokerState_PlayerCardsDealt;
-        }
-        break;
+        } break;
 
         case PokerState_PlayerCardsDealt: {
             for (int i = 0; i < 3; ++i)
@@ -1043,37 +666,34 @@ HandleConfirmButtonPress(Poker_Game* game_state)
 
             game_state->poker_state = PokerState_FlopCardsDealt;
 
-        }
-        break;
+        } break;
 
-        case PokerState_FlopCardsDealt: {
+        case PokerState_FlopCardsDealt: 
+        {
             game_state->house_hand[3] = Poker_DrawOne(CardState_Shown);
 
             game_state->poker_state = PokerState_RiverCardsDealt;
-        }
-        break;
+        } break;
 
-        case PokerState_RiverCardsDealt: {
+        case PokerState_RiverCardsDealt:
+        {
             game_state->house_hand[4] = Poker_DrawOne(CardState_Shown);
 
             game_state->poker_state = PokerState_TurnCardsDealt;
-        }
-        break;
+        } break;
 
-        case PokerState_TurnCardsDealt: {
+        case PokerState_TurnCardsDealt:
+        {
             // TODO: Award / Deduct points.
             // TODO: Lose / Win animations and sounds.
-
             game_state->poker_state = PokerState_GameOver;
-        }
-        break;
+        } break;
 
-        case PokerState_GameOver: {
+        case PokerState_GameOver:
+        {
             // TODO: Continue / New Game / Quit
-
             game_state->poker_state = PokerState_NotStarted;
-        }
-        break;
+        } break;
 
         default:
             break;
@@ -1121,20 +741,7 @@ DrawFaceCard(Poker_Card card, int x, int y)
     {
         cardIndex += (card.face_value - 2);
     }
-    if (card.face_value > CardFace_Ten && card.face_value != CardFace_Ace)
-    {
-        // TODO(nick): if it is a high face card then draw animation.
-        Vector2 position = 
-        {
-            .x = x,
-            .y = y,
-        };
-        DrawAnimationFrame(&CardTextures[cardIndex], &HighCardSpriteAnimation, &position, GlobalTargetFPS);
-    }
-    else
-    {
-        DrawTexture(CardTextures[cardIndex], x, y, WHITE);
-    }
+    DrawTexture(CardTextures[cardIndex], x, y, WHITE);
 }
 
 void

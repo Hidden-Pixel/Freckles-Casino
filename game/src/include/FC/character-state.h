@@ -15,7 +15,7 @@ typedef enum _characterId
 typedef enum _characterState
 {
     Idle              = 0x00,
-    TalkingNormal     = 0x01,
+    PlayingCards      = 0x01,
     Winning           = 0x02,
     Losing            = 0x03,
 } CharacterState;

@@ -49,7 +49,7 @@ global_variable Vector2 TitleScreenLogoPosition;
 global_variable Texture2D TitleScreenPressStart;
 global_variable Vector2 TitleScreenPressStartPosition;
 
-global_variable Texture2D CardTextures[CardSuit_Count * 14];
+global_variable Texture2D CardTextures[CardSuit_Count * CardFace_Count];
 global_variable SpriteAnimation HighCardSpriteAnimation;
 
 global_variable Vector2 RedCurtainVector2;

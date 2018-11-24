@@ -1,19 +1,17 @@
 #pragma once
 
-#include <stdbool.h>
 #include <FC/defines.h>
-#include <FC/buffer.h>
 
-global_variable const int CardFace_Count = 13;
+#define CardFace_Count 13
+#define CardSuit_Count  4
 
 typedef enum _poker_CardSuit
 {
-    CardSuit_None       = -1,
-    CardSuit_Heart      =  0,
+    CardSuit_None       =  0,
+    CardSuit_Heart      =  1,
     CardSuit_Club       =  2,
     CardSuit_Diamond    =  3,
     CardSuit_Spade      =  4,
-    CardSuit_Count      =  5,
 } Poker_CardSuit;
 
 typedef enum poker_CardFace

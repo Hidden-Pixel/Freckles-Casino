@@ -1,6 +1,10 @@
 #pragma once
 
 #include <stdbool.h>
+#include <FC/defines.h>
+#include <FC/buffer.h>
+
+global_variable const int CardFace_Count = 13;
 
 typedef enum _poker_CardSuit
 {
@@ -124,4 +128,3 @@ Poker_AddCardToList(Poker_CardList* card_list, Poker_Card card);
 
 void
 Poker_DestroyCardList(Poker_CardList* card_list);
-

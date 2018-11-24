@@ -1,6 +1,4 @@
 #include <FC/poker.h>
-#include <FC/defines.h>
-#include <FC/buffer.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <time.h>
@@ -50,21 +48,18 @@ Poker_Init(Poker_Game *game_state)
     game_state->house_hand[3] = Init_Poker_Card();
     game_state->house_hand[4] = Init_Poker_Card();
     // player_hand_type
-    game_state->player_hand_type = -1;
-    game_state->dealer_hand_type = -1;
-    /*
+    game_state->player_hand_type = PokerHand_None;
+    game_state->dealer_hand_type = PokerHand_None;
     game_state->chances_left = 0;
     game_state->player_score = 0;
     game_state->dealer_score = 0;
-    */
-    /*
-    for (int i = 0; i < CardSuit_Count * CardFace_Count; ++i)
+    // NOTE: 13 represents the number of Poker_CardFace(s)
+    for (int i = 0; i < CardSuit_Count * 13; ++i)
     {
-            SampleDeck[i].face_value = (Poker_CardFace)((i % CardFace_Count) + 2);
             SampleDeck[i].suit = (Poker_CardSuit)(i % CardSuit_Count);
+            SampleDeck[i].face_value = (Poker_CardFace)((i % CardFace_Count) + 2);
             SampleDeck[i].state = CardState_Hidden;
     }
-    */
     srand(time(NULL));
 }
 

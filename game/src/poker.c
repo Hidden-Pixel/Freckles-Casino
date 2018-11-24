@@ -59,7 +59,7 @@ Poker_Init(Poker_Game *game_state)
     for (int i = 0; i < DECK_SIZE; ++i)
     {
             SampleDeck[i].suit = (Poker_CardSuit)((i % CardSuit_Count) + 1);
-            SampleDeck[i].face_value = (Poker_CardFace)((i % CardFace_Count) + 2);
+            //SampleDeck[i].face_value = (Poker_CardFace)((i % CardFace_Count) + 2);
             SampleDeck[i].state = CardState_Hidden;
     }
     srand(time(NULL));

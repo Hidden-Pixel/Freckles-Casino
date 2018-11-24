@@ -17,8 +17,6 @@
 #include "raylib.h"
 #include "raymath.h"
 
-#define global_variable static
-
 // Our actual screen size
 #define WIDTH 1280
 #define HEIGHT 800
@@ -68,7 +66,6 @@ global_variable Vector2 MrFrecklesPosition[4];
 global_variable unsigned int MrFrecklesActiveState = Idle;
 
 global_variable bool GameStarted = false;
-global_variable unsigned int GameScene = SceneTitleScreen;
 
 global_variable Music CharacterThemeMusic[5];
 global_variable SoundMeta CharacterThemeMusicMeta[5];
@@ -132,9 +129,11 @@ int
 main(void)
 {
     local_persist Poker_Game game_state;
+    local_persist Game_Scene_State game_scene_state;
     // TODO(nick): replace with init game function
     GameScreen_Init(GlobalWindowWidth, GlobalWindowHeight, GAME_WIDTH, GAME_HEIGHT);
     Poker_Init(&game_state);
+    game_scene_state = Init_Game_Scene_State();
     InitWindow(GlobalWindowWidth, GlobalWindowHeight, GlobalWindowTitle);
     SetTargetFPS(GlobalTargetFPS);
 
@@ -152,8 +151,8 @@ main(void)
         while (GlobalRunning)
         {
             UpdateSounds();
-            ProcessInput(&game_state);
-            RenderScene(&game_state, GameScene);
+            ProcessInput(&game_state, &game_scene_state);
+            RenderScene(&game_state, game_scene_state.current_scene);
             if (WindowShouldClose())
             {
                 GlobalRunning = 0;
@@ -570,11 +569,11 @@ RenderGame(Poker_Game* game_state)
 }
 
 void
-RenderScene(Poker_Game* game_state, unsigned int scene)
+RenderScene(Poker_Game* game_state, Scene scene)
 {
     switch (scene)
     {
-        case SceneMainPokerTable:
+        case Scene_MainPokerTable:
         {
             RenderGame(game_state);
         } break;

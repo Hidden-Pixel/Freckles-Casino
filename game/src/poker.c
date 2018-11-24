@@ -22,6 +22,52 @@ local_persist Buffer hands_buffer =
     .memory         = NULL,
 };
 
+Poker_Card
+Init_Poker_Card()
+{
+    return (Poker_Card)
+    {
+        .suit       = CardSuit_None,
+        .face_value = CardFace_None,
+        .state      = CardState_None,
+    };
+}
+
+void
+Poker_Init(Poker_Game *game_state)
+{
+    game_state->poker_state = PokerState_NotStarted;
+    // player_hand
+    game_state->player_hand[0] = Init_Poker_Card();
+    game_state->player_hand[1] = Init_Poker_Card();
+    // dealer_hand
+    game_state->dealer_hand[0] = Init_Poker_Card();
+    game_state->dealer_hand[1] = Init_Poker_Card();
+    // house_hand
+    game_state->house_hand[0] = Init_Poker_Card();
+    game_state->house_hand[1] = Init_Poker_Card();
+    game_state->house_hand[2] = Init_Poker_Card();
+    game_state->house_hand[3] = Init_Poker_Card();
+    game_state->house_hand[4] = Init_Poker_Card();
+    // player_hand_type
+    game_state->player_hand_type = -1;
+    game_state->dealer_hand_type = -1;
+    /*
+    game_state->chances_left = 0;
+    game_state->player_score = 0;
+    game_state->dealer_score = 0;
+    */
+    /*
+    for (int i = 0; i < CardSuit_Count * CardFace_Count; ++i)
+    {
+            SampleDeck[i].face_value = (Poker_CardFace)((i % CardFace_Count) + 2);
+            SampleDeck[i].suit = (Poker_CardSuit)(i % CardSuit_Count);
+            SampleDeck[i].state = CardState_Hidden;
+    }
+    */
+    srand(time(NULL));
+}
+
 /*
  * @remark We're assuming that player_hand is length 2
  */
@@ -50,6 +96,7 @@ Poker_FindAllHands(Poker_Card* player_hand, Poker_Card* house_cards, int house_c
     return PokerHand_HighCard;
 }
 
+
 Poker_Card
 Poker_DrawOne(Poker_CardState state)
 {
@@ -58,18 +105,6 @@ Poker_DrawOne(Poker_CardState state)
     card.state = state;
     deck_index++;
     return card;
-}
-
-void
-Poker_Init()
-{
-    for (int i = 0; i < CardSuit_Count * CardFace_Count; ++i)
-    {
-            SampleDeck[i].face_value = (Poker_CardFace)((i % CardFace_Count) + 2);
-            SampleDeck[i].suit = (Poker_CardSuit)(i % CardSuit_Count);
-            SampleDeck[i].state = CardState_Hidden;
-    }
-    srand(time(NULL));
 }
 
 void

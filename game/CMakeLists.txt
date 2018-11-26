@@ -1,12 +1,11 @@
 cmake_minimum_required(VERSION 3.12)
 project(Freckles_Casino_Game)
 
-
 get_property(BUILD_AS_LIB GLOBAL PROPERTY RUN_TESTS)
 
 if (BUILD_AS_LIB)
     add_library(Freckles_Casino STATIC "")
-    set_source_files_properties(src/poker.c src/game-screen.c PROPERTIES LANGUAGE CXX)
+    set_source_files_properties(src/poker.c src/game-screen.c src/buffer.c PROPERTIES LANGUAGE CXX)
 else()
     add_executable(Freckles_Casino "")
 endif()
@@ -58,5 +57,5 @@ add_custom_command(
         ${CMAKE_CURRENT_SOURCE_DIR}/assets
         ${CMAKE_CURRENT_BINARY_DIR}/assets)
 
-target_sources(Freckles_Casino PRIVATE src/main.c src/game-screen.c src/poker.c src/sprite-animation.c)
+target_sources(Freckles_Casino PRIVATE src/main.c src/game-screen.c src/poker.c src/sprite-animation.c src/buffer.c)
 target_include_directories(Freckles_Casino PUBLIC src/include)

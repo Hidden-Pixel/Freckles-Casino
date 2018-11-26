@@ -16,10 +16,10 @@ local_persist Poker_Card SampleDeck[DECK_SIZE];
 local_persist int deck_index = 0;
 local_persist Buffer hands_buffer =
 {
-    .size           = 0,
     .capacity       = 0,
+    .size           = 0,
     .element_size   = 0,
-    .memory         = NULL,
+    .memory         = NULL
 };
 
 /*

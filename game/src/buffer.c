@@ -9,11 +9,11 @@ Buffer
 Buffer_Create(unsigned int element_size, int capacity)
 {
     Buffer buffer = (Buffer)
-    { 
-        .size           = 0,
+    {
         .capacity       = 0,
+        .size           = 0,
         .element_size   = 0,
-        .memory         = NULL,
+        .memory         = NULL
     };
     if (buffer.element_size > 0)
     {

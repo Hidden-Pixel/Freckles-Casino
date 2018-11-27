@@ -11,4 +11,4 @@
 #include "raylib.h"
 
 void
-ProcessInput(Poker_Game *poker_game_state, Game_Scene_State *game_scene_state);
+ProcessInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_state);

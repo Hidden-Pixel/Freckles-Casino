@@ -59,7 +59,7 @@ Poker_Init(Poker_Game *game_state)
     for (int i = 0; i < DECK_SIZE; ++i)
     {
             SampleDeck[i].suit = (Poker_CardSuit)((i % CardSuit_Count) + 1);
-            //SampleDeck[i].face_value = (Poker_CardFace)((i % CardFace_Count) + 2);
+            SampleDeck[i].face_value = (Poker_CardFace)((i % CardFace_Count) + 2);
             SampleDeck[i].state = CardState_Hidden;
     }
     srand(time(NULL));
@@ -105,8 +105,9 @@ Poker_DrawOne(Poker_CardState state)
 }
 
 void
-Poker_StartNewRound(Poker_Game* game_state)
+Poker_StartNewRound(Poker_Game *game_state)
 {
+    game_state->poker_state = PokerState_Started;
     deck_index = 0;
     for (int i = 0; i < DECK_SIZE; ++i) 
     {
@@ -123,36 +124,57 @@ Poker_StartNewRound(Poker_Game* game_state)
             DealersDeck[j] = temp;
         }
     }
+    game_state->poker_state = PokerState_Shuffled;
     for (int i = 0; i < 2; ++i) 
     {
-        game_state->player_hand[i].state = CardState_Hidden;
-        game_state->dealer_hand[i].state = CardState_Hidden;
+        game_state->player_hand[i] = Poker_DrawOne(CardState_Shown);
+        game_state->dealer_hand[i] = Poker_DrawOne(CardState_Hidden);
     }
     for (int i = 0; i < 5; ++i) 
     {
         game_state->house_hand[i].state = CardState_Hidden;
     }
+    game_state->poker_state = PokerState_PlayerCardsDealt;
 }
 
 void
-Poker_ProcessNewState(Poker_Game* game_state) {
+Poker_ProcessNewState(Poker_Game *game_state) 
+{
     switch (game_state->poker_state)
     {
+        case PokerState_NotStarted:
+        {
+            Poker_StartNewRound(game_state);
+        } break;
+
         case PokerState_PlayerCardsDealt:
+        {
+        } break;
+
         case PokerState_FlopCardsDealt:
+        {
+        } break;
+
         case PokerState_RiverCardsDealt:
+        {
+        } break;
+
         case PokerState_TurnCardsDealt:
+        {
             // TODO: Process hand type
-            break;
+        } break;
+
         default:
-            break;
+        {
+
+        } break;
     }
 }
 
 void
 Poker_Update(Poker_Game* game_state) 
 {
-
+    // TODO(nick):
 }
 
 Poker_CardList* Poker_CreateCardList(Poker_Card first_card) 

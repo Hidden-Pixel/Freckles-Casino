@@ -42,13 +42,14 @@ typedef enum _poker_CardState
 typedef enum _poke_GameState
 {
     PokerState_NotStarted       = 0,
-    PokerState_Shuffled         = 1,
-    PokerState_PlayerCardsDealt = 2,
-    PokerState_FlopCardsDealt   = 3,
-    PokerState_RiverCardsDealt  = 4,
-    PokerState_TurnCardsDealt   = 5,
-    PokerState_GameOver         = 6,
-    PokerState_Count            = 7,
+    PokerState_Started          = 1,
+    PokerState_Shuffled         = 2,
+    PokerState_PlayerCardsDealt = 3,
+    PokerState_FlopCardsDealt   = 4,
+    PokerState_RiverCardsDealt  = 5,
+    PokerState_TurnCardsDealt   = 6,
+    PokerState_GameOver         = 7,
+    PokerState_Count            = 8,
 } Poker_GameState;
 
 typedef enum _poker_Hand
@@ -89,13 +90,13 @@ void
 Poker_Init(Poker_Game *game_state);
 
 Poker_Hand
-Poker_FindAllHands(Poker_Card* player_hand, Poker_Card* house_cards, int house_card_count);
+Poker_FindAllHands(Poker_Card *player_hand, Poker_Card *house_cards, int house_card_count);
 
 Poker_Card
 Poker_DrawOne(Poker_CardState state);
 
 void
-Poker_StartNewRound(Poker_Game* game_state);
+Poker_StartNewRound(Poker_Game *game_state);
 
 void
 Poker_ProcessNewState(Poker_Game* game_state);

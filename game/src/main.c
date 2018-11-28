@@ -109,6 +109,18 @@ void
 LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture);
 
 void
+LoadCharacterTextures(Image *tempImage, Vector2 *imageVector);
+
+void
+LoadTitleScreen(Image *tempImage, Vector2 *imageVector);
+
+void
+LoadTableAndBackgroundTextures(Image *tempImage, Vector2 *imageVector);
+
+void
+SetPositions();
+
+void
 UnloadTextures();
 
 void
@@ -332,7 +344,7 @@ LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
     };
 }
 
-inline
+inline void
 LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
 {
     // NOTE: Mr. Freckles Spritesheets Begin
@@ -746,7 +758,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     // NOTE: Pyrella End
 }
 
-inline
+inline void
 LoadTitleScreen(Image *tempImage, Vector2 *imageVector)
 {
     *tempImage = LoadImage("assets/textures/Titlescreen/Pngs/TitleLogo.png");
@@ -770,7 +782,7 @@ LoadTitleScreen(Image *tempImage, Vector2 *imageVector)
     UnloadImage(*tempImage);
 }
 
-inline
+inline void
 SetPositions()
 {
     TableVector2.y = (GlobalWindowHeight - BlankGreenTableTexture.height);

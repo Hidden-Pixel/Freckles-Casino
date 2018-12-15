@@ -49,6 +49,7 @@ global_variable Texture2D CardTextures[CardSuit_Count * CardFace_Count];
 global_variable SpriteAnimation HighCardSpriteAnimation;
 
 global_variable Vector2 BackgroundVector2;
+global_variable Vector2 BackgroundCenterVector2;
 global_variable Vector2 RedCurtainVector2;
 global_variable Vector2 CardAreaLeft;
 global_variable Vector2 CardAreaRight;
@@ -278,7 +279,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/freckles-idle.png");
     imageVector->x = tempImage->width;
     imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
+    *imageVector = Vector2Scale(*imageVector, 2.0f);
     imageVector->x += GameScreen_LocalUnitsToScreen(2.0f);
     imageVector->y += GameScreen_LocalUnitsToScreen(2.0f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
@@ -358,6 +359,9 @@ SetPositions()
     BackgroundVector2.x = 0;
     BackgroundVector2.y = 0;
 
+    BackgroundCenterVector2.x = (BackgroundTexture.width / 2.0f);
+    BackgroundCenterVector2.y = (BackgroundTexture.height / 2.0f);
+
     // Set all title screen texture positions
     RedCurtainVector2.x = 0;
     RedCurtainVector2.x = 0;
@@ -365,6 +369,21 @@ SetPositions()
     TitleScreenLogoPosition.y = 0;
     TitleScreenPressStartPosition.x = (RedCurtainTexture.width / 2.0f) - (TitleScreenPressStartTexture.width / 2.0f);
     TitleScreenPressStartPosition.y = (RedCurtainTexture.height / 2.0f) + TitleScreenPressStartTexture.height + GameScreen_LocalUnitsToScreen(35.0f);
+
+    // Set the characters position(s)
+    int xOffset = 0;
+    int yOffset = 0;
+    for (unsigned int currentState = Idle; currentState < len(MrFrecklesPosition); currentState++)
+    {
+        // NOTE: calculate one frame size and get one-half of one frame size
+        if (MrFrecklesSpriteAnimation[currentState].totalFrames > 0) 
+        {
+            xOffset = (MrFrecklesSpritesheets[currentState].width / MrFrecklesSpriteAnimation[currentState].totalHorizontalFrames) * 0.5f;
+            yOffset = (MrFrecklesSpritesheets[currentState].height / MrFrecklesSpriteAnimation[currentState].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(27.0f);
+            MrFrecklesPosition[currentState].x = BackgroundCenterVector2.x - xOffset;
+            MrFrecklesPosition[currentState].y = BackgroundCenterVector2.y - yOffset;
+        }
+    }
 
     /*
     TableVector2.y = (GlobalWindowHeight - BlankGreenTableTexture.height);
@@ -375,8 +394,6 @@ SetPositions()
 
     CardAreaLeft.x = TableVector2.x + GameScreen_LocalUnitsToScreen(10.0f);
     CardAreaLeft.y = TableVector2.y + GameScreen_LocalUnitsToScreen(25.0f);
-
-    
 
     CardAreaRight.x = GlobalWindowWidth - GameScreen_LocalUnitsToScreen(15.0f) - 2.0f * CardSlotTexture.width;
     CardAreaRight.y = CardAreaLeft.y;
@@ -395,19 +412,7 @@ SetPositions()
     TitleScreenPressStartPosition.x = TableAreaCenter.x - (TitleScreenPressStart.width / 2.0f);
     TitleScreenPressStartPosition.y = TableAreaCenter.y + TitleScreenPressStart.height + GameScreen_LocalUnitsToScreen(35.0f);
 
-    int xOffset = 0;
-    int yOffset = 0;
-    for (unsigned int currentState = Idle; currentState < len(MrFrecklesPosition); currentState++)
-    {
-        // NOTE: calculate one frame size and get one-half of one frame size
-        if (MrFrecklesSpriteAnimation[currentState].totalFrames > 0) 
-        {
-            xOffset = (MrFrecklesSpritesheets[currentState].width / MrFrecklesSpriteAnimation[currentState].totalHorizontalFrames) * 0.5f;
-            yOffset = (MrFrecklesSpritesheets[currentState].height / MrFrecklesSpriteAnimation[currentState].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(35.0f);
-            MrFrecklesPosition[currentState].x = TableAreaCenter.x - xOffset;
-            MrFrecklesPosition[currentState].y = TableAreaCenter.y - yOffset;
-        }
-    }
+    
     */
 }
 
@@ -530,11 +535,11 @@ RenderGame(Poker_Game* game_state)
 
         DrawTexture(ScoreFrameTexture, CardAreaLeft.x, CardAreaLeft.y + CardSlotTexture.height, WHITE);
         DrawTexture(ScoreFrameTexture, CardAreaRight.x, CardAreaLeft.y + CardSlotTexture.height, WHITE);
-    
+        */
+
         Texture2D *currentCharacterSpritesheet = NULL;
         SpriteAnimation *currentCharacterAnimation = NULL;
         Vector2 *currentCharacterSpritePosition = NULL;
-
         switch (CurrentCharacterId)
         {
             case MrFreckles:
@@ -545,7 +550,6 @@ RenderGame(Poker_Game* game_state)
             } break;
         }
         DrawAnimationFrame(currentCharacterSpritesheet, currentCharacterAnimation, currentCharacterSpritePosition, GlobalTargetFPS);
-        */
     }
 
     EndDrawing();

@@ -12,3 +12,9 @@
 
 void
 ProcessInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_state);
+
+void
+ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_state);
+
+void
+ProcessTitleScreenInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_state);

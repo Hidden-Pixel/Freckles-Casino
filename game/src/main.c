@@ -34,20 +34,20 @@ global_variable unsigned char GlobalRunning = 1;
 global_variable int GlobalFrameCount = 0;
 global_variable int GlobalTargetFPS = 60;
 
+global_variable Vector2 CenterScreenPosition;
+
+// Title Screen Texture(s) / Animation(s) / Position(s)
+global_variable Texture2D TitleScreenSpriteSheet;
+global_variable SpriteAnimation TitleScreenSpriteAnimation;
+global_variable Vector2 TitleScreenAnimationPosition;
+
 global_variable Texture2D BackgroundTexture;
 global_variable Texture2D RedCurtainTexture;
 global_variable Texture2D BackOfCardTexture;
 global_variable Texture2D CardSlotTexture;
 global_variable Texture2D ScoreFrameTexture;
 
-global_variable Texture2D TitleScreenLogoTexture;
-global_variable Vector2 TitleScreenLogoPosition;
-
-global_variable Texture2D TitleScreenPressStartTexture;
-global_variable Vector2 TitleScreenPressStartPosition;
-
 global_variable Texture2D CardTextures[CardSuit_Count * CardFace_Count];
-global_variable SpriteAnimation HighCardSpriteAnimation;
 
 global_variable Vector2 BackgroundVector2;
 global_variable Vector2 BackgroundCenterVector2;
@@ -408,34 +408,33 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     // NOTE: Mr. Freckles Spritesheets End
 }
 
-// TODO(nick): load proper title screen times here
 inline
 LoadTitleScreen(Image *tempImage, Vector2 *imageVector)
 {
-    *tempImage = LoadImage("assets/textures/Titlescreen/TitleLogo.png");
+    *tempImage = LoadImage("assets/textures/Titlescreen/title-screen-spritesheet.png");
     imageVector->x = tempImage->width;
     imageVector->y = tempImage->height;
     *imageVector = Vector2Scale(*imageVector, 2.0f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    TitleScreenLogoTexture = LoadTextureFromImage(*tempImage);
+    TitleScreenSpriteSheet = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-
-    *tempImage = LoadImage("assets/textures/Titlescreen/PressStart.png");
-    imageVector->x = tempImage->width;
-    imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(1.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(1.0f);
-    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
-    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    TitleScreenPressStartTexture = LoadTextureFromImage(*tempImage);
-    UnloadImage(*tempImage);
+    TitleScreenSpriteAnimation = CreateSpriteAnimation(28, 1, 28, 10, TitleScreenSpriteSheet.width, TitleScreenSpriteSheet.height);
 }
 
+
+// TODO(nick): redo positions
 inline
 SetPositions()
 {
+    // Set center screen position
+    CenterScreenPosition.x = (GlobalWindowWidth / 2.0f);
+    CenterScreenPosition.y = (GlobalWindowHeight / 2.0f);
+
+    // Set all title screen position(s)
+    TitleScreenAnimationPosition.x = CenterScreenPosition.x - (TitleScreenSpriteSheet.width / TitleScreenSpriteAnimation.totalHorizontalFrames) * 0.5f;
+    TitleScreenAnimationPosition.y = CenterScreenPosition.y - (TitleScreenSpriteSheet.height / TitleScreenSpriteAnimation.totalVerticalFrames) * 0.5f;
+
     // Set default background position to be top left corner
     BackgroundVector2.x = 0;
     BackgroundVector2.y = 0;
@@ -443,14 +442,7 @@ SetPositions()
     BackgroundCenterVector2.x = (BackgroundTexture.width / 2.0f);
     BackgroundCenterVector2.y = (BackgroundTexture.height / 2.0f);
 
-    // Set all title screen texture positions
-    RedCurtainVector2.x = 0;
-    RedCurtainVector2.x = 0;
-    TitleScreenLogoPosition.x = (RedCurtainTexture.width / 2.0f) - (TitleScreenLogoTexture.width / 2.0f);
-    TitleScreenLogoPosition.y = 0;
-    TitleScreenPressStartPosition.x = (RedCurtainTexture.width / 2.0f) - (TitleScreenPressStartTexture.width / 2.0f);
-    TitleScreenPressStartPosition.y = (RedCurtainTexture.height / 2.0f) + TitleScreenPressStartTexture.height + GameScreen_LocalUnitsToScreen(35.0f);
-
+    
     // Set the characters position(s)
     int xOffset = 0;
     int yOffset = 0;
@@ -531,18 +523,14 @@ UnloadTextures()
     }
 }
 
-
-
 void
 RenderTitleScreen()
 {
+    // TODO(nick): add slide in animation code.
     BeginDrawing();
     {
         ClearBackground(BLACK);
-        DrawTexture(RedCurtainTexture, RedCurtainVector2.x, RedCurtainVector2.y, WHITE);
-        // TODO(nick): add slide in animation code.
-        DrawTexture(TitleScreenLogoTexture, TitleScreenLogoPosition.x, TitleScreenLogoPosition.y, WHITE);
-        DrawTexture(TitleScreenPressStartTexture, TitleScreenPressStartPosition.x, TitleScreenPressStartPosition.y, WHITE);
+        DrawAnimationFrame(&TitleScreenSpriteSheet, &TitleScreenSpriteAnimation, &TitleScreenAnimationPosition, GlobalTargetFPS);
     }
     EndDrawing();
 }

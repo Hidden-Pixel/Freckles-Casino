@@ -280,52 +280,132 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     imageVector->x = tempImage->width;
     imageVector->y = tempImage->height;
     *imageVector = Vector2Scale(*imageVector, 2.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(2.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(2.0f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     MrFrecklesSpritesheets[Idle] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
     MrFrecklesSpriteAnimation[Idle] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[Idle].width, MrFrecklesSpritesheets[Idle].height);
 
-    /*
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/PlayingCards.png");
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/freckles-gameplay.png");
     imageVector->x = tempImage->width;
     imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(2.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(2.0f);
+    *imageVector = Vector2Scale(*imageVector, 2.0f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    MrFrecklesSpritesheets[PlayingCards] = LoadTextureFromImage(*tempImage);
+    MrFrecklesSpritesheets[GamePlay] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrFrecklesSpriteAnimation[PlayingCards] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[PlayingCards].width, MrFrecklesSpritesheets[PlayingCards].height);
+    MrFrecklesSpriteAnimation[GamePlay] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[GamePlay].width, MrFrecklesSpritesheets[GamePlay].height);
 
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/Winning.png");
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/freckles-gameplay-level-final-1.png");
     imageVector->x = tempImage->width;
     imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(2.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(2.0f);
+    *imageVector = Vector2Scale(*imageVector, 2.0f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    MrFrecklesSpritesheets[Winning] = LoadTextureFromImage(*tempImage);
+    MrFrecklesSpritesheets[GamePlayFinal_1] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrFrecklesSpriteAnimation[Winning] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[Winning].width, MrFrecklesSpritesheets[Winning].height);
+    MrFrecklesSpriteAnimation[GamePlayFinal_1] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[GamePlayFinal_1].width, MrFrecklesSpritesheets[GamePlayFinal_1].height);
 
-    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/Losing.png");
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/freckles-gameplay-level-final-2.png");
     imageVector->x = tempImage->width;
     imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 3.0f);
-    imageVector->x += GameScreen_LocalUnitsToScreen(2.0f);
-    imageVector->y += GameScreen_LocalUnitsToScreen(2.0f);
+    *imageVector = Vector2Scale(*imageVector, 2.0f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
-    MrFrecklesSpritesheets[Losing] = LoadTextureFromImage(*tempImage);
+    MrFrecklesSpritesheets[GamePlayFinal_2] = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    MrFrecklesSpriteAnimation[Losing] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[Losing].width, MrFrecklesSpritesheets[Losing].height);
+    MrFrecklesSpriteAnimation[GamePlayFinal_2] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[GamePlayFinal_2].width, MrFrecklesSpritesheets[GamePlayFinal_2].height);
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/freckles-idle-stress-level-1.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 2.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    MrFrecklesSpritesheets[IdleStress_1] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    MrFrecklesSpriteAnimation[IdleStress_1] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[IdleStress_1].width, MrFrecklesSpritesheets[IdleStress_1].height);
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/freckles-idle-stress-level-2.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 2.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    MrFrecklesSpritesheets[IdleStress_2] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    MrFrecklesSpriteAnimation[IdleStress_2] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[IdleStress_2].width, MrFrecklesSpritesheets[IdleStress_2].height);
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/freckles-idle-stress-level-3.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 2.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    MrFrecklesSpritesheets[IdleStress_3] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    MrFrecklesSpriteAnimation[IdleStress_3] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[IdleStress_3].width, MrFrecklesSpritesheets[IdleStress_3].height);
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/freckles-talk-stress-level-1.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 2.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    MrFrecklesSpritesheets[TalkStress_1] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    MrFrecklesSpriteAnimation[TalkStress_1] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[TalkStress_1].width, MrFrecklesSpritesheets[TalkStress_1].height);
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/freckles-talk-stress-level-2.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 2.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    MrFrecklesSpritesheets[TalkStress_2] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    MrFrecklesSpriteAnimation[TalkStress_2] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[TalkStress_2].width, MrFrecklesSpritesheets[TalkStress_2].height);
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/freckles-talk-stress-level-3.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 2.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    MrFrecklesSpritesheets[TalkStress_3] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    MrFrecklesSpriteAnimation[TalkStress_3] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[TalkStress_3].width, MrFrecklesSpritesheets[TalkStress_3].height);
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/freckles-talk-stress-level-final.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 2.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    MrFrecklesSpritesheets[TalkStressFinal] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    MrFrecklesSpriteAnimation[TalkStressFinal] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[TalkStressFinal].width, MrFrecklesSpritesheets[TalkStressFinal].height);
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/freckles-lose.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 2.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    MrFrecklesSpritesheets[Lose] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    MrFrecklesSpriteAnimation[Lose] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[Lose].width, MrFrecklesSpritesheets[Lose].height);
+
+    *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/freckles-win.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 2.0f);
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    MrFrecklesSpritesheets[Win] = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    MrFrecklesSpriteAnimation[Win] = CreateSpriteAnimation(2, 1, 2, 2, MrFrecklesSpritesheets[Win].width, MrFrecklesSpritesheets[Win].height);
     // NOTE: Mr. Freckles Spritesheets End
-    */
 }
 
 inline
@@ -727,12 +807,18 @@ UnloadSounds()
     int i;
     for (i = 0; i < len(CharacterThemeMusic); i++)
     {
-        UnloadMusicStream(CharacterThemeMusic[i]);
+        if (CharacterThemeMusic[i] != NULL)
+        {
+            UnloadMusicStream(CharacterThemeMusic[i]);
+        }
     }
     
     for (i = 0; i < len(MrFrecklesDialogue); i++)
     {
-        UnloadMusicStream(MrFrecklesDialogue[i]);
+        if (MrFrecklesDialogue[i] != NULL)
+        {
+            UnloadMusicStream(MrFrecklesDialogue[i]);
+        }
     }
 }
 

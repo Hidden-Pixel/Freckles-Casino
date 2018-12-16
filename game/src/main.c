@@ -41,20 +41,22 @@ global_variable Texture2D TitleScreenSpriteSheet;
 global_variable SpriteAnimation TitleScreenSpriteAnimation;
 global_variable Vector2 TitleScreenAnimationPosition;
 
-global_variable Texture2D BackgroundTexture;
+// Background Texture(s) / Animation(s) / Position(s)
+global_variable Texture2D BorderTexture;
+global_variable Vector2 BorderPositon;
 global_variable Texture2D RedCurtainTexture;
-global_variable Texture2D BackOfCardTexture;
+global_variable Vector2 RedCurtainPosition;
+global_variable Texture2D GreenTableTexture;
+global_variable Vector2 GreenTablePosition;
 global_variable Texture2D CardSlotTexture;
-global_variable Texture2D ScoreFrameTexture;
-
-global_variable Texture2D CardTextures[CardSuit_Count * CardFace_Count];
-
-global_variable Vector2 BackgroundVector2;
-global_variable Vector2 BackgroundCenterVector2;
-global_variable Vector2 RedCurtainVector2;
 global_variable Vector2 CardAreaLeft;
 global_variable Vector2 CardAreaRight;
 global_variable Vector2 CardAreaCenter;
+global_variable Texture2D ScoreFrameTexture;
+
+// Card Texture(s)
+global_variable Texture2D BackOfCardTexture;
+global_variable Texture2D CardTextures[CardSuit_Count * CardFace_Count];
 
 global_variable unsigned int CurrentCharacterId = MrFreckles;
 
@@ -182,20 +184,25 @@ LoadCardTexture(char *filePath, Texture2D *texture)
     UnloadImage(tempImage);
 }
 
-// TODO IMPORTANT(nick): add all of the new assets here ...
 inline void
 LoadTableAndBackgroundTextures(Image *tempImage, Vector2 *imageVector)
 {
-    // NOTE: load background texture
-    *tempImage = LoadImage("assets/textures/Background/background.png");
+    // NOTE: load border texture
+    *tempImage = LoadImage("assets/textures/Background/border.png");
     ImageResizeNN(tempImage, GlobalWindowWidth, GlobalWindowHeight);
-    BackgroundTexture = LoadTextureFromImage(*tempImage);
+    BorderTexture = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
 
-    // NOTE: load red curtain texture - full
-    *tempImage = LoadImage("assets/textures/Titlescreen/Curtain.png");
+    // NOTE: load red curtain texture
+    *tempImage = LoadImage("assets/textures/Background/red-curtain.png");
     ImageResizeNN(tempImage, GlobalWindowWidth, GlobalWindowHeight);
     RedCurtainTexture = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+
+    // NOTE: load green table texture
+    *tempImage = LoadImage("assets/textures/Background/green-table.png");
+    ImageResizeNN(tempImage, GlobalWindowWidth, GlobalWindowHeight);
+    GreenTableTexture = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
 
     // NOTE: load card slot texture
@@ -422,7 +429,6 @@ LoadTitleScreen(Image *tempImage, Vector2 *imageVector)
     TitleScreenSpriteAnimation = CreateSpriteAnimation(28, 1, 28, 10, TitleScreenSpriteSheet.width, TitleScreenSpriteSheet.height);
 }
 
-
 // TODO(nick): redo positions
 inline
 SetPositions()
@@ -435,13 +441,9 @@ SetPositions()
     TitleScreenAnimationPosition.x = CenterScreenPosition.x - (TitleScreenSpriteSheet.width / TitleScreenSpriteAnimation.totalHorizontalFrames) * 0.5f;
     TitleScreenAnimationPosition.y = CenterScreenPosition.y - (TitleScreenSpriteSheet.height / TitleScreenSpriteAnimation.totalVerticalFrames) * 0.5f;
 
-    // Set default background position to be top left corner
-    BackgroundVector2.x = 0;
-    BackgroundVector2.y = 0;
-
-    BackgroundCenterVector2.x = (BackgroundTexture.width / 2.0f);
-    BackgroundCenterVector2.y = (BackgroundTexture.height / 2.0f);
-
+    // Set all game background positions
+    BorderPositon.x = 0;
+    BorderPositon.y = 0;
     
     // Set the characters position(s)
     int xOffset = 0;
@@ -453,8 +455,8 @@ SetPositions()
         {
             xOffset = (MrFrecklesSpritesheets[currentState].width / MrFrecklesSpriteAnimation[currentState].totalHorizontalFrames) * 0.5f;
             yOffset = (MrFrecklesSpritesheets[currentState].height / MrFrecklesSpriteAnimation[currentState].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(27.0f);
-            MrFrecklesPosition[currentState].x = BackgroundCenterVector2.x - xOffset;
-            MrFrecklesPosition[currentState].y = BackgroundCenterVector2.y - yOffset;
+            MrFrecklesPosition[currentState].x = CenterScreenPosition.x - xOffset;
+            MrFrecklesPosition[currentState].y = CenterScreenPosition.y - yOffset;
         }
     }
 
@@ -511,6 +513,7 @@ LoadTextures()
     SetPositions();
 }
 
+// TODO(nick): update this function to unload all loaded in texture ...
 void
 UnloadTextures()
 {
@@ -541,7 +544,7 @@ RenderGame(Poker_Game* game_state)
     BeginDrawing();
     {
         ClearBackground(BLACK);
-        DrawTexture(BackgroundTexture, BackgroundVector2.x, BackgroundVector2.y, WHITE);
+        DrawTexture(BorderTexture, BorderPositon.x, BorderPositon.y, WHITE);
 
         // TODO(nick): all of the position now has to be fixed due to the background changing
         /*

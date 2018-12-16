@@ -37,6 +37,7 @@ global_variable int GlobalTargetFPS = 60;
 global_variable Texture2D BackgroundTexture;
 global_variable Texture2D RedCurtainTexture;
 global_variable Texture2D BackOfCardTexture;
+global_variable Texture2D CardSlotTexture;
 global_variable Texture2D ScoreFrameTexture;
 
 global_variable Texture2D TitleScreenLogoTexture;
@@ -186,17 +187,21 @@ inline void
 LoadTableAndBackgroundTextures(Image *tempImage, Vector2 *imageVector)
 {
     // NOTE: load background texture
-    // @Size: 320x240
     *tempImage = LoadImage("assets/textures/Background/background.png");
     ImageResizeNN(tempImage, GlobalWindowWidth, GlobalWindowHeight);
     BackgroundTexture = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
 
     // NOTE: load red curtain texture - full
-    // @Size: 133x97
     *tempImage = LoadImage("assets/textures/Titlescreen/Curtain.png");
     ImageResizeNN(tempImage, GlobalWindowWidth, GlobalWindowHeight);
     RedCurtainTexture = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+
+    // NOTE: load card slot texture
+    *tempImage = LoadImage("assets/textures/Misc/card-slot-texture.png");
+    ImageResizeNN(tempImage, GlobalWindowWidth, GlobalWindowHeight);
+    CardSlotTexture = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
 }
 
@@ -204,11 +209,9 @@ inline void
 LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
 {
     // Back of Card
-    // @Size: 15x12
     LoadCardTexture("assets/textures/Cards/BackOfCard/BackOfCard.png", BackOfCardTexture);
 
     // Hearts
-    // @Size: 15x12
     LoadCardTexture("assets/textures/Cards/Hearts/Pngs/2Hearts.png", &CardTextures[0]);
     LoadCardTexture("assets/textures/Cards/Hearts/Pngs/3Hearts.png", &CardTextures[1]);
     LoadCardTexture("assets/textures/Cards/Hearts/Pngs/4Hearts.png", &CardTextures[2]);
@@ -224,7 +227,6 @@ LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
     LoadCardTexture("assets/textures/Cards/Hearts/Pngs/AceHearts.png", &CardTextures[12]);
 
     // Clubs
-    // @Size: 15x12
     LoadCardTexture("assets/textures/Cards/Clubs/Pngs/2Clubs.png", &CardTextures[13]);
     LoadCardTexture("assets/textures/Cards/Clubs/Pngs/3Clubs.png", &CardTextures[14]);
     LoadCardTexture("assets/textures/Cards/Clubs/Pngs/4Clubs.png", &CardTextures[15]);
@@ -240,7 +242,6 @@ LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
     LoadCardTexture("assets/textures/Cards/Clubs/Pngs/AceClubs.png", &CardTextures[25]);
 
     // Diamonds
-    // @Size: 15x12
     LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/2Dia.png", &CardTextures[26]);
     LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/3Dia.png", &CardTextures[27]);
     LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/4Dia.png", &CardTextures[28]);
@@ -256,7 +257,6 @@ LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
     LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/AceDia.png", &CardTextures[38]);
 
     // Spades
-    // @Size: 15x12
     LoadCardTexture("assets/textures/Cards/Spades/Pngs/2Spades.png", &CardTextures[39]);
     LoadCardTexture("assets/textures/Cards/Spades/Pngs/3Spades.png", &CardTextures[40]);
     LoadCardTexture("assets/textures/Cards/Spades/Pngs/4Spades.png", &CardTextures[41]);
@@ -408,6 +408,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     // NOTE: Mr. Freckles Spritesheets End
 }
 
+// TODO(nick): load proper title screen times here
 inline
 LoadTitleScreen(Image *tempImage, Vector2 *imageVector)
 {

@@ -49,9 +49,7 @@ global_variable Vector2 RedCurtainPosition;
 global_variable Texture2D GreenTableTexture;
 global_variable Vector2 GreenTablePosition;
 global_variable Texture2D CardSlotTexture;
-global_variable Vector2 CardAreaLeft;
-global_variable Vector2 CardAreaRight;
-global_variable Vector2 CardAreaCenter;
+global_variable Vector2 CardSlotPositions[10];
 global_variable Texture2D ScoreFrameTexture;
 
 // Card Texture(s)
@@ -195,19 +193,22 @@ LoadTableAndBackgroundTextures(Image *tempImage, Vector2 *imageVector)
 
     // NOTE: load red curtain texture
     *tempImage = LoadImage("assets/textures/Background/red-curtain.png");
-    ImageResizeNN(tempImage, GlobalWindowWidth, GlobalWindowHeight);
+    ImageResizeNN(tempImage, GlobalWindowWidth, GlobalWindowHeight * 0.6f);
     RedCurtainTexture = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
 
     // NOTE: load green table texture
     *tempImage = LoadImage("assets/textures/Background/green-table.png");
-    ImageResizeNN(tempImage, GlobalWindowWidth, GlobalWindowHeight);
+    ImageResizeNN(tempImage, GlobalWindowWidth, GlobalWindowHeight * 0.4f);
     GreenTableTexture = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
 
     // NOTE: load card slot texture
     *tempImage = LoadImage("assets/textures/Misc/card-slot-texture.png");
-    ImageResizeNN(tempImage, GlobalWindowWidth, GlobalWindowHeight);
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     CardSlotTexture = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
 }
@@ -429,7 +430,9 @@ LoadTitleScreen(Image *tempImage, Vector2 *imageVector)
     TitleScreenSpriteAnimation = CreateSpriteAnimation(28, 1, 28, 10, TitleScreenSpriteSheet.width, TitleScreenSpriteSheet.height);
 }
 
-// TODO(nick): redo positions
+// TODO(nick): 
+// 1) redo positions
+// 2) change to vector operations
 inline
 SetPositions()
 {
@@ -444,6 +447,32 @@ SetPositions()
     // Set all game background positions
     BorderPositon.x = 0;
     BorderPositon.y = 0;
+
+    RedCurtainPosition.x = 0;
+    RedCurtainPosition.y = 0;
+
+    GreenTablePosition.x = RedCurtainPosition.x;
+    GreenTablePosition.y = RedCurtainPosition.y + RedCurtainTexture.height;
+
+    Vector2 CardStartingPosition;
+    CardStartingPosition.x = CenterScreenPosition.x - (CardSlotTexture.width * 0.5f) - (CardSlotTexture.width * 3.0f);
+    CardStartingPosition.y = CenterScreenPosition.y - (CardSlotTexture.height * 2.5f);
+
+    float CardPadding = GameScreen_LocalUnitsToScreen(16.0f);
+
+    for (unsigned int i = 0; i < len(CardSlotPositions); i++)
+    {
+        // top
+        if (i < 5)
+        {
+            CardSlotPositions[i].x = CardStartingPosition.x + (CardPadding * i) + (CardSlotTexture.width * i);
+            CardSlotPositions[i].y = CardStartingPosition.y;
+        }
+        else 
+        {
+
+        }
+    }
     
     // Set the characters position(s)
     int xOffset = 0;
@@ -544,7 +573,14 @@ RenderGame(Poker_Game* game_state)
     BeginDrawing();
     {
         ClearBackground(BLACK);
+        DrawTexture(RedCurtainTexture, RedCurtainPosition.x, RedCurtainPosition.y, WHITE);
+        DrawTexture(GreenTableTexture, GreenTablePosition.x, GreenTablePosition.y, WHITE);
         DrawTexture(BorderTexture, BorderPositon.x, BorderPositon.y, WHITE);
+
+        for (unsigned int i = 0; i < len(CardSlotPositions); i++)
+        {
+            DrawTexture(CardSlotTexture, CardSlotPositions[i].x, CardSlotPositions[i].y, WHITE);
+        }
 
         // TODO(nick): all of the position now has to be fixed due to the background changing
         /*

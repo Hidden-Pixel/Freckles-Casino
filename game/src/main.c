@@ -454,26 +454,29 @@ SetPositions()
     GreenTablePosition.x = RedCurtainPosition.x;
     GreenTablePosition.y = RedCurtainPosition.y + RedCurtainTexture.height;
 
-    Vector2 CardStartingPosition;
-    CardStartingPosition.x = CenterScreenPosition.x - (CardSlotTexture.width * 0.5f) - (CardSlotTexture.width * 3.0f);
-    CardStartingPosition.y = CenterScreenPosition.y - (CardSlotTexture.height * 2.5f);
+    Vector2 CardStartingPositionTop =
+    {
+        .x = CenterScreenPosition.x - (CardSlotTexture.width * 0.5f) - (CardSlotTexture.width * 3.0f),
+        .y = CenterScreenPosition.y - (CardSlotTexture.height * 2.5f),
+    };
+
+    Vector2 CardStartingPositionBottom = 
+    {
+        .x = CardStartingPositionTop.x,
+        .y = CenterScreenPosition.y + (CardSlotTexture.height * 2.0f),
+    };
 
     float CardPadding = GameScreen_LocalUnitsToScreen(16.0f);
-
-    for (unsigned int i = 0; i < len(CardSlotPositions); i++)
+    int offset = 5;
+    for (unsigned int i = 0; i < len(CardSlotPositions) / 2; i++)
     {
-        // top
-        if (i < 5)
-        {
-            CardSlotPositions[i].x = CardStartingPosition.x + (CardPadding * i) + (CardSlotTexture.width * i);
-            CardSlotPositions[i].y = CardStartingPosition.y;
-        }
-        else 
-        {
+        CardSlotPositions[i].x = CardStartingPositionTop.x + (CardPadding * i) + (CardSlotTexture.width * i);
+        CardSlotPositions[i].y = CardStartingPositionTop.y;
 
-        }
+        CardSlotPositions[i + offset].x = CardStartingPositionBottom.x + (CardPadding * i) + (CardSlotTexture.width * i);
+        CardSlotPositions[i + offset].y = CardStartingPositionBottom.y;
     }
-    
+
     // Set the characters position(s)
     int xOffset = 0;
     int yOffset = 0;
@@ -483,41 +486,11 @@ SetPositions()
         if (MrFrecklesSpriteAnimation[currentState].totalFrames > 0) 
         {
             xOffset = (MrFrecklesSpritesheets[currentState].width / MrFrecklesSpriteAnimation[currentState].totalHorizontalFrames) * 0.5f;
-            yOffset = (MrFrecklesSpritesheets[currentState].height / MrFrecklesSpriteAnimation[currentState].totalVerticalFrames) - GameScreen_LocalUnitsToScreen(27.0f);
+            yOffset = (MrFrecklesSpritesheets[currentState].height / MrFrecklesSpriteAnimation[currentState].totalVerticalFrames);
             MrFrecklesPosition[currentState].x = CenterScreenPosition.x - xOffset;
-            MrFrecklesPosition[currentState].y = CenterScreenPosition.y - yOffset;
+            MrFrecklesPosition[currentState].y = GreenTablePosition.y - yOffset;
         }
     }
-
-    /*
-    TableVector2.y = (GlobalWindowHeight - BlankGreenTableTexture.height);
-    TableVector2.x = 0;
-
-    TableAreaCenter.y = TableVector2.y;
-    TableAreaCenter.x = (BlankGreenTableTexture.width / 2.0f);
-
-    CardAreaLeft.x = TableVector2.x + GameScreen_LocalUnitsToScreen(10.0f);
-    CardAreaLeft.y = TableVector2.y + GameScreen_LocalUnitsToScreen(25.0f);
-
-    CardAreaRight.x = GlobalWindowWidth - GameScreen_LocalUnitsToScreen(15.0f) - 2.0f * CardSlotTexture.width;
-    CardAreaRight.y = CardAreaLeft.y;
-
-    // Distance formula for space between the two areas.
-    float center_space = CardAreaRight.x - (CardAreaLeft.x + 2.0f * CardSlotTexture.width);
-
-    // Find padding to evenly space on each side
-    // We want to fit 5 cards in the space with two blank areas
-    // f(x) = ((avail_space/size - x) * size) / 2
-    float center_padding = (((center_space / CardSlotTexture.width) - 5.0f) * CardSlotTexture.width) / 2.0f;
-
-    CardAreaCenter.x = (CardAreaLeft.x + 2.0f * CardSlotTexture.width) + center_padding;
-    CardAreaCenter.y = CardAreaLeft.y + CardSlotTexture.height - GameScreen_LocalUnitsToScreen(3.0f);
-    
-    TitleScreenPressStartPosition.x = TableAreaCenter.x - (TitleScreenPressStart.width / 2.0f);
-    TitleScreenPressStartPosition.y = TableAreaCenter.y + TitleScreenPressStart.height + GameScreen_LocalUnitsToScreen(35.0f);
-
-    
-    */
 }
 
 void

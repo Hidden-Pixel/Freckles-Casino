@@ -43,26 +43,38 @@ global_variable Vector2 TitleScreenAnimationPosition;
 
 // Background Texture(s) / Animation(s) / Position(s)
 global_variable Texture2D BorderTexture;
-global_variable Vector2 BorderPositon;
+global_variable Vector2 BorderPosition;
 global_variable Texture2D RedCurtainTexture;
 global_variable Vector2 RedCurtainPosition;
 global_variable Texture2D GreenTableTexture;
 global_variable Vector2 GreenTablePosition;
 global_variable Texture2D CardSlotTexture;
 global_variable Vector2 CardSlotPositions[10];
-global_variable Texture2D ScoreFrameTexture;
 
-// Card Texture(s)
+// Misc Texture(s) / Position(s)
+global_variable Texture2D FrecklesNamePlateTexture;
+global_variable Vector2 FrecklesNamePlatePosition;
+global_variable Texture2D NamePlateTexture;
+global_variable Vector2 NamePlatePosition;
+global_variable Texture2D BankTexture;
+global_variable Vector2 BankPosition;
+global_variable Texture2D HoldCursorTexture;
+global_variable Vector2 HoldCursorPosition;
+global_variable Texture2D SpeechBubbleTexture;
+global_variable Vector2 SpeechBubblePosition;
+
+// Card Texture(s) / Position(s)
 global_variable Texture2D BackOfCardTexture;
 global_variable Texture2D CardTextures[CardSuit_Count * CardFace_Count];
 global_variable Vector2 CardPositions[10];
 
-global_variable unsigned int CurrentCharacterId = MrFreckles;
-
+// Character Texture(s) / Animation(s) / Position(s)
 global_variable Texture2D MrFrecklesSpritesheets[13];
 global_variable SpriteAnimation MrFrecklesSpriteAnimation[13];
 global_variable Vector2 MrFrecklesPosition[13];
+
 global_variable unsigned int MrFrecklesActiveState = Idle;
+global_variable unsigned int CurrentCharacterId = MrFreckles;
 
 global_variable bool GameStarted = false;
 
@@ -224,6 +236,42 @@ LoadTableAndBackgroundTextures(Image *tempImage, Vector2 *imageVector)
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     CardSlotTexture = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+
+    // NOTE: load name plate texture
+    *tempImage = LoadImage("assets/textures/Misc/name-plate.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    NamePlateTexture = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+
+    // NOTE: load score frame texture
+    *tempImage = LoadImage("assets/textures/Misc/bank.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    BankTexture = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+
+    // NOTE: load hold cursor texture
+    *tempImage = LoadImage("assets/textures/Misc/hold-cursor.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    HoldCursorTexture = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+
+    // NOTE: load speech bubble texture
+    *tempImage = LoadImage("assets/textures/Misc/speech-bubble.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    SpeechBubbleTexture = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
 }
 
@@ -454,29 +502,27 @@ SetPositions()
     // Set all title screen position(s)
     TitleScreenAnimationPosition.x = CenterScreenPosition.x - (TitleScreenSpriteSheet.width / TitleScreenSpriteAnimation.totalHorizontalFrames) * 0.5f;
     TitleScreenAnimationPosition.y = CenterScreenPosition.y - (TitleScreenSpriteSheet.height / TitleScreenSpriteAnimation.totalVerticalFrames) * 0.5f;
-
     // Set all game background positions
-    BorderPositon.x = 0;
-    BorderPositon.y = 0;
-
+    BorderPosition.x = 0;
+    BorderPosition.y = 0;
     RedCurtainPosition.x = 0;
     RedCurtainPosition.y = 0;
-
     GreenTablePosition.x = RedCurtainPosition.x;
     GreenTablePosition.y = RedCurtainPosition.y + RedCurtainTexture.height;
-
+    NamePlatePosition.x = (CenterScreenPosition.x - (NamePlateTexture.width * 0.5f));
+    NamePlatePosition.y = (GreenTablePosition.y + GameScreen_LocalUnitsToScreen(10.0f));
+    BankPosition.x = BorderPosition.x + GameScreen_LocalUnitsToScreen(20.0f);
+    BankPosition.y = GreenTablePosition.y - BankTexture.height - GameScreen_LocalUnitsToScreen(20.0f);
     Vector2 CardSlotStartingPositionTop =
     {
         .x = CenterScreenPosition.x - (CardSlotTexture.width * 0.5f) - (CardSlotTexture.width * 3.0f),
         .y = CenterScreenPosition.y - (CardSlotTexture.height * 2.5f),
     };
-
     Vector2 CardSlotStartingPositionBottom = 
     {
         .x = CardSlotStartingPositionTop.x,
         .y = CenterScreenPosition.y + (CardSlotTexture.height * 2.0f),
     };
-
     float CardSlotPadding = GameScreen_LocalUnitsToScreen(16.0f);
     int offset = 5;
     for (unsigned int i = 0; i < len(CardSlotPositions) / 2; i++)
@@ -486,7 +532,6 @@ SetPositions()
         CardSlotPositions[i + offset].x = CardSlotStartingPositionBottom.x + (CardSlotPadding * i) + (CardSlotTexture.width * i);
         CardSlotPositions[i + offset].y = CardSlotStartingPositionBottom.y;
     }
-
     for (unsigned int i = 0; i < len(CardPositions) / 2; i++)
     {
         CardPositions[i].x = CardSlotStartingPositionTop.x + (CardSlotPadding * i) + (CardSlotTexture.width * i);
@@ -495,7 +540,6 @@ SetPositions()
         CardPositions[i + offset].x = CardSlotStartingPositionTop.x + (CardSlotPadding * i) + (CardSlotTexture.width * i);
         CardPositions[i + offset].y = CardSlotStartingPositionBottom.y + GameScreen_LocalUnitsToScreen(2.0f);
     }
-
     // Set the characters position(s)
     int xOffset = 0;
     int yOffset = 0;
@@ -539,7 +583,6 @@ void
 UnloadTextures()
 {
     UnloadTexture(BackOfCardTexture);
-    UnloadTexture(ScoreFrameTexture);
     int i = 0;
     for (i = 0; i < len(MrFrecklesSpritesheets); i++)
     {
@@ -567,20 +610,18 @@ RenderGame(Poker_Game* game_state)
         ClearBackground(BLACK);
         DrawTexture(RedCurtainTexture, RedCurtainPosition.x, RedCurtainPosition.y, WHITE);
         DrawTexture(GreenTableTexture, GreenTablePosition.x, GreenTablePosition.y, WHITE);
-        DrawTexture(BorderTexture, BorderPositon.x, BorderPositon.y, WHITE);
-
+        DrawTexture(NamePlateTexture, NamePlatePosition.x, NamePlatePosition.y, WHITE);
+        DrawTexture(BankTexture, BankPosition.x, BankPosition.y, WHITE);
+        DrawTexture(BorderTexture, BorderPosition.x, BorderPosition.y, WHITE);
         for (unsigned int i = 0; i < len(CardSlotPositions); i++)
         {
             DrawTexture(CardSlotTexture, CardSlotPositions[i].x, CardSlotPositions[i].y, WHITE);
         }
-
         unsigned int offset = 5;
         for (unsigned int i = 0; i < len(CardPositions) / 2; i++)
         {
             // TODO(nick): game state needs to change as poker rules have changed 
             // no longer texas hold'em, just straight 5 card
-
-            
             if (game_state->dealer_hand[i].state == CardState_Hidden)
             {
                 DrawTexture(BackOfCardTexture, CardPositions[i].x, CardPositions[i].y, WHITE);
@@ -613,7 +654,6 @@ RenderGame(Poker_Game* game_state)
         }
         DrawAnimationFrame(currentCharacterSpritesheet, currentCharacterAnimation, currentCharacterSpritePosition, GlobalTargetFPS);
     }
-
     EndDrawing();
     GlobalFrameCount++;
 }

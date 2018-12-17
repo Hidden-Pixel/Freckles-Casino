@@ -157,7 +157,7 @@ Poker_Shuffle(Poker_Game *game_state)
 }
 
 internal void
-Deal_Cards(Poker_Game *game_state)
+Poker_DealCards(Poker_Game *game_state)
 {
     int i = 0;
     switch (game_state->poker_type)
@@ -193,16 +193,7 @@ Poker_StartNewRound(Poker_Game *game_state)
 {
     game_state->poker_state = PokerState_Started;
     Poker_Shuffle(game_state);
-    for (int i = 0; i < 2; ++i) 
-    {
-        game_state->player_hand[i] = Poker_DrawOne(CardState_Shown);
-        game_state->dealer_hand[i] = Poker_DrawOne(CardState_Hidden);
-    }
-    for (int i = 0; i < 5; ++i) 
-    {
-        game_state->house_hand[i].state = CardState_Hidden;
-    }
-    game_state->poker_state = PokerState_PlayerCardsDealt;
+    Poker_DealCards(game_state);
 }
 
 void
@@ -225,7 +216,24 @@ Poker_ProcessNewState(Poker_Game *game_state)
 internal void
 Poker_ProcessNewFiveCardState(Poker_Game *game_state)
 {
-    // TODO(nick):
+    // TODO: finish up logic
+    switch (game_state->poker_state)
+    {
+        case PokerState_NotStarted:
+        {
+            Poker_StartNewRound(game_state);
+        } break;
+
+        case PokerState_Shuffled:
+        {
+            // TODO:
+        } break;
+
+        case PokerState_PlayerCardsDealt:
+        {
+            // TODO:
+        } break;
+    }
 }
 
 internal void
@@ -236,7 +244,6 @@ Poker_ProcessNewHoldemState(Poker_Game *game_state)
         case PokerState_NotStarted:
         {
             Poker_StartNewRound(game_state);
-            game_state->poker_state = PokerState_Shuffled;
         } break;
 
         case PokerState_Shuffled:

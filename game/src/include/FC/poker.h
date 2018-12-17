@@ -113,7 +113,7 @@ internal void
 Poker_Shuffle(Poker_Game *game_state);
 
 internal void
-Deal_Cards(Poker_Game *game_state);
+Poker_DealCards(Poker_Game *game_state);
 
 void
 Poker_StartNewRound(Poker_Game *game_state);

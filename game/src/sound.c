@@ -18,7 +18,10 @@ InitializeSoundMeta(Music *soundArray, SoundMeta *soundMetaArray, int length)
 {
     for (int i = 0; i < length; i++)
     {
-        soundMetaArray[i] = CreateSoundMeta(&soundArray[i]);
+        if (soundArray[i] != NULL)
+        {
+            soundMetaArray[i] = CreateSoundMeta(&soundArray[i]);
+        }
     }
 }
 

@@ -1,6 +1,16 @@
 cmake_minimum_required(VERSION 3.12)
 project(Freckles_Casino_Game)
-add_executable(Freckles_Casino "")
+
+
+get_property(BUILD_AS_LIB GLOBAL PROPERTY RUN_TESTS)
+
+if (BUILD_AS_LIB)
+    add_library(Freckles_Casino STATIC "")
+    set_source_files_properties(src/poker.c src/game-screen.c PROPERTIES LANGUAGE CXX)
+else()
+    add_executable(Freckles_Casino "")
+endif()
+
 target_compile_features(Freckles_Casino PUBLIC c_std_11)
 
 if (WIN32)

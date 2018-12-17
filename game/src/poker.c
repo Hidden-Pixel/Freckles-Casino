@@ -10,6 +10,7 @@
 // There's 52 cards in a deck and we're NOT counting jokers, folks.
 #define DECK_SIZE 52
 #define MAX_HAND_COMBOS 22
+#define MAX_HOLDS 5
 
 local_persist Poker_Card DealersDeck[DECK_SIZE];
 local_persist Poker_Card SampleDeck[DECK_SIZE];
@@ -30,6 +31,7 @@ Init_Poker_Card()
         .suit       = CardSuit_None,
         .face_value = CardFace_None,
         .state      = CardState_None,
+        .hold       = 0,
     };
 }
 
@@ -69,8 +71,8 @@ Poker_Init_FiveCard(Poker_Game *game_state)
     }
     game_state->player_hand_type = PokerHand_None;
     game_state->dealer_hand_type = PokerHand_None;
-    game_state->player_score = 0;
-    game_state->dealer_score = 0;
+    game_state->player_score = 1000;
+    game_state->dealer_score = 1000;
 }
 
 internal inline void
@@ -185,6 +187,7 @@ Poker_DealCards(Poker_Game *game_state)
             game_state->house_hand[i].state = CardState_Hidden;
         }
     }
+    // TODO(nick): determine hand types
     game_state->poker_state = PokerState_PlayerCardsDealt;
 }
 
@@ -197,47 +200,62 @@ Poker_StartNewRound(Poker_Game *game_state)
 }
 
 void
-Poker_ProcessNewState(Poker_Game *game_state) 
+Poker_ProcessState(Poker_Game *game_state) 
 {
     switch (game_state->poker_type)
     {
         case GameType_FiveCard:
         {
-            Poker_ProcessNewFiveCardState(game_state);
+            Poker_ProcessFiveCardState(game_state);
         } break;
 
         case GameType_Holdem:
         {
-            Poker_ProcessNewHoldemState(game_state);
+            Poker_ProcessHoldemState(game_state);
         } break;
     }
 }
 
 internal void
-Poker_ProcessNewFiveCardState(Poker_Game *game_state)
+Poker_ProcessFiveCardState(Poker_Game *game_state)
 {
-    // TODO: finish up logic
     switch (game_state->poker_state)
     {
         case PokerState_NotStarted:
         {
-            Poker_StartNewRound(game_state);
+            // TODO(nick): main menu
         } break;
 
-        case PokerState_Shuffled:
+        case PokerState_Started:
         {
-            // TODO:
+            Poker_StartNewRound(game_state);
+            // TODO(nick): take ante money - this should be set in the UI
         } break;
 
         case PokerState_PlayerCardsDealt:
         {
-            // TODO:
+            // TODO(nick):
+        } break;
+
+        case PokerState_SelectHolds:
+        {
+
+        } break;
+
+        case PokerState_Betting:
+        {
+            // TODO(nick): start betting process ...
+        } break;
+
+        case PokerState_ExchangeCards:
+        {
+            // TODO(nick): only allow one betting round ...
         } break;
     }
 }
 
 internal void
-Poker_ProcessNewHoldemState(Poker_Game *game_state)
+Poker_ProcessHoldemState(Poker_Game *game_state)
 {
     switch (game_state->poker_state)
     {

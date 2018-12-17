@@ -122,9 +122,6 @@ void
 DrawFaceCard(Poker_Card card, int x, int y);
 
 void
-HandleConfirmButtonPress(Poker_Game* game_state);
-
-void
 RenderScene(Poker_Game* game_state, unsigned int scene);
 
 void
@@ -593,7 +590,9 @@ UnloadTextures()
 void
 RenderTitleScreen()
 {
-    // TODO(nick): add slide in animation code.
+    // TODO(nick):
+    // 1) add slide in animation code.
+    // 2) static draw after first animation loop - then start again at a particular time set interval
     BeginDrawing();
     {
         ClearBackground(BLACK);
@@ -673,73 +672,6 @@ RenderScene(Poker_Game* game_state, Scene scene)
             RenderTitleScreen();
         } break;
     }
-}
-
-void
-HandleConfirmButtonPress(Poker_Game* game_state)
-{
-    switch (game_state->poker_state)
-    {
-        case PokerState_NotStarted: 
-        {
-            Poker_StartNewRound(game_state);
-            game_state->poker_state = PokerState_Shuffled;
-        } break;
-
-        case PokerState_Shuffled: 
-        {
-            for(int i = 0; i < 2; ++i)
-            {
-                // TODO: Card dealing / flipping animation
-                game_state->player_hand[i] = Poker_DrawOne(CardState_Shown);
-                game_state->dealer_hand[i] = Poker_DrawOne(CardState_Shown);
-            }
-
-            game_state->poker_state = PokerState_PlayerCardsDealt;
-        } break;
-
-        case PokerState_PlayerCardsDealt: {
-            for (int i = 0; i < 3; ++i)
-            {
-                game_state->house_hand[i] = Poker_DrawOne(CardState_Shown);
-            }
-
-            game_state->poker_state = PokerState_FlopCardsDealt;
-
-        } break;
-
-        case PokerState_FlopCardsDealt: 
-        {
-            game_state->house_hand[3] = Poker_DrawOne(CardState_Shown);
-
-            game_state->poker_state = PokerState_RiverCardsDealt;
-        } break;
-
-        case PokerState_RiverCardsDealt:
-        {
-            game_state->house_hand[4] = Poker_DrawOne(CardState_Shown);
-
-            game_state->poker_state = PokerState_TurnCardsDealt;
-        } break;
-
-        case PokerState_TurnCardsDealt:
-        {
-            // TODO: Award / Deduct points.
-            // TODO: Lose / Win animations and sounds.
-            game_state->poker_state = PokerState_GameOver;
-        } break;
-
-        case PokerState_GameOver:
-        {
-            // TODO: Continue / New Game / Quit
-            game_state->poker_state = PokerState_NotStarted;
-        } break;
-
-        default:
-            break;
-    }
-
-    Poker_ProcessNewState(game_state);
 }
 
 void
@@ -849,9 +781,8 @@ InitSounds()
 {
     CharacterThemeMusicMeta[MrFreckles].playLimit = INFINITE_PLAY;
     AddSoundToBuffer(&CharacterThemeMusic[MrFreckles], &CharacterThemeMusicMeta[MrFreckles]);
-
-    MrFrecklesDialogueMeta[18].playLimit = 1;
-    AddSoundToBuffer(&MrFrecklesDialogue[18], &MrFrecklesDialogueMeta[18]);
+    //MrFrecklesDialogueMeta[18].playLimit = 1;
+    //AddSoundToBuffer(&MrFrecklesDialogue[18], &MrFrecklesDialogueMeta[18]);
 }
 
 void

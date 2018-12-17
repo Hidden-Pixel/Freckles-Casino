@@ -55,8 +55,11 @@ typedef enum _poke_GameState
     PokerState_FlopCardsDealt   = 4,
     PokerState_RiverCardsDealt  = 5,
     PokerState_TurnCardsDealt   = 6,
-    PokerState_GameOver         = 7,
-    PokerState_Count            = 8,
+    PokerState_SelectHolds      = 7,
+    PokerState_Betting          = 8,
+    PokerState_GameOver         = 9,
+    PokerState_ExchangeCards    = 10,
+    PokerState_Count            = 11,
 } Poker_GameState;
 
 typedef enum _poker_Hand
@@ -78,6 +81,7 @@ typedef struct _poker_Card
     Poker_CardSuit  suit;
     Poker_CardFace  face_value;
     Poker_CardState state;
+    unsigned char   hold;
 } Poker_Card;
 
 typedef struct _poker_Game
@@ -89,6 +93,7 @@ typedef struct _poker_Game
     Poker_Card      house_hand[5];
     Poker_Hand      player_hand_type;
     Poker_Hand      dealer_hand_type;
+    int             player_hold_count;
     int             chances_left;
     int             player_score;
     int             dealer_score;
@@ -119,13 +124,13 @@ void
 Poker_StartNewRound(Poker_Game *game_state);
 
 void
-Poker_ProcessNewState(Poker_Game* game_state);
+Poker_ProcessState(Poker_Game* game_state);
 
 internal void
-Poker_ProcessNewFiveCardState(Poker_Game *game_state);
+Poker_ProcessFiveCardState(Poker_Game *game_state);
 
 internal void
-Poker_ProcessNewHoldemState(Poker_Game *game_state);
+Poker_ProcessHoldemState(Poker_Game *game_state);
 
 void
 Poker_Update(Poker_Game* game_state);

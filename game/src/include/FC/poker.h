@@ -32,6 +32,13 @@ typedef enum poker_CardFace
     CardFace_Ace    = 14,
 } Poker_CardFace;
 
+typedef enum poker_GameType
+{
+    GameType_None       = 0,
+    GameType_FiveCard   = 1,
+    GameType_Holdem     = 2,
+} Poker_GameType;
+
 typedef enum _poker_CardState
 {
     CardState_None      = 0,
@@ -76,8 +83,9 @@ typedef struct _poker_Card
 typedef struct _poker_Game
 {
     Poker_GameState poker_state;
-    Poker_Card      player_hand[2];
-    Poker_Card      dealer_hand[2];
+    Poker_GameType  poker_type;
+    Poker_Card      player_hand[5];
+    Poker_Card      dealer_hand[5];
     Poker_Card      house_hand[5];
     Poker_Hand      player_hand_type;
     Poker_Hand      dealer_hand_type;
@@ -87,7 +95,13 @@ typedef struct _poker_Game
 } Poker_Game;
 
 void
-Poker_Init(Poker_Game *game_state);
+Poker_Init(Poker_Game *game_state, Poker_GameType game_type);
+
+internal inline void
+Poker_Init_FiveCard(Poker_Game *game_state);
+
+internal inline void
+Poker_Init_Holdem(Poker_Game *game_state);
 
 Poker_Hand
 Poker_FindAllHands(Poker_Card *player_hand, Poker_Card *house_cards, int house_card_count);
@@ -95,11 +109,23 @@ Poker_FindAllHands(Poker_Card *player_hand, Poker_Card *house_cards, int house_c
 Poker_Card
 Poker_DrawOne(Poker_CardState state);
 
+internal void
+Poker_Shuffle(Poker_Game *game_state);
+
+internal void
+Deal_Cards(Poker_Game *game_state);
+
 void
 Poker_StartNewRound(Poker_Game *game_state);
 
 void
 Poker_ProcessNewState(Poker_Game* game_state);
+
+internal void
+Poker_ProcessNewFiveCardState(Poker_Game *game_state);
+
+internal void
+Poker_ProcessNewHoldemState(Poker_Game *game_state);
 
 void
 Poker_Update(Poker_Game* game_state);

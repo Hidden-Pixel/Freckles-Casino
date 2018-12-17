@@ -131,7 +131,8 @@ main(void)
     local_persist Game_Scene_State game_scene_state;
     // TODO(nick): replace with init game function
     GameScreen_Init(GlobalWindowWidth, GlobalWindowHeight, GAME_WIDTH, GAME_HEIGHT);
-    Poker_Init(&game_state);
+    // TODO(nick): create a main menu that allows user to pick game type
+    Poker_Init(&game_state, GameType_FiveCard);
     game_scene_state = Init_Game_Scene_State();
     InitWindow(GlobalWindowWidth, GlobalWindowHeight, GlobalWindowTitle);
     SetTargetFPS(GlobalTargetFPS);
@@ -569,73 +570,26 @@ RenderGame(Poker_Game* game_state)
         {
             // TODO(nick): game state needs to change as poker rules have changed 
             // no longer texas hold'em, just straight 5 card
-            DrawTexture(BackOfCardTexture, CardPositions[i].x, CardPositions[i].y, WHITE);
-            DrawTexture(BackOfCardTexture, CardPositions[i + offset].x, CardPositions[i + offset].y, WHITE);
-        }
 
-        // TODO(nick): all of the position now has to be fixed due to the background changing
-        /*
-        Vector2 leftArea =
-        { 
-            .x = CardAreaLeft.x + GameScreen_LocalUnitsToScreen(4.0f),
-            .y = CardAreaLeft.y + GameScreen_LocalUnitsToScreen(5.0f),
-        };
-        Vector2 rightArea =
-        {
-            .x = CardAreaRight.x + GameScreen_LocalUnitsToScreen(4.f),
-            .y = CardAreaRight.y + GameScreen_LocalUnitsToScreen(5.f),
-        };
-        Vector2 centerArea =
-        {
-            .x = CardAreaCenter.x + GameScreen_LocalUnitsToScreen(4.0f),
-            .y = CardAreaCenter.y + GameScreen_LocalUnitsToScreen(5.0f),
-        };
-        DrawHorizontalCardArea(CardSlotTexture, CardAreaLeft, 2, CardSlotTexture.width);
-        DrawHorizontalCardArea(CardSlotTexture, CardAreaRight, 2, CardSlotTexture.width);
-        DrawHorizontalCardArea(CardSlotTexture, CardAreaCenter, 5, CardSlotTexture.width);
-
-        // NOTE: A tiny optimization would be parallel arrays for cards and textures.
-        for (int i = 0; i < 2; ++i)
-        {
-            float shift = CardSlotTexture.width * i;
-
-            if (game_state->player_hand[i].state == CardState_Hidden)
-            {
-                DrawTexture(BackOfCardTexture, leftArea.x + shift, leftArea.y, WHITE);
-            }
-            else if (game_state->player_hand[i].state == CardState_Shown)
-            {
-                DrawFaceCard(game_state->player_hand[i], leftArea.x + shift, leftArea.y);
-            }
-
+            
             if (game_state->dealer_hand[i].state == CardState_Hidden)
             {
-                DrawTexture(BackOfCardTexture, rightArea.x + shift, rightArea.y, WHITE);
+                DrawTexture(BackOfCardTexture, CardPositions[i].x, CardPositions[i].y, WHITE);
             }
             else if (game_state->dealer_hand[i].state == CardState_Shown)
             {
-                DrawFaceCard(game_state->dealer_hand[i], rightArea.x + shift, rightArea.y);
+                DrawFaceCard(game_state->dealer_hand[i], CardPositions[i].x, CardPositions[i].y);
+            }
+
+            if (game_state->player_hand[i].state == CardState_Hidden)
+            {
+                DrawTexture(BackOfCardTexture, CardPositions[i + offset].x, CardPositions[i + offset].y, WHITE);
+            }
+            else if (game_state->player_hand[i].state == CardState_Shown)
+            {
+                DrawFaceCard(game_state->player_hand[i], CardPositions[i + offset].x, CardPositions[i + offset].y);
             }
         }
-
-        for (int i = 0; i < 5; ++i)
-        {
-            float shift = CardSlotTexture.width * i;
-
-            if (game_state->house_hand[i].state == CardState_Hidden)
-            {
-                DrawTexture(BackOfCardTexture, centerArea.x + shift, centerArea.y, WHITE);
-            }
-            else if (game_state->house_hand[i].state == CardState_Shown)
-            {
-                DrawFaceCard(game_state->house_hand[i], centerArea.x + shift, centerArea.y);
-            }
-        }
-
-        DrawTexture(ScoreFrameTexture, CardAreaLeft.x, CardAreaLeft.y + CardSlotTexture.height, WHITE);
-        DrawTexture(ScoreFrameTexture, CardAreaRight.x, CardAreaLeft.y + CardSlotTexture.height, WHITE);
-        */
-
         Texture2D *currentCharacterSpritesheet = NULL;
         SpriteAnimation *currentCharacterAnimation = NULL;
         Vector2 *currentCharacterSpritePosition = NULL;

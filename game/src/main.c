@@ -55,6 +55,7 @@ global_variable Texture2D ScoreFrameTexture;
 // Card Texture(s)
 global_variable Texture2D BackOfCardTexture;
 global_variable Texture2D CardTextures[CardSuit_Count * CardFace_Count];
+global_variable Vector2 CardPositions[10];
 
 global_variable unsigned int CurrentCharacterId = MrFreckles;
 
@@ -454,27 +455,35 @@ SetPositions()
     GreenTablePosition.x = RedCurtainPosition.x;
     GreenTablePosition.y = RedCurtainPosition.y + RedCurtainTexture.height;
 
-    Vector2 CardStartingPositionTop =
+    Vector2 CardSlotStartingPositionTop =
     {
         .x = CenterScreenPosition.x - (CardSlotTexture.width * 0.5f) - (CardSlotTexture.width * 3.0f),
         .y = CenterScreenPosition.y - (CardSlotTexture.height * 2.5f),
     };
 
-    Vector2 CardStartingPositionBottom = 
+    Vector2 CardSlotStartingPositionBottom = 
     {
-        .x = CardStartingPositionTop.x,
+        .x = CardSlotStartingPositionTop.x,
         .y = CenterScreenPosition.y + (CardSlotTexture.height * 2.0f),
     };
 
-    float CardPadding = GameScreen_LocalUnitsToScreen(16.0f);
+    float CardSlotPadding = GameScreen_LocalUnitsToScreen(16.0f);
     int offset = 5;
     for (unsigned int i = 0; i < len(CardSlotPositions) / 2; i++)
     {
-        CardSlotPositions[i].x = CardStartingPositionTop.x + (CardPadding * i) + (CardSlotTexture.width * i);
-        CardSlotPositions[i].y = CardStartingPositionTop.y;
+        CardSlotPositions[i].x = CardSlotStartingPositionTop.x + (CardSlotPadding * i) + (CardSlotTexture.width * i);
+        CardSlotPositions[i].y = CardSlotStartingPositionTop.y;
+        CardSlotPositions[i + offset].x = CardSlotStartingPositionBottom.x + (CardSlotPadding * i) + (CardSlotTexture.width * i);
+        CardSlotPositions[i + offset].y = CardSlotStartingPositionBottom.y;
+    }
 
-        CardSlotPositions[i + offset].x = CardStartingPositionBottom.x + (CardPadding * i) + (CardSlotTexture.width * i);
-        CardSlotPositions[i + offset].y = CardStartingPositionBottom.y;
+    for (unsigned int i = 0; i < len(CardPositions) / 2; i++)
+    {
+        CardPositions[i].x = CardSlotStartingPositionTop.x + (CardSlotPadding * i) + (CardSlotTexture.width * i);
+        CardPositions[i].y = CardSlotStartingPositionTop.y + GameScreen_LocalUnitsToScreen(2.0f);
+
+        CardPositions[i + offset].x = CardSlotStartingPositionTop.x + (CardSlotPadding * i) + (CardSlotTexture.width * i);
+        CardPositions[i + offset].y = CardSlotStartingPositionBottom.y + GameScreen_LocalUnitsToScreen(2.0f);
     }
 
     // Set the characters position(s)
@@ -553,6 +562,15 @@ RenderGame(Poker_Game* game_state)
         for (unsigned int i = 0; i < len(CardSlotPositions); i++)
         {
             DrawTexture(CardSlotTexture, CardSlotPositions[i].x, CardSlotPositions[i].y, WHITE);
+        }
+
+        unsigned int offset = 5;
+        for (unsigned int i = 0; i < len(CardPositions) / 2; i++)
+        {
+            // TODO(nick): game state needs to change as poker rules have changed 
+            // no longer texas hold'em, just straight 5 card
+            DrawTexture(BackOfCardTexture, CardPositions[i].x, CardPositions[i].y, WHITE);
+            DrawTexture(BackOfCardTexture, CardPositions[i + offset].x, CardPositions[i + offset].y, WHITE);
         }
 
         // TODO(nick): all of the position now has to be fixed due to the background changing

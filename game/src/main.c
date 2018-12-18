@@ -59,7 +59,9 @@ global_variable Vector2 NamePlatePosition;
 global_variable Texture2D BankTexture;
 global_variable Vector2 BankPosition;
 global_variable Texture2D HoldCursorTexture;
-global_variable Vector2 HoldCursorPosition;
+global_variable Vector2 HoldCursorPositions[5];
+global_variable unsigned char DrawHoldCursor[5];
+global_variable unsigned char CurrentHoldCursorIndex;
 global_variable Texture2D SpeechBubbleTexture;
 global_variable Vector2 SpeechBubblePosition;
 
@@ -87,6 +89,9 @@ global_variable SoundMeta MrFrecklesDialogueMeta[26];
 const char* CreditsText = "CREDITS";
 const char* JackpotText = "JACKPOT";
 const char* BetText     = "BET";
+
+inline void 
+GameInit(Poker_Game *game_state, Game_Scene_State *game_scene_state, Game_Input_State *game_input_state);
 
 void
 LoadTextures();
@@ -122,13 +127,13 @@ void
 DrawFaceCard(Poker_Card card, int x, int y);
 
 void
-RenderScene(Poker_Game* game_state, unsigned int scene);
+RenderScene(Poker_Game* game_state, Game_Input_State *game_input_state, unsigned int scene);
 
 void
 RenderTitleScreen();
 
 void
-RenderGame(Poker_Game* game_state);
+RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state);
 
 void
 DrawFaceCard(Poker_Card card, int x, int y);
@@ -150,40 +155,43 @@ main(void)
 {
     local_persist Poker_Game game_state;
     local_persist Game_Scene_State game_scene_state;
-    // TODO(nick): replace with init game function
-    GameScreen_Init(GlobalWindowWidth, GlobalWindowHeight, GAME_WIDTH, GAME_HEIGHT);
-    // TODO(nick): create a main menu that allows user to pick game type
-    Poker_Init(&game_state, GameType_FiveCard);
-    game_scene_state = Init_Game_Scene_State();
-    InitWindow(GlobalWindowWidth, GlobalWindowHeight, GlobalWindowTitle);
-    SetTargetFPS(GlobalTargetFPS);
-
-    // NOTE: load all textures
-    LoadTextures();
-
-    // NOTE: load all sounds
-    InitAudioDevice();
-    LoadSounds();
-    InitSounds();
-
+    local_persist Game_Input_State game_input_state;
+    GameInit(&game_state, &game_scene_state, &game_input_state);
     if (IsWindowReady())
     {
         PlaySounds();
         while (GlobalRunning)
         {
             UpdateSounds();
-            ProcessInput(&game_state, &game_scene_state);
-            RenderScene(&game_state, game_scene_state.current_scene);
+            ProcessInput(&game_state, &game_scene_state, &game_input_state);
+            RenderScene(&game_state, &game_input_state, game_scene_state.current_scene);
             if (WindowShouldClose())
             {
                 GlobalRunning = 0;
             }
         }
     }
-
     ExitGame();
-
     return 0;
+}
+
+inline void
+GameInit(Poker_Game *game_state, Game_Scene_State *game_scene_state, Game_Input_State *game_input_state)
+{
+    zero_array(DrawHoldCursor);
+    Init_Input_State(game_input_state);
+    GameScreen_Init(GlobalWindowWidth, GlobalWindowHeight, GAME_WIDTH, GAME_HEIGHT);
+    // TODO(nick): create a main menu that allows user to pick game type
+    Poker_Init(game_state, GameType_FiveCard);
+    *game_scene_state = Init_Game_Scene_State();
+    InitWindow(GlobalWindowWidth, GlobalWindowHeight, GlobalWindowTitle);
+    SetTargetFPS(GlobalTargetFPS);
+    // NOTE: load all textures
+    LoadTextures();
+    // NOTE: load all sounds
+    InitAudioDevice();
+    LoadSounds();
+    InitSounds();
 }
 
 void
@@ -518,7 +526,7 @@ SetPositions()
     Vector2 CardSlotStartingPositionBottom = 
     {
         .x = CardSlotStartingPositionTop.x,
-        .y = CenterScreenPosition.y + (CardSlotTexture.height * 2.0f),
+        .y = CenterScreenPosition.y + (CardSlotTexture.height * 1.5f),
     };
     float CardSlotPadding = GameScreen_LocalUnitsToScreen(16.0f);
     int offset = 5;
@@ -533,9 +541,10 @@ SetPositions()
     {
         CardPositions[i].x = CardSlotStartingPositionTop.x + (CardSlotPadding * i) + (CardSlotTexture.width * i);
         CardPositions[i].y = CardSlotStartingPositionTop.y + GameScreen_LocalUnitsToScreen(2.0f);
-
         CardPositions[i + offset].x = CardSlotStartingPositionTop.x + (CardSlotPadding * i) + (CardSlotTexture.width * i);
         CardPositions[i + offset].y = CardSlotStartingPositionBottom.y + GameScreen_LocalUnitsToScreen(2.0f);
+        HoldCursorPositions[i].x = CardPositions[i + offset].x;
+        HoldCursorPositions[i].y = CardPositions[i + offset].y + HoldCursorTexture.width + (CardSlotTexture.width * 0.5f);
     }
     // Set the characters position(s)
     int xOffset = 0;
@@ -602,7 +611,7 @@ RenderTitleScreen()
 }
 
 void
-RenderGame(Poker_Game* game_state)
+RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
 {
     BeginDrawing();
     {
@@ -615,6 +624,16 @@ RenderGame(Poker_Game* game_state)
         for (unsigned int i = 0; i < len(CardSlotPositions); i++)
         {
             DrawTexture(CardSlotTexture, CardSlotPositions[i].x, CardSlotPositions[i].y, WHITE);
+        }
+        if (CurrentHoldCursorIndex >= 0) 
+        {
+            DrawTexture(HoldCursorTexture, HoldCursorPositions[game_input_state->hold_cursor_index].x, HoldCursorPositions[game_input_state->hold_cursor_index].y, WHITE);
+            /*
+            for (unsigned int i = 0; i < len(HoldCursorPositions); i++)
+            {
+                DrawTexture(HoldCursorTexture, HoldCursorPositions[i].x, HoldCursorPositions[i].y, WHITE);
+            }
+            */
         }
         unsigned int offset = 5;
         for (unsigned int i = 0; i < len(CardPositions) / 2; i++)
@@ -658,13 +677,13 @@ RenderGame(Poker_Game* game_state)
 }
 
 void
-RenderScene(Poker_Game* game_state, Scene scene)
+RenderScene(Poker_Game *game_state, Game_Input_State *game_input_state, Scene scene)
 {
     switch (scene)
     {
         case Scene_MainPokerTable:
         {
-            RenderGame(game_state);
+            RenderGame(game_state, game_input_state);
         } break;
 
         default:

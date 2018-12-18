@@ -93,7 +93,7 @@ typedef struct _poker_Game
     Poker_Card      house_hand[5];
     Poker_Hand      player_hand_type;
     Poker_Hand      dealer_hand_type;
-    int             player_hold_count;
+    int             betting_round;
     int             chances_left;
     int             player_score;
     int             dealer_score;

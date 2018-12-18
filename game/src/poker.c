@@ -11,6 +11,7 @@
 #define DECK_SIZE 52
 #define MAX_HAND_COMBOS 22
 #define MAX_HOLDS 5
+#define DEFAULT_ANTE 25
 
 local_persist Poker_Card DealersDeck[DECK_SIZE];
 local_persist Poker_Card SampleDeck[DECK_SIZE];
@@ -73,6 +74,8 @@ Poker_Init_FiveCard(Poker_Game *game_state)
     game_state->dealer_hand_type = PokerHand_None;
     game_state->player_score = 1000;
     game_state->dealer_score = 1000;
+    game_state->betting_round = 0;
+    game_state->chances_left = 3;
 }
 
 internal inline void
@@ -197,6 +200,7 @@ Poker_StartNewRound(Poker_Game *game_state)
     game_state->poker_state = PokerState_Started;
     Poker_Shuffle(game_state);
     Poker_DealCards(game_state);
+    game_state->betting_round = 0;
 }
 
 void
@@ -221,35 +225,52 @@ Poker_ProcessFiveCardState(Poker_Game *game_state)
 {
     switch (game_state->poker_state)
     {
-        case PokerState_NotStarted:
-        {
-            // TODO(nick): main menu
-        } break;
-
         case PokerState_Started:
         {
-            Poker_StartNewRound(game_state);
-            // TODO(nick): take ante money - this should be set in the UI
+            if (game_state->player_score > DEFAULT_ANTE)
+            {
+                Poker_StartNewRound(game_state);
+                game_state->player_score -= DEFAULT_ANTE;
+            } 
+            else
+            {
+                game_state->poker_state = PokerState_GameOver;
+            }
         } break;
 
         case PokerState_PlayerCardsDealt:
         {
-            // TODO(nick):
+            game_state->poker_state = PokerState_Betting;
+            game_state->betting_round++;
         } break;
 
         case PokerState_SelectHolds:
         {
-
+            // TODO(nick): ...
         } break;
 
         case PokerState_Betting:
         {
             // TODO(nick): start betting process ...
+            if (game_state->betting_round == 1)
+            {
+                // TODO(nick):
+                game_state->poker_state = PokerState_SelectHolds;
+            }
+            else
+            {
+                // TODO(nick):
+            }
         } break;
 
         case PokerState_ExchangeCards:
         {
             // TODO(nick): only allow one betting round ...
+        } break;
+
+        case PokerState_GameOver:
+        {
+            // TODO(nick): ...
         } break;
     }
 }

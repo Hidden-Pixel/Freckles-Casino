@@ -13,6 +13,9 @@
 #define MAX_HOLDS 5
 #define DEFAULT_ANTE 25
 
+// TODO: populate with possible straights.
+local_persist int Straights[9];
+
 local_persist Poker_Card DealersDeck[DECK_SIZE];
 local_persist Poker_Card SampleDeck[DECK_SIZE];
 local_persist int deck_index = 0;
@@ -101,31 +104,42 @@ Poker_Init_Holdem(Poker_Game *game_state)
     game_state->dealer_score = 0;
 }
 
-/*
- * @remark We're assuming that player_hand is length 2
- */
+inline int
+Poker_CardRank(Poker_Card card) {
+    return card.suit * 13 + card.face_value;
+}
+
 Poker_Hand
-Poker_FindAllHands(Poker_Card* player_hand, Poker_Card* house_cards, int house_card_count) 
+Poker_FindBestHand(Poker_Card* player_hand, int hand_size)
 {
-    int card_count_squared = pow(2, house_card_count);
-    if (house_card_count > 2) {
-        // combinations: f(x) = h(h-x), where h is the house count and x is the size of picks
-        int three_house_cards = house_card_count > 3 ? card_count_squared - house_card_count * 3 : 1;
-        // We'll pre-calculate these, at least until we decide we want to support Omaha
-        int four_house_cards = house_card_count > 4 ? 5 : 0;
-        int five_house_cards = house_card_count > 4 ? 1 : 0;
-        int total_combinations = three_house_cards + four_house_cards + five_house_cards;
-        // Create all the possible hands
-        // TODO(nick): replace with list - IMPORTANT
-        if (hands_buffer.memory == NULL)
-        {
-            Buffer_Create(sizeof(Poker_CardList *), total_combinations);
-        }
-        //Poker_CardList* hands[MAX_HAND_COMBOS];
-        // TODO: Create all possible hands
-    } else {
-      // TODO: Just process the player's hand.
+    int card_counts[CardFace_Count];
+    int suit_counts[CardSuit_Count];
+    int hand_flags[PokerHand_Count];
+
+    for (int i = 0; i < hand_size; ++i) {
+        card_counts[player_hand[i].face_value] += 1;
+        suit_counts[player_hand[i].suit] += 1;
     }
+
+    for (int i = 0; i < CardSuit_Count; ++i) {
+        if (suit_counts[i] == 5) {
+            hand_flags[PokerHand_Flush] += 1;
+            break;
+        }
+    }
+
+    for (int i = 0; i < CardFace_Count; ++i) {
+        if (card_counts[i] == 2) {
+            hand_flags[PokerHand_Pair] += 1;
+        }
+        if (card_counts[i] == 3) {
+            hand_flags[PokerHand_ThreeOfAKind] += 1;
+        }
+        if (card_counts[i] == 4) {
+            hand_flags[PokerHand_FourOfAKind] += 1;
+        }
+    }
+
     return PokerHand_HighCard;
 }
 

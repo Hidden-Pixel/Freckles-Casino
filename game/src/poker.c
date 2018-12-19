@@ -40,13 +40,13 @@ Init_Poker_Card()
     };
 }
 
-internal inline void
-Poker_Init_Hands()
+void
+Poker_CacheHands()
 {
     for (int i = 0; i < STRAIGHT_HANDS; ++i) {
         // NOTE: Assumes little endian
         int straight = 0;
-        for (int j = i; j < 5; ++j) {
+        for (int j = i; j < i + 5; ++j) {
             straight |= (1 << j);
         }
         Straights[i] = straight;
@@ -77,7 +77,7 @@ Poker_Init(Poker_Game *game_state, Poker_GameType game_type)
             SampleDeck[i].state = CardState_Hidden;
     }
     srand(time(NULL));
-    Poker_Init_Hands();
+    Poker_CacheHands();
 }
 
 internal inline void
@@ -127,9 +127,9 @@ Poker_CardRank(Poker_Card card) {
 Poker_Hand
 Poker_FindBestHand(Poker_Card* player_hand, int hand_size)
 {
-    int card_counts[CardFace_Count];
-    int suit_counts[CardSuit_Count];
-    int hand_flags[PokerHand_Count];
+    int card_counts[CardFace_Count] = { 0 };
+    int suit_counts[CardSuit_Count] = { 0 };
+    int hand_flags[PokerHand_Count] = { 0 };
     int hand_bits = 0;
 
     for (int i = 0; i < hand_size; ++i) {

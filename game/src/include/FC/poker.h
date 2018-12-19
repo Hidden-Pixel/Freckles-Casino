@@ -8,11 +8,11 @@
 
 typedef enum _poker_CardSuit
 {
-    CardSuit_None       =  0,
-    CardSuit_Heart      =  1,
-    CardSuit_Club       =  2,
-    CardSuit_Diamond    =  3,
-    CardSuit_Spade      =  4,
+    CardSuit_None       =  -1,
+    CardSuit_Club       =  0,
+    CardSuit_Diamond    =  1,
+    CardSuit_Heart      =  2,
+    CardSuit_Spade      =  3,
 } Poker_CardSuit;
 
 typedef enum poker_CardFace
@@ -150,6 +150,9 @@ typedef struct
     Poker_LinkedListNode* first;
     Poker_LinkedListNode* last;
 } Poker_CardList;
+
+void
+Poker_CacheHands();
 
 Poker_CardList*
 Poker_CreateCardList(Poker_Card first_card);

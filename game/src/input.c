@@ -13,6 +13,7 @@ Init_Input_State(Game_Input_State *game_input_state)
 {
     game_input_state->hold_cursor_index = 0;
     game_input_state->hold_cursor_index_max = 5;
+    zero_array(game_input_state->hold_cursor_selects);
 }
 
 void
@@ -58,6 +59,17 @@ ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_
                 if (game_input_state->hold_cursor_index < 0)
                 {
                     game_input_state->hold_cursor_index = (game_input_state->hold_cursor_index_max - 1);
+                }
+            }
+            if (IsKeyPressed(KEY_H))
+            {
+                if (game_input_state->hold_cursor_selects[game_input_state->hold_cursor_index] == CURSOR_SELECTED)
+                {
+                    game_input_state->hold_cursor_selects[game_input_state->hold_cursor_index] = CURSOR_NONE;
+                }
+                else
+                {
+                    game_input_state->hold_cursor_selects[game_input_state->hold_cursor_index] = CURSOR_SELECTED;
                 }
             }
         }

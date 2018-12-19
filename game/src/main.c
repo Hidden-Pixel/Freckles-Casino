@@ -61,7 +61,6 @@ global_variable Vector2 BankPosition;
 global_variable Texture2D HoldCursorTexture;
 global_variable BlinkAnimation CurrentHoldCursorBlinkAnimation;
 global_variable Vector2 HoldCursorPositions[5];
-global_variable unsigned char DrawHoldCursor[5];
 global_variable unsigned char CurrentHoldCursorIndex;
 global_variable Texture2D SpeechBubbleTexture;
 global_variable Vector2 SpeechBubblePosition;
@@ -179,7 +178,6 @@ main(void)
 inline void
 GameInit(Poker_Game *game_state, Game_Scene_State *game_scene_state, Game_Input_State *game_input_state)
 {
-    zero_array(DrawHoldCursor);
     Init_Input_State(game_input_state);
     GameScreen_Init(GlobalWindowWidth, GlobalWindowHeight, GAME_WIDTH, GAME_HEIGHT);
     // TODO(nick): create a main menu that allows user to pick game type
@@ -187,9 +185,7 @@ GameInit(Poker_Game *game_state, Game_Scene_State *game_scene_state, Game_Input_
     *game_scene_state = Init_Game_Scene_State();
     InitWindow(GlobalWindowWidth, GlobalWindowHeight, GlobalWindowTitle);
     SetTargetFPS(GlobalTargetFPS);
-    // NOTE: load all textures
     LoadTextures();
-    // NOTE: load all sounds
     InitAudioDevice();
     LoadSounds();
     InitSounds();
@@ -612,6 +608,7 @@ RenderTitleScreen()
     EndDrawing();
 }
 
+// TODO(nick): possible start storing hold states in game state instead of game input state
 void
 RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
 {
@@ -629,14 +626,18 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
         }
         if (CurrentHoldCursorIndex >= 0) 
         {
-            DrawBlinkAnimation(&HoldCursorTexture, &CurrentHoldCursorBlinkAnimation, &HoldCursorPositions[game_input_state->hold_cursor_index], GlobalTargetFPS);
-            //DrawTexture(HoldCursorTexture, HoldCursorPositions[game_input_state->hold_cursor_index].x, HoldCursorPositions[game_input_state->hold_cursor_index].y, WHITE);
-            /*
-            for (unsigned int i = 0; i < len(HoldCursorPositions); i++)
+            for (unsigned int i = 0; i < len(game_input_state->hold_cursor_selects); i++)
             {
-                DrawTexture(HoldCursorTexture, HoldCursorPositions[i].x, HoldCursorPositions[i].y, WHITE);
+                // NOTE: always draw the current icon as blinking
+                if (i == game_input_state->hold_cursor_index)
+                {
+                    DrawBlinkAnimation(&HoldCursorTexture, &CurrentHoldCursorBlinkAnimation, &HoldCursorPositions[i], GlobalTargetFPS);
+                }
+                else if (game_input_state->hold_cursor_selects[i] == CURSOR_SELECTED)
+                {
+                    DrawTexture(HoldCursorTexture, HoldCursorPositions[i].x, HoldCursorPositions[i].y, WHITE);
+                }
             }
-            */
         }
         unsigned int offset = 5;
         for (unsigned int i = 0; i < len(CardPositions) / 2; i++)

@@ -68,13 +68,13 @@ typedef enum _poker_Hand
     PokerHand_HighCard      =  0,
     PokerHand_Pair          =  1,
     PokerHand_TwoPair       =  2,
-    PokerHand_ThreeOfAKind  =  4,
-    PokerHand_Straight      =  8,
-    PokerHand_Flush         =  16,
-    PokerHand_FullHouse     =  PokerHand_TwoPair | PokerHand_ThreeOfAKind,
-    PokerHand_FourOfAKind   =  64,
-    PokerHand_StraightFlush =  PokerHand_Straight | PokerHand_Flush,
-    PokerHand_RoyalFlush = 128
+    PokerHand_ThreeOfAKind  =  3,
+    PokerHand_Straight      =  4,
+    PokerHand_Flush         =  5,
+    PokerHand_FullHouse     =  6,
+    PokerHand_FourOfAKind   =  7,
+    PokerHand_StraightFlush =  8,
+    PokerHand_RoyalFlush = 9
 } Poker_Hand;
 
 typedef struct _poker_Card

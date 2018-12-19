@@ -12,9 +12,10 @@
 #define MAX_HAND_COMBOS 22
 #define MAX_HOLDS 5
 #define DEFAULT_ANTE 25
+#define STRAIGHT_HANDS 9
 
 // TODO: populate with possible straights.
-local_persist int Straights[9];
+local_persist int Straights[STRAIGHT_HANDS];
 
 local_persist Poker_Card DealersDeck[DECK_SIZE];
 local_persist Poker_Card SampleDeck[DECK_SIZE];
@@ -37,6 +38,19 @@ Init_Poker_Card()
         .state      = CardState_None,
         .hold       = 0,
     };
+}
+
+internal inline void
+Poker_Init_Hands()
+{
+    for (int i = 0; i < STRAIGHT_HANDS; ++i) {
+        // NOTE: Assumes little endian
+        int straight = 0;
+        for (int j = i; j < 5; ++j) {
+            straight |= (1 << j);
+        }
+        Straights[i] = straight;
+    }
 }
 
 void
@@ -63,6 +77,7 @@ Poker_Init(Poker_Game *game_state, Poker_GameType game_type)
             SampleDeck[i].state = CardState_Hidden;
     }
     srand(time(NULL));
+    Poker_Init_Hands();
 }
 
 internal inline void
@@ -115,10 +130,12 @@ Poker_FindBestHand(Poker_Card* player_hand, int hand_size)
     int card_counts[CardFace_Count];
     int suit_counts[CardSuit_Count];
     int hand_flags[PokerHand_Count];
+    int hand_bits = 0;
 
     for (int i = 0; i < hand_size; ++i) {
         card_counts[player_hand[i].face_value] += 1;
         suit_counts[player_hand[i].suit] += 1;
+        hand_bits |= (1 << player_hand[i].face_value);
     }
 
     for (int i = 0; i < CardSuit_Count; ++i) {
@@ -126,6 +143,30 @@ Poker_FindBestHand(Poker_Card* player_hand, int hand_size)
             hand_flags[PokerHand_Flush] += 1;
             break;
         }
+    }
+
+    for (int i = 0; i < STRAIGHT_HANDS; ++i) {
+        if (Straights[i] == hand_bits) {
+            hand_flags[PokerHand_Straight] += 1;
+            break;
+        }
+    }
+
+    // Figure out if we have a straight flush or royal flush
+    if (hand_flags[PokerHand_Straight] > 0 && hand_flags[PokerHand_Flush] > 0) {
+        if (card_counts[CardFace_Ace] > 0) {
+            return PokerHand_RoyalFlush;
+        }
+
+        return PokerHand_StraightFlush;
+    }
+
+    if (hand_flags[PokerHand_Flush] > 0) {
+        return PokerHand_Flush;
+    }
+
+    if (hand_flags[PokerHand_Straight] > 0) {
+        return PokerHand_Straight;
     }
 
     for (int i = 0; i < CardFace_Count; ++i) {
@@ -138,6 +179,26 @@ Poker_FindBestHand(Poker_Card* player_hand, int hand_size)
         if (card_counts[i] == 4) {
             hand_flags[PokerHand_FourOfAKind] += 1;
         }
+    }
+
+    if (hand_flags[PokerHand_Pair] > 0 && hand_flags[PokerHand_ThreeOfAKind] > 0) {
+        return PokerHand_FullHouse;
+    }
+
+    if (hand_flags[PokerHand_FourOfAKind] > 0) {
+        return PokerHand_FourOfAKind;
+    }
+
+    if (hand_flags[PokerHand_ThreeOfAKind] > 0) {
+        return PokerHand_ThreeOfAKind;
+    }
+
+    if (hand_flags[PokerHand_Pair] == 2) {
+        return PokerHand_TwoPair;
+    }
+
+    if (hand_flags[PokerHand_Pair] > 0) {
+        return PokerHand_Pair;
     }
 
     return PokerHand_HighCard;

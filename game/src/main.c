@@ -59,6 +59,7 @@ global_variable Vector2 NamePlatePosition;
 global_variable Texture2D BankTexture;
 global_variable Vector2 BankPosition;
 global_variable Texture2D HoldCursorTexture;
+global_variable BlinkAnimation CurrentHoldCursorBlinkAnimation;
 global_variable Vector2 HoldCursorPositions[5];
 global_variable unsigned char DrawHoldCursor[5];
 global_variable unsigned char CurrentHoldCursorIndex;
@@ -268,6 +269,7 @@ LoadTableAndBackgroundTextures(Image *tempImage, Vector2 *imageVector)
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     HoldCursorTexture = LoadTextureFromImage(*tempImage);
+    CurrentHoldCursorBlinkAnimation = CreateBlinkAnimation(1);
     UnloadImage(*tempImage);
 
     // NOTE: load speech bubble texture
@@ -627,7 +629,8 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
         }
         if (CurrentHoldCursorIndex >= 0) 
         {
-            DrawTexture(HoldCursorTexture, HoldCursorPositions[game_input_state->hold_cursor_index].x, HoldCursorPositions[game_input_state->hold_cursor_index].y, WHITE);
+            DrawBlinkAnimation(&HoldCursorTexture, &CurrentHoldCursorBlinkAnimation, &HoldCursorPositions[game_input_state->hold_cursor_index], GlobalTargetFPS);
+            //DrawTexture(HoldCursorTexture, HoldCursorPositions[game_input_state->hold_cursor_index].x, HoldCursorPositions[game_input_state->hold_cursor_index].y, WHITE);
             /*
             for (unsigned int i = 0; i < len(HoldCursorPositions); i++)
             {

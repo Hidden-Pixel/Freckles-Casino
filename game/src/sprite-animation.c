@@ -62,3 +62,35 @@ DrawAnimationFrame(Texture2D *spritesheet, SpriteAnimation *spriteAnimation, Vec
     DrawTextureRec(*spritesheet, spriteAnimation->currentFrameRect, *spritePosition, WHITE);
     spriteAnimation->frameCounter++;
 }
+
+BlinkAnimation
+CreateBlinkAnimation(int blinksPerSecond)
+{
+    BlinkAnimation blinkAnimation = (BlinkAnimation)
+    {
+        .blinksPerSecond        = blinksPerSecond,
+        .blinkDurationFrames    = 0,
+        .frameCounter           = 0,
+    };
+    return blinkAnimation;
+}
+
+void
+DrawBlinkAnimation(Texture2D *spritesheet, BlinkAnimation *blinkAnimation, Vector2 *spritePosition, int gameFPS) 
+{
+    int frameBlink = (gameFPS / blinkAnimation->blinksPerSecond);
+    blinkAnimation->frameCounter++;
+    if (blinkAnimation->frameCounter >= frameBlink)
+    {
+        blinkAnimation->blinkDurationFrames++;
+        if (blinkAnimation->blinkDurationFrames >= (frameBlink / 4))
+        {
+            blinkAnimation->blinkDurationFrames = 0;
+            blinkAnimation->frameCounter = 0;
+        }
+    }
+    if (blinkAnimation->blinkDurationFrames == 0)
+    {
+        DrawTexture(*spritesheet, spritePosition->x, spritePosition->y, WHITE);
+    }
+}

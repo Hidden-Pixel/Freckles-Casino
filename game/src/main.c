@@ -90,7 +90,7 @@ const char* CreditsText = "CREDITS";
 const char* JackpotText = "JACKPOT";
 const char* BetText     = "BET";
 
-inline void 
+void
 GameInit(Poker_Game *game_state, Game_Scene_State *game_scene_state, Game_Input_State *game_input_state);
 
 void

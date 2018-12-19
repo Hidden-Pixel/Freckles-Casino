@@ -330,6 +330,7 @@ tags
 .idea/**/libraries
 
 # CMake
+cmake-build-debug-mingw32/
 cmake-build-debug/
 cmake-build-release/
 
@@ -359,6 +360,7 @@ fabric.properties
 
 # Editor-based Rest Client
 .idea/httpRequests
+
 ### CMake template
 CMakeCache.txt
 CMakeFiles
@@ -369,3 +371,4 @@ cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
+

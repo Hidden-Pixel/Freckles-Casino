@@ -3,6 +3,7 @@
  *
  */
 
+#include <stddef.h>
 #include <FC/sound.h>
 #include <FC/defines.h>
 

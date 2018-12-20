@@ -10,16 +10,22 @@
 // There's 52 cards in a deck and we're NOT counting jokers, folks.
 #define DECK_SIZE 52
 #define MAX_HAND_COMBOS 22
+#define MAX_HOLDS 5
+#define DEFAULT_ANTE 25
+#define STRAIGHT_HANDS 9
+
+// TODO: populate with possible straights.
+local_persist int Straights[STRAIGHT_HANDS];
 
 local_persist Poker_Card DealersDeck[DECK_SIZE];
 local_persist Poker_Card SampleDeck[DECK_SIZE];
 local_persist int deck_index = 0;
 local_persist Buffer hands_buffer =
 {
-    .size           = 0,
     .capacity       = 0,
+    .size           = 0,
     .element_size   = 0,
-    .memory         = NULL,
+    .memory         = NULL
 };
 
 Poker_Card
@@ -30,7 +36,21 @@ Init_Poker_Card()
         .suit       = CardSuit_None,
         .face_value = CardFace_None,
         .state      = CardState_None,
+        .hold       = 0,
     };
+}
+
+void
+Poker_CacheHands()
+{
+    for (int i = 0; i < STRAIGHT_HANDS; ++i) {
+        // NOTE: Assumes little endian
+        int straight = 0;
+        for (int j = i; j < i + 5; ++j) {
+            straight |= (1 << j);
+        }
+        Straights[i] = straight;
+    }
 }
 
 void
@@ -57,6 +77,7 @@ Poker_Init(Poker_Game *game_state, Poker_GameType game_type)
             SampleDeck[i].state = CardState_Hidden;
     }
     srand(time(NULL));
+    Poker_CacheHands();
 }
 
 internal inline void
@@ -69,8 +90,10 @@ Poker_Init_FiveCard(Poker_Game *game_state)
     }
     game_state->player_hand_type = PokerHand_None;
     game_state->dealer_hand_type = PokerHand_None;
-    game_state->player_score = 0;
-    game_state->dealer_score = 0;
+    game_state->player_score = 1000;
+    game_state->dealer_score = 1000;
+    game_state->betting_round = 0;
+    game_state->chances_left = 3;
 }
 
 internal inline void
@@ -96,31 +119,88 @@ Poker_Init_Holdem(Poker_Game *game_state)
     game_state->dealer_score = 0;
 }
 
-/*
- * @remark We're assuming that player_hand is length 2
- */
+inline int
+Poker_CardRank(Poker_Card card) {
+    return card.suit * 13 + card.face_value;
+}
+
 Poker_Hand
-Poker_FindAllHands(Poker_Card* player_hand, Poker_Card* house_cards, int house_card_count) 
+Poker_FindBestHand(Poker_Card* player_hand, int hand_size)
 {
-    int card_count_squared = pow(2, house_card_count);
-    if (house_card_count > 2) {
-        // combinations: f(x) = h(h-x), where h is the house count and x is the size of picks
-        int three_house_cards = house_card_count > 3 ? card_count_squared - house_card_count * 3 : 1;
-        // We'll pre-calculate these, at least until we decide we want to support Omaha
-        int four_house_cards = house_card_count > 4 ? 5 : 0;
-        int five_house_cards = house_card_count > 4 ? 1 : 0;
-        int total_combinations = three_house_cards + four_house_cards + five_house_cards;
-        // Create all the possible hands
-        // TODO(nick): replace with list - IMPORTANT
-        if (hands_buffer.memory == NULL)
-        {
-            Buffer_Create(sizeof(Poker_CardList *), total_combinations);
-        }
-        //Poker_CardList* hands[MAX_HAND_COMBOS];
-        // TODO: Create all possible hands
-    } else {
-      // TODO: Just process the player's hand.
+    int card_counts[CardFace_Count] = { 0 };
+    int suit_counts[CardSuit_Count] = { 0 };
+    int hand_flags[PokerHand_Count] = { 0 };
+    int hand_bits = 0;
+
+    for (int i = 0; i < hand_size; ++i) {
+        card_counts[player_hand[i].face_value] += 1;
+        suit_counts[player_hand[i].suit] += 1;
+        hand_bits |= (1 << player_hand[i].face_value);
     }
+
+    for (int i = 0; i < CardSuit_Count; ++i) {
+        if (suit_counts[i] == 5) {
+            hand_flags[PokerHand_Flush] += 1;
+            break;
+        }
+    }
+
+    for (int i = 0; i < STRAIGHT_HANDS; ++i) {
+        if (Straights[i] == hand_bits) {
+            hand_flags[PokerHand_Straight] += 1;
+            break;
+        }
+    }
+
+    // Figure out if we have a straight flush or royal flush
+    if (hand_flags[PokerHand_Straight] > 0 && hand_flags[PokerHand_Flush] > 0) {
+        if (card_counts[CardFace_Ace] > 0) {
+            return PokerHand_RoyalFlush;
+        }
+
+        return PokerHand_StraightFlush;
+    }
+
+    if (hand_flags[PokerHand_Flush] > 0) {
+        return PokerHand_Flush;
+    }
+
+    if (hand_flags[PokerHand_Straight] > 0) {
+        return PokerHand_Straight;
+    }
+
+    for (int i = 0; i < CardFace_Count; ++i) {
+        if (card_counts[i] == 2) {
+            hand_flags[PokerHand_Pair] += 1;
+        }
+        if (card_counts[i] == 3) {
+            hand_flags[PokerHand_ThreeOfAKind] += 1;
+        }
+        if (card_counts[i] == 4) {
+            hand_flags[PokerHand_FourOfAKind] += 1;
+        }
+    }
+
+    if (hand_flags[PokerHand_Pair] > 0 && hand_flags[PokerHand_ThreeOfAKind] > 0) {
+        return PokerHand_FullHouse;
+    }
+
+    if (hand_flags[PokerHand_FourOfAKind] > 0) {
+        return PokerHand_FourOfAKind;
+    }
+
+    if (hand_flags[PokerHand_ThreeOfAKind] > 0) {
+        return PokerHand_ThreeOfAKind;
+    }
+
+    if (hand_flags[PokerHand_Pair] == 2) {
+        return PokerHand_TwoPair;
+    }
+
+    if (hand_flags[PokerHand_Pair] > 0) {
+        return PokerHand_Pair;
+    }
+
     return PokerHand_HighCard;
 }
 
@@ -157,7 +237,7 @@ Poker_Shuffle(Poker_Game *game_state)
 }
 
 internal void
-Deal_Cards(Poker_Game *game_state)
+Poker_DealCards(Poker_Game *game_state)
 {
     int i = 0;
     switch (game_state->poker_type)
@@ -185,6 +265,7 @@ Deal_Cards(Poker_Game *game_state)
             game_state->house_hand[i].state = CardState_Hidden;
         }
     }
+    // TODO(nick): determine hand types
     game_state->poker_state = PokerState_PlayerCardsDealt;
 }
 
@@ -193,50 +274,90 @@ Poker_StartNewRound(Poker_Game *game_state)
 {
     game_state->poker_state = PokerState_Started;
     Poker_Shuffle(game_state);
-    for (int i = 0; i < 2; ++i) 
-    {
-        game_state->player_hand[i] = Poker_DrawOne(CardState_Shown);
-        game_state->dealer_hand[i] = Poker_DrawOne(CardState_Hidden);
-    }
-    for (int i = 0; i < 5; ++i) 
-    {
-        game_state->house_hand[i].state = CardState_Hidden;
-    }
-    game_state->poker_state = PokerState_PlayerCardsDealt;
+    Poker_DealCards(game_state);
+    game_state->betting_round = 0;
 }
 
 void
-Poker_ProcessNewState(Poker_Game *game_state) 
+Poker_ProcessState(Poker_Game *game_state) 
 {
     switch (game_state->poker_type)
     {
         case GameType_FiveCard:
         {
-            Poker_ProcessNewFiveCardState(game_state);
+            Poker_ProcessFiveCardState(game_state);
         } break;
 
         case GameType_Holdem:
         {
-            Poker_ProcessNewHoldemState(game_state);
+            Poker_ProcessHoldemState(game_state);
         } break;
     }
 }
 
 internal void
-Poker_ProcessNewFiveCardState(Poker_Game *game_state)
+Poker_ProcessFiveCardState(Poker_Game *game_state)
 {
-    // TODO(nick):
+    switch (game_state->poker_state)
+    {
+        case PokerState_Started:
+        {
+            if (game_state->player_score > DEFAULT_ANTE)
+            {
+                Poker_StartNewRound(game_state);
+                game_state->player_score -= DEFAULT_ANTE;
+            } 
+            else
+            {
+                game_state->poker_state = PokerState_GameOver;
+            }
+        } break;
+
+        case PokerState_PlayerCardsDealt:
+        {
+            game_state->poker_state = PokerState_Betting;
+            game_state->betting_round++;
+        } break;
+
+        case PokerState_SelectHolds:
+        {
+            // TODO(nick): ...
+        } break;
+
+        case PokerState_Betting:
+        {
+            // TODO(nick): start betting process ...
+            if (game_state->betting_round == 1)
+            {
+                // TODO(nick):
+                game_state->poker_state = PokerState_SelectHolds;
+            }
+            else
+            {
+                // TODO(nick):
+            }
+        } break;
+
+        case PokerState_ExchangeCards:
+        {
+            // TODO(nick): only allow one betting round ...
+        } break;
+
+        case PokerState_GameOver:
+        {
+            // TODO(nick): ...
+        } break;
+    }
 }
 
 internal void
-Poker_ProcessNewHoldemState(Poker_Game *game_state)
+Poker_ProcessHoldemState(Poker_Game *game_state)
 {
     switch (game_state->poker_state)
     {
         case PokerState_NotStarted:
         {
             Poker_StartNewRound(game_state);
-            game_state->poker_state = PokerState_Shuffled;
         } break;
 
         case PokerState_Shuffled:

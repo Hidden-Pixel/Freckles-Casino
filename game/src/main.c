@@ -43,26 +43,40 @@ global_variable Vector2 TitleScreenAnimationPosition;
 
 // Background Texture(s) / Animation(s) / Position(s)
 global_variable Texture2D BorderTexture;
-global_variable Vector2 BorderPositon;
+global_variable Vector2 BorderPosition;
 global_variable Texture2D RedCurtainTexture;
 global_variable Vector2 RedCurtainPosition;
 global_variable Texture2D GreenTableTexture;
 global_variable Vector2 GreenTablePosition;
 global_variable Texture2D CardSlotTexture;
 global_variable Vector2 CardSlotPositions[10];
-global_variable Texture2D ScoreFrameTexture;
 
-// Card Texture(s)
+// Misc Texture(s) / Position(s)
+global_variable Texture2D FrecklesNamePlateTexture;
+global_variable Vector2 FrecklesNamePlatePosition;
+global_variable Texture2D NamePlateTexture;
+global_variable Vector2 NamePlatePosition;
+global_variable Texture2D BankTexture;
+global_variable Vector2 BankPosition;
+global_variable Texture2D HoldCursorTexture;
+global_variable BlinkAnimation CurrentHoldCursorBlinkAnimation;
+global_variable Vector2 HoldCursorPositions[5];
+global_variable unsigned char CurrentHoldCursorIndex;
+global_variable Texture2D SpeechBubbleTexture;
+global_variable Vector2 SpeechBubblePosition;
+
+// Card Texture(s) / Position(s)
 global_variable Texture2D BackOfCardTexture;
 global_variable Texture2D CardTextures[CardSuit_Count * CardFace_Count];
 global_variable Vector2 CardPositions[10];
 
-global_variable unsigned int CurrentCharacterId = MrFreckles;
-
+// Character Texture(s) / Animation(s) / Position(s)
 global_variable Texture2D MrFrecklesSpritesheets[13];
 global_variable SpriteAnimation MrFrecklesSpriteAnimation[13];
 global_variable Vector2 MrFrecklesPosition[13];
+
 global_variable unsigned int MrFrecklesActiveState = Idle;
+global_variable unsigned int CurrentCharacterId = MrFreckles;
 
 global_variable bool GameStarted = false;
 
@@ -77,6 +91,9 @@ const char* JackpotText = "JACKPOT";
 const char* BetText     = "BET";
 
 void
+GameInit(Poker_Game *game_state, Game_Scene_State *game_scene_state, Game_Input_State *game_input_state);
+
+void
 LoadTextures();
 
 void
@@ -84,6 +101,18 @@ LoadCardTexture(char *filePath, Texture2D *texture);
 
 void
 LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture);
+
+void
+LoadCharacterTextures(Image *tempImage, Vector2 *imageVector);
+
+void
+LoadTitleScreen(Image *tempImage, Vector2 *imageVector);
+
+void
+LoadTableAndBackgroundTextures(Image *tempImage, Vector2 *imageVector);
+
+void
+SetPositions();
 
 void
 UnloadTextures();
@@ -98,16 +127,13 @@ void
 DrawFaceCard(Poker_Card card, int x, int y);
 
 void
-HandleConfirmButtonPress(Poker_Game* game_state);
-
-void
-RenderScene(Poker_Game* game_state, unsigned int scene);
+RenderScene(Poker_Game* game_state, Game_Input_State *game_input_state, unsigned int scene);
 
 void
 RenderTitleScreen();
 
 void
-RenderGame(Poker_Game* game_state);
+RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state);
 
 void
 DrawFaceCard(Poker_Card card, int x, int y);
@@ -129,40 +155,40 @@ main(void)
 {
     local_persist Poker_Game game_state;
     local_persist Game_Scene_State game_scene_state;
-    // TODO(nick): replace with init game function
-    GameScreen_Init(GlobalWindowWidth, GlobalWindowHeight, GAME_WIDTH, GAME_HEIGHT);
-    // TODO(nick): create a main menu that allows user to pick game type
-    Poker_Init(&game_state, GameType_FiveCard);
-    game_scene_state = Init_Game_Scene_State();
-    InitWindow(GlobalWindowWidth, GlobalWindowHeight, GlobalWindowTitle);
-    SetTargetFPS(GlobalTargetFPS);
-
-    // NOTE: load all textures
-    LoadTextures();
-
-    // NOTE: load all sounds
-    InitAudioDevice();
-    LoadSounds();
-    InitSounds();
-
+    local_persist Game_Input_State game_input_state;
+    GameInit(&game_state, &game_scene_state, &game_input_state);
     if (IsWindowReady())
     {
         PlaySounds();
         while (GlobalRunning)
         {
             UpdateSounds();
-            ProcessInput(&game_state, &game_scene_state);
-            RenderScene(&game_state, game_scene_state.current_scene);
+            ProcessInput(&game_state, &game_scene_state, &game_input_state);
+            RenderScene(&game_state, &game_input_state, game_scene_state.current_scene);
             if (WindowShouldClose())
             {
                 GlobalRunning = 0;
             }
         }
     }
-
     ExitGame();
-
     return 0;
+}
+
+inline void
+GameInit(Poker_Game *game_state, Game_Scene_State *game_scene_state, Game_Input_State *game_input_state)
+{
+    Init_Input_State(game_input_state);
+    GameScreen_Init(GlobalWindowWidth, GlobalWindowHeight, GAME_WIDTH, GAME_HEIGHT);
+    // TODO(nick): create a main menu that allows user to pick game type
+    Poker_Init(game_state, GameType_FiveCard);
+    *game_scene_state = Init_Game_Scene_State();
+    InitWindow(GlobalWindowWidth, GlobalWindowHeight, GlobalWindowTitle);
+    SetTargetFPS(GlobalTargetFPS);
+    LoadTextures();
+    InitAudioDevice();
+    LoadSounds();
+    InitSounds();
 }
 
 void
@@ -212,6 +238,43 @@ LoadTableAndBackgroundTextures(Image *tempImage, Vector2 *imageVector)
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     CardSlotTexture = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+
+    // NOTE: load name plate texture
+    *tempImage = LoadImage("assets/textures/Misc/name-plate.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    NamePlateTexture = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+
+    // NOTE: load score frame texture
+    *tempImage = LoadImage("assets/textures/Misc/bank.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    BankTexture = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+
+    // NOTE: load hold cursor texture
+    *tempImage = LoadImage("assets/textures/Misc/hold-cursor.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    HoldCursorTexture = LoadTextureFromImage(*tempImage);
+    CurrentHoldCursorBlinkAnimation = CreateBlinkAnimation(1);
+    UnloadImage(*tempImage);
+
+    // NOTE: load speech bubble texture
+    *tempImage = LoadImage("assets/textures/Misc/speech-bubble.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    SpeechBubbleTexture = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
 }
 
@@ -282,7 +345,7 @@ LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
     LoadCardTexture("assets/textures/Cards/Spades/Pngs/AceSpades.png", &CardTextures[51]);
 }
 
-inline
+inline void
 LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
 {
     // NOTE: Mr. Freckles Spritesheets Begin
@@ -418,7 +481,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     // NOTE: Mr. Freckles Spritesheets End
 }
 
-inline
+inline void
 LoadTitleScreen(Image *tempImage, Vector2 *imageVector)
 {
     *tempImage = LoadImage("assets/textures/Titlescreen/title-screen-spritesheet.png");
@@ -432,10 +495,7 @@ LoadTitleScreen(Image *tempImage, Vector2 *imageVector)
     TitleScreenSpriteAnimation = CreateSpriteAnimation(28, 1, 28, 10, TitleScreenSpriteSheet.width, TitleScreenSpriteSheet.height);
 }
 
-// TODO(nick): 
-// 1) redo positions
-// 2) change to vector operations
-inline
+inline void
 SetPositions()
 {
     // Set center screen position
@@ -445,29 +505,27 @@ SetPositions()
     // Set all title screen position(s)
     TitleScreenAnimationPosition.x = CenterScreenPosition.x - (TitleScreenSpriteSheet.width / TitleScreenSpriteAnimation.totalHorizontalFrames) * 0.5f;
     TitleScreenAnimationPosition.y = CenterScreenPosition.y - (TitleScreenSpriteSheet.height / TitleScreenSpriteAnimation.totalVerticalFrames) * 0.5f;
-
     // Set all game background positions
-    BorderPositon.x = 0;
-    BorderPositon.y = 0;
-
+    BorderPosition.x = 0;
+    BorderPosition.y = 0;
     RedCurtainPosition.x = 0;
     RedCurtainPosition.y = 0;
-
     GreenTablePosition.x = RedCurtainPosition.x;
     GreenTablePosition.y = RedCurtainPosition.y + RedCurtainTexture.height;
-
+    NamePlatePosition.x = (CenterScreenPosition.x - (NamePlateTexture.width * 0.5f));
+    NamePlatePosition.y = (GreenTablePosition.y + GameScreen_LocalUnitsToScreen(10.0f));
+    BankPosition.x = BorderPosition.x + GameScreen_LocalUnitsToScreen(20.0f);
+    BankPosition.y = GreenTablePosition.y - BankTexture.height - GameScreen_LocalUnitsToScreen(20.0f);
     Vector2 CardSlotStartingPositionTop =
     {
         .x = CenterScreenPosition.x - (CardSlotTexture.width * 0.5f) - (CardSlotTexture.width * 3.0f),
         .y = CenterScreenPosition.y - (CardSlotTexture.height * 2.5f),
     };
-
     Vector2 CardSlotStartingPositionBottom = 
     {
         .x = CardSlotStartingPositionTop.x,
-        .y = CenterScreenPosition.y + (CardSlotTexture.height * 2.0f),
+        .y = CenterScreenPosition.y + (CardSlotTexture.height * 1.5f),
     };
-
     float CardSlotPadding = GameScreen_LocalUnitsToScreen(16.0f);
     int offset = 5;
     for (unsigned int i = 0; i < len(CardSlotPositions) / 2; i++)
@@ -477,16 +535,15 @@ SetPositions()
         CardSlotPositions[i + offset].x = CardSlotStartingPositionBottom.x + (CardSlotPadding * i) + (CardSlotTexture.width * i);
         CardSlotPositions[i + offset].y = CardSlotStartingPositionBottom.y;
     }
-
     for (unsigned int i = 0; i < len(CardPositions) / 2; i++)
     {
         CardPositions[i].x = CardSlotStartingPositionTop.x + (CardSlotPadding * i) + (CardSlotTexture.width * i);
         CardPositions[i].y = CardSlotStartingPositionTop.y + GameScreen_LocalUnitsToScreen(2.0f);
-
         CardPositions[i + offset].x = CardSlotStartingPositionTop.x + (CardSlotPadding * i) + (CardSlotTexture.width * i);
         CardPositions[i + offset].y = CardSlotStartingPositionBottom.y + GameScreen_LocalUnitsToScreen(2.0f);
+        HoldCursorPositions[i].x = CardPositions[i + offset].x;
+        HoldCursorPositions[i].y = CardPositions[i + offset].y + HoldCursorTexture.width + (CardSlotTexture.width * 0.5f);
     }
-
     // Set the characters position(s)
     int xOffset = 0;
     int yOffset = 0;
@@ -530,7 +587,6 @@ void
 UnloadTextures()
 {
     UnloadTexture(BackOfCardTexture);
-    UnloadTexture(ScoreFrameTexture);
     int i = 0;
     for (i = 0; i < len(MrFrecklesSpritesheets); i++)
     {
@@ -541,7 +597,9 @@ UnloadTextures()
 void
 RenderTitleScreen()
 {
-    // TODO(nick): add slide in animation code.
+    // TODO(nick):
+    // 1) add slide in animation code.
+    // 2) static draw after first animation loop - then start again at a particular time set interval
     BeginDrawing();
     {
         ClearBackground(BLACK);
@@ -550,28 +608,42 @@ RenderTitleScreen()
     EndDrawing();
 }
 
+// TODO(nick): possible start storing hold states in game state instead of game input state
 void
-RenderGame(Poker_Game* game_state)
+RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
 {
     BeginDrawing();
     {
         ClearBackground(BLACK);
         DrawTexture(RedCurtainTexture, RedCurtainPosition.x, RedCurtainPosition.y, WHITE);
         DrawTexture(GreenTableTexture, GreenTablePosition.x, GreenTablePosition.y, WHITE);
-        DrawTexture(BorderTexture, BorderPositon.x, BorderPositon.y, WHITE);
-
+        DrawTexture(NamePlateTexture, NamePlatePosition.x, NamePlatePosition.y, WHITE);
+        DrawTexture(BankTexture, BankPosition.x, BankPosition.y, WHITE);
+        DrawTexture(BorderTexture, BorderPosition.x, BorderPosition.y, WHITE);
         for (unsigned int i = 0; i < len(CardSlotPositions); i++)
         {
             DrawTexture(CardSlotTexture, CardSlotPositions[i].x, CardSlotPositions[i].y, WHITE);
         }
-
+        if (CurrentHoldCursorIndex >= 0) 
+        {
+            for (unsigned int i = 0; i < len(game_input_state->hold_cursor_selects); i++)
+            {
+                // NOTE: always draw the current icon as blinking
+                if (i == game_input_state->hold_cursor_index)
+                {
+                    DrawBlinkAnimation(&HoldCursorTexture, &CurrentHoldCursorBlinkAnimation, &HoldCursorPositions[i], GlobalTargetFPS);
+                }
+                else if (game_input_state->hold_cursor_selects[i] == CURSOR_SELECTED)
+                {
+                    DrawTexture(HoldCursorTexture, HoldCursorPositions[i].x, HoldCursorPositions[i].y, WHITE);
+                }
+            }
+        }
         unsigned int offset = 5;
         for (unsigned int i = 0; i < len(CardPositions) / 2; i++)
         {
             // TODO(nick): game state needs to change as poker rules have changed 
             // no longer texas hold'em, just straight 5 card
-
-            
             if (game_state->dealer_hand[i].state == CardState_Hidden)
             {
                 DrawTexture(BackOfCardTexture, CardPositions[i].x, CardPositions[i].y, WHITE);
@@ -604,19 +676,18 @@ RenderGame(Poker_Game* game_state)
         }
         DrawAnimationFrame(currentCharacterSpritesheet, currentCharacterAnimation, currentCharacterSpritePosition, GlobalTargetFPS);
     }
-
     EndDrawing();
     GlobalFrameCount++;
 }
 
 void
-RenderScene(Poker_Game* game_state, Scene scene)
+RenderScene(Poker_Game *game_state, Game_Input_State *game_input_state, Scene scene)
 {
     switch (scene)
     {
         case Scene_MainPokerTable:
         {
-            RenderGame(game_state);
+            RenderGame(game_state, game_input_state);
         } break;
 
         default:
@@ -624,73 +695,6 @@ RenderScene(Poker_Game* game_state, Scene scene)
             RenderTitleScreen();
         } break;
     }
-}
-
-void
-HandleConfirmButtonPress(Poker_Game* game_state)
-{
-    switch (game_state->poker_state)
-    {
-        case PokerState_NotStarted: 
-        {
-            Poker_StartNewRound(game_state);
-            game_state->poker_state = PokerState_Shuffled;
-        } break;
-
-        case PokerState_Shuffled: 
-        {
-            for(int i = 0; i < 2; ++i)
-            {
-                // TODO: Card dealing / flipping animation
-                game_state->player_hand[i] = Poker_DrawOne(CardState_Shown);
-                game_state->dealer_hand[i] = Poker_DrawOne(CardState_Shown);
-            }
-
-            game_state->poker_state = PokerState_PlayerCardsDealt;
-        } break;
-
-        case PokerState_PlayerCardsDealt: {
-            for (int i = 0; i < 3; ++i)
-            {
-                game_state->house_hand[i] = Poker_DrawOne(CardState_Shown);
-            }
-
-            game_state->poker_state = PokerState_FlopCardsDealt;
-
-        } break;
-
-        case PokerState_FlopCardsDealt: 
-        {
-            game_state->house_hand[3] = Poker_DrawOne(CardState_Shown);
-
-            game_state->poker_state = PokerState_RiverCardsDealt;
-        } break;
-
-        case PokerState_RiverCardsDealt:
-        {
-            game_state->house_hand[4] = Poker_DrawOne(CardState_Shown);
-
-            game_state->poker_state = PokerState_TurnCardsDealt;
-        } break;
-
-        case PokerState_TurnCardsDealt:
-        {
-            // TODO: Award / Deduct points.
-            // TODO: Lose / Win animations and sounds.
-            game_state->poker_state = PokerState_GameOver;
-        } break;
-
-        case PokerState_GameOver:
-        {
-            // TODO: Continue / New Game / Quit
-            game_state->poker_state = PokerState_NotStarted;
-        } break;
-
-        default:
-            break;
-    }
-
-    Poker_ProcessNewState(game_state);
 }
 
 void
@@ -800,9 +804,8 @@ InitSounds()
 {
     CharacterThemeMusicMeta[MrFreckles].playLimit = INFINITE_PLAY;
     AddSoundToBuffer(&CharacterThemeMusic[MrFreckles], &CharacterThemeMusicMeta[MrFreckles]);
-
-    MrFrecklesDialogueMeta[18].playLimit = 1;
-    AddSoundToBuffer(&MrFrecklesDialogue[18], &MrFrecklesDialogueMeta[18]);
+    //MrFrecklesDialogueMeta[18].playLimit = 1;
+    //AddSoundToBuffer(&MrFrecklesDialogue[18], &MrFrecklesDialogueMeta[18]);
 }
 
 void

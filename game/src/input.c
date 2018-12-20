@@ -9,38 +9,76 @@
 #include <stdbool.h>
 
 void
-ProcessInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_state)
+Init_Input_State(Game_Input_State *game_input_state)
+{
+    game_input_state->hold_cursor_index = 0;
+    game_input_state->hold_cursor_index_max = 5;
+    zero_array(game_input_state->hold_cursor_selects);
+}
+
+void
+ProcessInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_state, Game_Input_State *game_input_state)
 {
     switch (game_scene_state->current_scene)
     {
         case Scene_MainPokerTable:
         {
-            ProcessGamePlayInput(game_poker_state, game_scene_state);
+            ProcessGamePlayInput(game_poker_state, game_scene_state, game_input_state);
         } break;
 
         case Scene_TitleScreen:
         {
-            ProcessTitleScreenInput(game_poker_state, game_scene_state);
+            ProcessTitleScreenInput(game_poker_state, game_scene_state, game_input_state);
         } break;
     }
 }
 
 void
-ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_state)
+ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_state, Game_Input_State *game_input_state)
 {
-    local_persist bool confirmPressed = false;
-    if (IsKeyDown(KEY_SPACE) && confirmPressed == true)
+    if (IsKeyPressed(KEY_SPACE) &&
+        game_poker_state->poker_state == PokerState_NotStarted)
     {
-        confirmPressed = false;
+        game_poker_state->poker_state = PokerState_Started;
     }
-    if (IsKeyDown(KEY_SPACE) && confirmPressed == false && game_poker_state->poker_state == PokerState_NotStarted)
+    if (game_poker_state->poker_state >= PokerState_PlayerCardsDealt)
     {
-        Poker_ProcessNewState(game_poker_state);
+        if (game_poker_state->poker_state == PokerState_SelectHolds)
+        {
+            if (IsKeyPressed(KEY_RIGHT))
+            {
+                game_input_state->hold_cursor_index++;
+                if (game_input_state->hold_cursor_index >= game_input_state->hold_cursor_index_max)
+                {
+                    game_input_state->hold_cursor_index = 0;
+                }
+            }
+            if (IsKeyPressed(KEY_LEFT))
+            {
+                game_input_state->hold_cursor_index--;
+                if (game_input_state->hold_cursor_index < 0)
+                {
+                    game_input_state->hold_cursor_index = (game_input_state->hold_cursor_index_max - 1);
+                }
+            }
+            if (IsKeyPressed(KEY_H))
+            {
+                if (game_input_state->hold_cursor_selects[game_input_state->hold_cursor_index] == CURSOR_SELECTED)
+                {
+                    game_input_state->hold_cursor_selects[game_input_state->hold_cursor_index] = CURSOR_NONE;
+                }
+                else
+                {
+                    game_input_state->hold_cursor_selects[game_input_state->hold_cursor_index] = CURSOR_SELECTED;
+                }
+            }
+        }
     }
+    Poker_ProcessState(game_poker_state);
 }
 
 void
-ProcessTitleScreenInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_state)
+ProcessTitleScreenInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_state, Game_Input_State *game_input_state)
 {
     local_persist bool confirmPressed = false;
     if (IsKeyPressed(KEY_S) && confirmPressed == true)

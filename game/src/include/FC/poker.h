@@ -4,32 +4,33 @@
 
 #define CardFace_Count 13
 #define CardSuit_Count  4
+#define PokerHand_Count 9
 
 typedef enum _poker_CardSuit
 {
-    CardSuit_None       =  0,
-    CardSuit_Heart      =  1,
-    CardSuit_Club       =  2,
-    CardSuit_Diamond    =  3,
-    CardSuit_Spade      =  4,
+    CardSuit_None       =  -1,
+    CardSuit_Club       =  0,
+    CardSuit_Diamond    =  1,
+    CardSuit_Heart      =  2,
+    CardSuit_Spade      =  3,
 } Poker_CardSuit;
 
 typedef enum poker_CardFace
 {
-    CardFace_None   =  0,
-    CardFace_Two    =  2,
-    CardFace_Three  =  3,
-    CardFace_Four   =  4,
-    CardFace_Five   =  5,
-    CardFace_Six    =  6,
-    CardFace_Seven  =  7,
-    CardFace_Eight  =  8,
-    CardFace_Nine   =  9,
-    CardFace_Ten    = 10,
-    CardFace_Jack   = 11,
-    CardFace_Queen  = 12,
-    CardFace_King   = 13,
-    CardFace_Ace    = 14,
+    CardFace_None   =  -1,
+    CardFace_Two    =  0,
+    CardFace_Three  =  1,
+    CardFace_Four   =  2,
+    CardFace_Five   =  3,
+    CardFace_Six    =  4,
+    CardFace_Seven  =  5,
+    CardFace_Eight  =  6,
+    CardFace_Nine   =  7,
+    CardFace_Ten    =  8,
+    CardFace_Jack   =  9,
+    CardFace_Queen  =  10,
+    CardFace_King   =  11,
+    CardFace_Ace    =  12,
 } Poker_CardFace;
 
 typedef enum poker_GameType
@@ -46,7 +47,7 @@ typedef enum _poker_CardState
     CardState_Shown     = 2,
 } Poker_CardState;
 
-typedef enum _poke_GameState
+typedef enum _poker_GameState
 {
     PokerState_NotStarted       = 0,
     PokerState_Started          = 1,
@@ -55,8 +56,10 @@ typedef enum _poke_GameState
     PokerState_FlopCardsDealt   = 4,
     PokerState_RiverCardsDealt  = 5,
     PokerState_TurnCardsDealt   = 6,
-    PokerState_GameOver         = 7,
-    PokerState_Count            = 8,
+    PokerState_SelectHolds      = 7,
+    PokerState_Betting          = 8,
+    PokerState_GameOver         = 9,
+    PokerState_ExchangeCards    = 10,
 } Poker_GameState;
 
 typedef enum _poker_Hand
@@ -71,6 +74,7 @@ typedef enum _poker_Hand
     PokerHand_FullHouse     =  6,
     PokerHand_FourOfAKind   =  7,
     PokerHand_StraightFlush =  8,
+    PokerHand_RoyalFlush = 9
 } Poker_Hand;
 
 typedef struct _poker_Card
@@ -78,6 +82,7 @@ typedef struct _poker_Card
     Poker_CardSuit  suit;
     Poker_CardFace  face_value;
     Poker_CardState state;
+    unsigned char   hold;
 } Poker_Card;
 
 typedef struct _poker_Game
@@ -89,6 +94,7 @@ typedef struct _poker_Game
     Poker_Card      house_hand[5];
     Poker_Hand      player_hand_type;
     Poker_Hand      dealer_hand_type;
+    int             betting_round;
     int             chances_left;
     int             player_score;
     int             dealer_score;
@@ -113,19 +119,19 @@ internal void
 Poker_Shuffle(Poker_Game *game_state);
 
 internal void
-Deal_Cards(Poker_Game *game_state);
+Poker_DealCards(Poker_Game *game_state);
 
 void
 Poker_StartNewRound(Poker_Game *game_state);
 
 void
-Poker_ProcessNewState(Poker_Game* game_state);
+Poker_ProcessState(Poker_Game* game_state);
 
 internal void
-Poker_ProcessNewFiveCardState(Poker_Game *game_state);
+Poker_ProcessFiveCardState(Poker_Game *game_state);
 
 internal void
-Poker_ProcessNewHoldemState(Poker_Game *game_state);
+Poker_ProcessHoldemState(Poker_Game *game_state);
 
 void
 Poker_Update(Poker_Game* game_state);
@@ -145,6 +151,9 @@ typedef struct
     Poker_LinkedListNode* last;
 } Poker_CardList;
 
+void
+Poker_CacheHands();
+
 Poker_CardList*
 Poker_CreateCardList(Poker_Card first_card);
 
@@ -153,3 +162,6 @@ Poker_AddCardToList(Poker_CardList* card_list, Poker_Card card);
 
 void
 Poker_DestroyCardList(Poker_CardList* card_list);
+
+Poker_Hand
+Poker_FindBestHand(Poker_Card* player_hand, int hand_size);

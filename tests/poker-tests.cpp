@@ -1,9 +1,28 @@
 #include <FC/poker.h>
+#include <FC/commands.h>
+#include <FC/input.h>
 
 #undef internal
 
 #include <gtest/gtest.h>
 
+TEST(Poker_Tests, Callback_Test) {
+    Poker_Card hand[1];
+    Poker_Card card {
+        .suit = CardSuit_Spade,
+        .face_value = CardFace_Eight,
+        .state = CardState_Shown,
+        .hold = CURSOR_NONE
+    };
+
+    hand[0] = card;
+
+    Command_OnCardHoldPressed = [](Poker_Card* card_hand, int card_index, unsigned char hold_state) {
+        card_hand[card_index].hold = hold_state;
+    };
+    Command_OnCardHoldPressed(hand, 0, CURSOR_SELECTED);
+    ASSERT_EQ(CURSOR_SELECTED, hand[0].hold);
+}
 
 TEST(Poker_Tests, Linked_List_Test) {
     Poker_Card card1 { .suit = CardSuit_Club, .face_value = CardFace_Ace, .state = CardState_Shown };

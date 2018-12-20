@@ -1,5 +1,6 @@
 #include <FC/poker.h>
 #include <FC/buffer.h>
+#include <FC/commands.h>
 
 #include <assert.h>
 #include <stdlib.h>
@@ -28,6 +29,11 @@ local_persist Buffer hands_buffer =
     .memory         = NULL
 };
 
+internal void
+Poker_ToggleCardHold(Poker_Card* card_hand, int card_index, unsigned char hold_state) {
+    card_hand[card_index].hold = hold_state;
+}
+
 Poker_Card
 Init_Poker_Card()
 {
@@ -43,6 +49,7 @@ Init_Poker_Card()
 void
 Poker_CacheHands()
 {
+    // Create all values for hands with a straight in them
     for (int i = 0; i < STRAIGHT_HANDS; ++i) {
         // NOTE: Assumes little endian
         int straight = 0;
@@ -78,6 +85,7 @@ Poker_Init(Poker_Game *game_state, Poker_GameType game_type)
     }
     srand(time(NULL));
     Poker_CacheHands();
+    Command_OnCardHoldPressed = &Poker_ToggleCardHold;
 }
 
 internal inline void
@@ -135,6 +143,8 @@ Poker_FindBestHand(Poker_Card* player_hand, int hand_size)
     for (int i = 0; i < hand_size; ++i) {
         card_counts[player_hand[i].face_value] += 1;
         suit_counts[player_hand[i].suit] += 1;
+        // 13 bit flags for cards in hand.
+        // 0 0000 0001 1111 would be a low straight.
         hand_bits |= (1 << player_hand[i].face_value);
     }
 

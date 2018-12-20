@@ -5,6 +5,7 @@
 
 #include <FC/defines.h>
 #include <FC/input.h>
+#include <FC/commands.h>
 
 #include <stdbool.h>
 
@@ -70,6 +71,12 @@ ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_
                 else
                 {
                     game_input_state->hold_cursor_selects[game_input_state->hold_cursor_index] = CURSOR_SELECTED;
+                }
+
+                if (Command_OnCardHoldPressed != 0) {
+                    Command_OnCardHoldPressed(game_poker_state->player_hand,
+                                     game_input_state->hold_cursor_index,
+                                     game_input_state->hold_cursor_selects[game_input_state->hold_cursor_index]);
                 }
             }
         }

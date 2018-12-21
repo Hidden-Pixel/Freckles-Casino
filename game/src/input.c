@@ -75,16 +75,17 @@ ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_
                 }
 
                 assert(Command_OnCardHoldPressed);
-
                 Command_OnCardHoldPressed(game_poker_state->player_hand,
                                      game_input_state->hold_cursor_index,
                                      game_input_state->hold_cursor_selects[game_input_state->hold_cursor_index]);
 
             }
+            // TODO(Alex): No idea if this makes sense for moving on. "Are you sure?" might be appropriate here.
             if (IsKeyPressed(KEY_SPACE))
             {
                 assert(Command_OnCardHoldComplete);
                 Command_OnCardHoldComplete(game_poker_state->player_hand, 5);
+                game_poker_state->poker_state = PokerState_ExchangeCards;
             }
         }
     }

@@ -8,6 +8,7 @@
 #include <FC/commands.h>
 
 #include <stdbool.h>
+#include <assert.h>
 
 void
 Init_Input_State(Game_Input_State *game_input_state)
@@ -73,11 +74,17 @@ ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_
                     game_input_state->hold_cursor_selects[game_input_state->hold_cursor_index] = CURSOR_SELECTED;
                 }
 
-                if (Command_OnCardHoldPressed != 0) {
-                    Command_OnCardHoldPressed(game_poker_state->player_hand,
+                assert(Command_OnCardHoldPressed);
+
+                Command_OnCardHoldPressed(game_poker_state->player_hand,
                                      game_input_state->hold_cursor_index,
                                      game_input_state->hold_cursor_selects[game_input_state->hold_cursor_index]);
-                }
+
+            }
+            if (IsKeyPressed(KEY_SPACE))
+            {
+                assert(Command_OnCardHoldComplete);
+                Command_OnCardHoldComplete(game_poker_state->player_hand, 5);
             }
         }
     }

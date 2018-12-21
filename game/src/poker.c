@@ -29,11 +29,6 @@ local_persist Buffer hands_buffer =
     .memory         = NULL
 };
 
-internal void
-Poker_ToggleCardHold(Poker_Card* card_hand, int card_index, unsigned char hold_state) {
-    card_hand[card_index].hold = hold_state;
-}
-
 Poker_Card
 Init_Poker_Card()
 {
@@ -57,6 +52,20 @@ Poker_CacheHands()
             straight |= (1 << j);
         }
         Straights[i] = straight;
+    }
+}
+
+internal void
+Poker_ToggleCardHold(Poker_Card* card_hand, int card_index, unsigned char hold_state) {
+    card_hand[card_index].hold = hold_state;
+}
+
+internal void
+Poker_FinishCardHold(Poker_Card* card_hand, int hand_size) {
+    for (int i = 0; i < hand_size; ++i) {
+        if (card_hand[i].hold == 2) {
+            card_hand[i] = Poker_DrawOne(CardState_Shown);
+        }
     }
 }
 
@@ -86,6 +95,7 @@ Poker_Init(Poker_Game *game_state, Poker_GameType game_type)
     srand(time(NULL));
     Poker_CacheHands();
     Command_OnCardHoldPressed = &Poker_ToggleCardHold;
+    Command_OnCardHoldComplete = &Poker_FinishCardHold;
 }
 
 internal inline void

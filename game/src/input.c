@@ -85,6 +85,11 @@ ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_
             {
                 assert(Command_OnCardHoldComplete);
                 Command_OnCardHoldComplete(game_poker_state->player_hand, 5);
+                game_input_state->hold_cursor_selects[0] = CURSOR_NONE;
+                game_input_state->hold_cursor_selects[1] = CURSOR_NONE;
+                game_input_state->hold_cursor_selects[2] = CURSOR_NONE;
+                game_input_state->hold_cursor_selects[3] = CURSOR_NONE;
+                game_input_state->hold_cursor_selects[4] = CURSOR_NONE;
                 game_poker_state->poker_state = PokerState_ExchangeCards;
             }
         }

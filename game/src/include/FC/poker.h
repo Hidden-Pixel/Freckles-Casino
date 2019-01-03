@@ -85,6 +85,16 @@ typedef struct _poker_Card
     unsigned char   hold;
 } Poker_Card;
 
+typedef struct _poker_RankedHand_5
+{
+    Poker_Hand hand_type;
+    Poker_Card card_1;
+    Poker_Card card_2;
+    Poker_Card card_3;
+    Poker_Card card_4;
+    Poker_Card card_5;
+} Poker_RankedHand_5;
+
 typedef struct _poker_Game
 {
     Poker_GameState poker_state;

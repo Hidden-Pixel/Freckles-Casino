@@ -68,5 +68,6 @@ target_sources(Freckles_Casino PRIVATE
         src/sprite-animation.c
         src/input.c
         src/commands.c
+        src/ai-behavior.c
         )
 target_include_directories(Freckles_Casino PUBLIC src/include)

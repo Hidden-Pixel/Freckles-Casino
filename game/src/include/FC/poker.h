@@ -6,6 +6,9 @@
 #define CardSuit_Count  4
 #define PokerHand_Count 9
 
+extern const char* CardSuit_Names[CardSuit_Count];
+extern const char* CardFace_Names[CardFace_Count];
+
 typedef enum _poker_CardSuit
 {
     CardSuit_None       =  -1,
@@ -32,6 +35,8 @@ typedef enum poker_CardFace
     CardFace_King   =  11,
     CardFace_Ace    =  12,
 } Poker_CardFace;
+
+
 
 typedef enum poker_GameType
 {

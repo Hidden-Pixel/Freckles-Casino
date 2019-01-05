@@ -85,7 +85,7 @@ ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_
             if (IsKeyPressed(KEY_SPACE))
             {
                 assert(Command_OnCardHoldComplete);
-                AI_FiveCardDraw_MakeHoldDecision(&game_poker_state->dealer_hand);
+                AI_FiveCardDraw_MakeHoldDecision(game_poker_state->dealer_hand);
                 Command_OnCardHoldComplete(game_poker_state->dealer_hand, CardState_Hidden, 5);
                 Command_OnCardHoldComplete(game_poker_state->player_hand, CardState_Shown, 5);
                 game_input_state->hold_cursor_selects[0] = CURSOR_NONE;

@@ -12,7 +12,9 @@ else()
     target_compile_features(Freckles_Casino PUBLIC c_std_11)
 endif()
 
-
+IF(CMAKE_BUILD_TYPE MATCHES "Debug")
+    target_compile_definitions(Freckles_Casino PUBLIC DEBUG)
+ENDIF(CMAKE_BUILD_TYPE MATCHES "Debug")
 
 if (WIN32)
     add_library(raylib STATIC IMPORTED)

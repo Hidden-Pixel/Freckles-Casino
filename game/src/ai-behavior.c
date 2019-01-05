@@ -54,9 +54,9 @@ AI_FiveCardDraw_MakeHoldDecision(Poker_Card* hand) {
         case PokerHand_FourOfAKind: {
             for (int i = 0; i < 5; ++i) {
                 if (rankedHand.card_counts[rankedHand.ranked_cards[i].face_value] > 1) {
-                    hand[rankedToHandMap[i]].hold = HoldState_Held;
+                    rankedHand.ranked_cards[i].hold = HoldState_Held;
                 } else {
-                    hand[rankedToHandMap[i]].hold = HoldState_NotHeld;
+                    rankedHand.ranked_cards[i].hold = HoldState_NotHeld;
                 }
             }
         } break;

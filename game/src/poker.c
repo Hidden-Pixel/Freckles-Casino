@@ -15,6 +15,19 @@
 #define DEFAULT_ANTE 25
 #define STRAIGHT_HANDS 9
 
+const char* CardSuit_Names[CardSuit_Count] =
+        {
+                "C", "D", "H", "S"
+        };
+
+const char* CardFace_Names[CardFace_Count] =
+        {
+                "2", "3", "4", "5",
+                "6", "7", "8", "9",
+                "10", "J", "Q", "K",
+                "A"
+        };
+
 // TODO: populate with possible straights.
 local_persist int Straights[STRAIGHT_HANDS];
 

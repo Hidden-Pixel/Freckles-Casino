@@ -9,6 +9,7 @@
 
 #include <stdbool.h>
 #include <assert.h>
+#include <FC/ai-behavior.h>
 
 void
 Init_Input_State(Game_Input_State *game_input_state)
@@ -84,13 +85,20 @@ ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_
             if (IsKeyPressed(KEY_SPACE))
             {
                 assert(Command_OnCardHoldComplete);
-                Command_OnCardHoldComplete(game_poker_state->player_hand, 5);
+                AI_FiveCardDraw_MakeHoldDecision(&game_poker_state->dealer_hand);
+                Command_OnCardHoldComplete(game_poker_state->dealer_hand, CardState_Hidden, 5);
+                Command_OnCardHoldComplete(game_poker_state->player_hand, CardState_Shown, 5);
                 game_input_state->hold_cursor_selects[0] = CURSOR_NONE;
                 game_input_state->hold_cursor_selects[1] = CURSOR_NONE;
                 game_input_state->hold_cursor_selects[2] = CURSOR_NONE;
                 game_input_state->hold_cursor_selects[3] = CURSOR_NONE;
                 game_input_state->hold_cursor_selects[4] = CURSOR_NONE;
                 game_poker_state->poker_state = PokerState_ExchangeCards;
+            }
+        }
+        if (game_poker_state->poker_state == PokerState_ExchangeCards) {
+            if (IsKeyPressed(KEY_SPACE)) {
+                Poker_RevealHand(game_poker_state->dealer_hand, 5);
             }
         }
     }

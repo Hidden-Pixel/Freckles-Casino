@@ -13,6 +13,7 @@
 #include <FC/input.h>
 
 #include <stdio.h>
+#include <assert.h>
 
 #include "raylib.h"
 #include "raymath.h"
@@ -709,33 +710,8 @@ DrawHorizontalCardArea(Texture2D texture, Vector2 area, int card_count, float x_
 void
 DrawFaceCard(Poker_Card card, int x, int y)
 {
-    int cardIndex = 0;
-    switch (card.suit)
-    {
-        case CardSuit_Heart:
-        {
-            cardIndex = 0;
-        } break;
-
-        case CardSuit_Club:
-        {
-            cardIndex = 13;
-        } break;
-
-        case CardSuit_Diamond:
-        {
-            cardIndex = 26;
-        } break;
-
-        case CardSuit_Spade:
-        {
-            cardIndex = 39;
-        } break;
-    }
-    if (card.face_value > CardFace_Two)
-    {
-        cardIndex += (card.face_value - 2);
-    }
+    int cardIndex = Poker_CardRank(card);
+    assert(cardIndex < 52);
     DrawTexture(CardTextures[cardIndex], x, y, WHITE);
 }
 

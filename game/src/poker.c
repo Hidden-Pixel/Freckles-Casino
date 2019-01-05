@@ -61,10 +61,11 @@ Poker_ToggleCardHold(Poker_Card* card_hand, int card_index, unsigned char hold_s
 }
 
 internal void
-Poker_FinishCardHold(Poker_Card* card_hand, int hand_size) {
+Poker_FiveCard_FinishCardHold(Poker_Card* card_hand, Poker_CardState card_visibility, int hand_size) {
     for (int i = 0; i < hand_size; ++i) {
-        if (card_hand[i].hold == 2) {
-            card_hand[i] = Poker_DrawOne(CardState_Shown);
+        Poker_Card card = card_hand[i];
+        if (card.hold == HoldState_NotHeld) {
+            card_hand[i] = Poker_DrawOne(card_visibility);
         }
     }
 }
@@ -88,14 +89,14 @@ Poker_Init(Poker_Game *game_state, Poker_GameType game_type)
     }
     for (int i = 0; i < DECK_SIZE; ++i)
     {
-            SampleDeck[i].suit = (Poker_CardSuit)((i % CardSuit_Count) + 1);
-            SampleDeck[i].face_value = (Poker_CardFace)((i % CardFace_Count) + 2);
+            SampleDeck[i].suit = (Poker_CardSuit)(i % CardSuit_Count);
+            SampleDeck[i].face_value = (Poker_CardFace)(i % CardFace_Count);
             SampleDeck[i].state = CardState_Hidden;
     }
     srand(time(NULL));
     Poker_CacheHands();
     Command_OnCardHoldPressed = &Poker_ToggleCardHold;
-    Command_OnCardHoldComplete = &Poker_FinishCardHold;
+    Command_OnCardHoldComplete = &Poker_FiveCard_FinishCardHold;
 }
 
 internal inline void
@@ -137,7 +138,7 @@ Poker_Init_Holdem(Poker_Game *game_state)
     game_state->dealer_score = 0;
 }
 
-inline int
+int
 Poker_CardRank(Poker_Card card) {
     return card.suit * 13 + card.face_value;
 }
@@ -280,13 +281,20 @@ Poker_DealCards(Poker_Game *game_state)
     }
     if (game_state->poker_type == GameType_Holdem)
     {
-        for (int i = 0; i < 5; ++i) 
+        for (int j = 0; j < 5; ++j)
         {
             game_state->house_hand[i].state = CardState_Hidden;
         }
     }
-    // TODO(nick): determine hand types
+
     game_state->poker_state = PokerState_PlayerCardsDealt;
+}
+
+void
+Poker_RevealHand(Poker_Card* hand, int hand_size) {
+    for (int i = 0; i < hand_size; ++i) {
+        hand[i].state = CardState_Shown;
+    }
 }
 
 void

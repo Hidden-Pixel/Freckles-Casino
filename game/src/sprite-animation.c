@@ -19,12 +19,37 @@ CreateSpriteAnimation(int totalFrames, int verticalFrames, int horizontalFrames,
     {
         .currentDrawFrameIndex  = 0,
         .frameCounter           = 0,
+        .totalFramesRendered    = 0,
         .totalFrames            = totalFrames,
         .totalVerticalFrames    = verticalFrames,
         .totalHorizontalFrames  = horizontalFrames,
         .frameSpeed             = frameSpeed,
         .frameWidth             = ((float)sheetWidth / (float)horizontalFrames),
         .frameHeight            = ((float)sheetHeight / (float)verticalFrames),
+        .pauseFrame             = -1,
+        .pauseFrameDuration     = 0,
+        .paused                 = false,
+    };
+    return spriteAnimation;
+}
+
+SpriteAnimation
+CreateSpriteAnimationWithPause(int totalFrames, int verticalFrames, int horizontalFrames, int frameSpeed, int sheetWidth, int sheetHeight, int pauseFrame, int pauseFrameDuration)
+{
+    SpriteAnimation spriteAnimation = (SpriteAnimation)
+    {
+        .currentDrawFrameIndex  = 0,
+        .frameCounter           = 0,
+        .totalFramesRendered    = 0,
+        .totalFrames            = totalFrames,
+        .totalVerticalFrames    = verticalFrames,
+        .totalHorizontalFrames  = horizontalFrames,
+        .frameSpeed             = frameSpeed,
+        .frameWidth             = ((float)sheetWidth / (float)horizontalFrames),
+        .frameHeight            = ((float)sheetHeight / (float)verticalFrames),
+        .pauseFrame             = pauseFrame,
+        .pauseFrameDuration     = pauseFrameDuration,
+        .paused                 = false,
     };
     return spriteAnimation;
 }
@@ -35,8 +60,21 @@ DrawAnimationFrame(Texture2D *spritesheet, SpriteAnimation *spriteAnimation, Vec
     if (spriteAnimation->frameCounter >= (gameFPS / spriteAnimation->frameSpeed))
     {
         spriteAnimation->frameCounter = 0;
+        spriteAnimation->totalFramesRendered++;
         spriteAnimation->currentDrawFrameIndex++;
-        if (spriteAnimation->currentDrawFrameIndex > (spriteAnimation->totalFrames - 1))
+        if (spriteAnimation->currentDrawFrameIndex == spriteAnimation->pauseFrame)
+        {
+            spriteAnimation->paused = true;
+            if ((spriteAnimation->totalFramesRendered % spriteAnimation->pauseFrameDuration) == 0)
+            {
+                spriteAnimation->paused = false;
+            }
+        }
+        if (spriteAnimation->paused == true)
+        {
+            spriteAnimation->currentDrawFrameIndex = (spriteAnimation->pauseFrame - 1);
+        }
+        else if (spriteAnimation->currentDrawFrameIndex > (spriteAnimation->totalFrames - 1))
         {
             spriteAnimation->currentDrawFrameIndex = 0;
         }

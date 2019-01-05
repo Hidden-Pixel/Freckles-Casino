@@ -10,6 +10,6 @@ Init_Game_Scene_State()
 {
     return (Game_Scene_State)
     {
-        .current_scene = Scene_TitleScreen,
+        .current_scene = Scene_LogoScreen,
     };
 }

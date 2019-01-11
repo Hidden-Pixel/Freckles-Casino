@@ -4,10 +4,12 @@
 
 #define CardFace_Count 13
 #define CardSuit_Count  4
-#define PokerHand_Count 9
+#define PokerHand_Count 10
 
 extern const char* CardSuit_Names[CardSuit_Count];
-extern const char* CardFace_Names[CardFace_Count];
+extern const char* CardFace_ShortNames[CardFace_Count];
+extern const char* CardFace_FullNames[CardFace_Count];
+extern const char* Hand_Names[PokerHand_Count];
 
 typedef enum _poker_CardSuit
 {
@@ -79,7 +81,7 @@ typedef enum _poker_Hand
     PokerHand_FullHouse     =  6,
     PokerHand_FourOfAKind   =  7,
     PokerHand_StraightFlush =  8,
-    PokerHand_RoyalFlush = 9
+    PokerHand_RoyalFlush    =  9
 } Poker_Hand;
 
 typedef enum _poker_CardHoldState

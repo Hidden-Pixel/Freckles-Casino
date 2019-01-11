@@ -2,3 +2,4 @@
 
 Func_CardHold_Pressed Command_OnCardHoldPressed = 0;
 Func_CardHold_Complete Command_OnCardHoldComplete = 0;
+Func_GameOver Command_OnGameOver = 0;

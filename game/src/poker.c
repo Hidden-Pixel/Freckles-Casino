@@ -20,7 +20,7 @@ const char* CardSuit_Names[CardSuit_Count] =
                 "C", "D", "H", "S"
         };
 
-const char* CardFace_Names[CardFace_Count] =
+const char* CardFace_ShortNames[CardFace_Count] =
         {
                 "2", "3", "4", "5",
                 "6", "7", "8", "9",
@@ -28,9 +28,29 @@ const char* CardFace_Names[CardFace_Count] =
                 "A"
         };
 
-// TODO: populate with possible straights.
-local_persist int Straights[STRAIGHT_HANDS];
+const char* CardFace_FullNames[CardFace_Count] =
+        {
+            "Two", "Three", "Four", "Five",
+            "Six", "Seven", "Eight", "Nine",
+            "Ten", "Jack", "Queen", "King",
+            "Ace"
+        };
 
+const char* Hand_Names[PokerHand_Count] =
+        {
+            "High Card",
+            "Pair",
+            "Two Pair",
+            "Three of a Kind",
+            "Straight",
+            "Flush",
+            "Full House",
+            "Four of a Kind",
+            "Straight Flush",
+            "Royal Flush"
+        };
+
+local_persist int Straights[STRAIGHT_HANDS];
 local_persist Poker_Card DealersDeck[DECK_SIZE];
 local_persist Poker_Card SampleDeck[DECK_SIZE];
 local_persist int deck_index = 0;
@@ -69,12 +89,14 @@ Poker_CacheHands()
 }
 
 internal void
-Poker_ToggleCardHold(Poker_Card* card_hand, int card_index, unsigned char hold_state) {
+Poker_ToggleCardHold(Poker_Card* card_hand, int card_index, unsigned char hold_state)
+{
     card_hand[card_index].hold = hold_state;
 }
 
 internal void
-Poker_FiveCard_FinishCardHold(Poker_Card* card_hand, Poker_CardState card_visibility, int hand_size) {
+Poker_FiveCard_FinishCardHold(Poker_Card* card_hand, Poker_CardState card_visibility, int hand_size)
+{
     for (int i = 0; i < hand_size; ++i) {
         Poker_Card card = card_hand[i];
         if (card.hold == HoldState_NotHeld) {
@@ -386,7 +408,7 @@ Poker_ProcessFiveCardState(Poker_Game *game_state)
 
         case PokerState_GameOver:
         {
-            // TODO(nick): ...
+
         } break;
     }
 }

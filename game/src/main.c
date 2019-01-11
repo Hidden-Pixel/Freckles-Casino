@@ -11,6 +11,7 @@
 #include <FC/character-state.h>
 #include <FC/sound.h>
 #include <FC/input.h>
+#include <FC/commands.h>
 
 #include <stdio.h>
 #include <assert.h>
@@ -45,6 +46,8 @@ global_variable Vector2 HiddenPixelLogoPosition;
 
 // Font
 global_variable SpriteFont GameFont;
+
+global_variable char MessageBuffer[256];
 
 // Title Screen Texture(s) / Animation(s) / Position(s)
 global_variable Texture2D TitleScreenSpriteSheet;
@@ -167,6 +170,14 @@ InitSounds();
 void
 ExitGame();
 
+// TODO(Alex): Pass MessageBuffer to PokerInit
+void
+FiveCard_OnGameOver(Poker_Hand player_hand, Poker_Hand dealer_hand)
+{
+    sprintf(MessageBuffer, "Freckle's Hand: %s, Your Hand: %s",
+            Hand_Names[dealer_hand], Hand_Names[player_hand]);
+}
+
 int
 main(void)
 {
@@ -203,9 +214,10 @@ GameInit(Poker_Game *game_state, Game_Scene_State *game_scene_state, Game_Input_
     InitWindow(GlobalWindowWidth, GlobalWindowHeight, GlobalWindowTitle);
     SetTargetFPS(GlobalTargetFPS);
     LoadTextures();
-    InitAudioDevice();
-    LoadSounds();
-    InitSounds();
+    //InitAudioDevice();
+    //LoadSounds();
+    //InitSounds();
+    Command_OnGameOver = &FiveCard_OnGameOver;
 }
 
 void
@@ -759,22 +771,27 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
             } break;
         }
         DrawAnimationFrame(currentCharacterSpritesheet, currentCharacterAnimation, currentCharacterSpritePosition, GlobalTargetFPS);
+
+        Vector2 messagePosition = { .x = NamePlatePosition.x - 20,
+                                    .y = NamePlatePosition.y - 20};
+
+        DrawTextEx(GameFont, MessageBuffer, messagePosition, 16.f, 0.f, BLACK);
 #if DEBUG
         if (game_state->poker_state != PokerState_NotStarted) {
             Vector2 vec = {.x = 50, .y = 50};
             char buf[50];
             sprintf(buf, "Freckle's Hand: %s%s %s%s %s%s %s%s %s%s",
-                    CardFace_Names[game_state->dealer_hand[0].face_value],
+                    CardFace_ShortNames[game_state->dealer_hand[0].face_value],
                     CardSuit_Names[game_state->dealer_hand[0].suit],
-                    CardFace_Names[game_state->dealer_hand[1].face_value],
+                    CardFace_ShortNames[game_state->dealer_hand[1].face_value],
                     CardSuit_Names[game_state->dealer_hand[1].suit],
-                    CardFace_Names[game_state->dealer_hand[2].face_value],
+                    CardFace_ShortNames[game_state->dealer_hand[2].face_value],
                     CardSuit_Names[game_state->dealer_hand[2].suit],
-                    CardFace_Names[game_state->dealer_hand[3].face_value],
+                    CardFace_ShortNames[game_state->dealer_hand[3].face_value],
                     CardSuit_Names[game_state->dealer_hand[3].suit],
-                    CardFace_Names[game_state->dealer_hand[4].face_value],
+                    CardFace_ShortNames[game_state->dealer_hand[4].face_value],
                     CardSuit_Names[game_state->dealer_hand[4].suit]);
-            DrawTextEx(GameFont, buf, vec, 12.f, 0.f, BLACK);
+            DrawTextEx(GameFont, buf, vec, 16.f, 0.f, BLACK);
         }
 #endif
     }

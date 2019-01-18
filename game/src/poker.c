@@ -330,7 +330,8 @@ Poker_DealCards(Poker_Game *game_state)
 }
 
 void
-Poker_RevealHand(Poker_Card* hand, int hand_size) {
+Poker_RevealHand(Poker_Card* hand, int hand_size)
+{
     for (int i = 0; i < hand_size; ++i) {
         hand[i].state = CardState_Shown;
     }

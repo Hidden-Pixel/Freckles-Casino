@@ -174,8 +174,18 @@ ExitGame();
 void
 FiveCard_OnGameOver(Poker_Hand player_hand, Poker_Hand dealer_hand)
 {
-    sprintf(MessageBuffer, "Freckle's Hand: %s, Your Hand: %s",
-            Hand_Names[dealer_hand], Hand_Names[player_hand]);
+    if (player_hand > dealer_hand) {
+        sprintf(MessageBuffer, "Freckle's Hand: %s, Your Hand: %s - You Win!",
+                Hand_Names[dealer_hand], Hand_Names[player_hand]);
+    } else if (player_hand < dealer_hand) {
+        sprintf(MessageBuffer, "Freckle's Hand: %s, Your Hand: %s - You Lose.",
+                Hand_Names[dealer_hand], Hand_Names[player_hand]);
+    } else {
+        // TODO(Alex): Check other cards in the hand.
+        sprintf(MessageBuffer, "Freckle's Hand: %s, Your Hand: %s - Tie!",
+                Hand_Names[dealer_hand], Hand_Names[player_hand]);
+    }
+
 }
 
 int

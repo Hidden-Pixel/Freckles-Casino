@@ -13,7 +13,7 @@
 #define MAX_HAND_COMBOS 22
 #define MAX_HOLDS 5
 #define DEFAULT_ANTE 25
-#define STRAIGHT_HANDS 9
+#define STRAIGHT_HANDS 10
 
 const char* CardSuit_Names[CardSuit_Count] =
         {
@@ -78,7 +78,7 @@ void
 Poker_CacheHands()
 {
     // Create all values for hands with a straight in them
-    for (int i = 0; i < STRAIGHT_HANDS; ++i) {
+    for (int i = 0; i < STRAIGHT_HANDS-1; ++i) {
         // NOTE: Assumes little endian
         int straight = 0;
         for (int j = i; j < i + 5; ++j) {
@@ -86,6 +86,10 @@ Poker_CacheHands()
         }
         Straights[i] = straight;
     }
+
+    // For Ace-2-3-4-5
+    int fiveHighStraight = (1 << CardFace_Ace) | (1 << CardFace_Two) | (1 << CardFace_Three) | (1 << CardFace_Four) | (1 << CardFace_Five);
+    Straights[STRAIGHT_HANDS-1] = fiveHighStraight;
 }
 
 internal void

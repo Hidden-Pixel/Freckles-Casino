@@ -7,8 +7,9 @@
 
 typedef enum _scene
 {
-    Scene_TitleScreen       = 0x00,
-    Scene_MainPokerTable    = 0x01,
+    Scene_LogoScreen        = 0x00,
+    Scene_TitleScreen       = 0x01,
+    Scene_MainPokerTable    = 0x02,
 } Scene;
 
 typedef struct _game_scene_state

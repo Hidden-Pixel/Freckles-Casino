@@ -36,10 +36,20 @@ global_variable int GlobalTargetFPS = 60;
 
 global_variable Vector2 CenterScreenPosition;
 
+// Logos Texture(s) / Position(s)S
+global_variable Texture2D PewkoLogoTexture;
+global_variable Vector2 PewkoLogoPosition;
+global_variable Texture2D HiddenPixelLogoTexture;
+global_variable Vector2 HiddenPixelLogoPosition;
+
 // Title Screen Texture(s) / Animation(s) / Position(s)
 global_variable Texture2D TitleScreenSpriteSheet;
 global_variable SpriteAnimation TitleScreenSpriteAnimation;
 global_variable Vector2 TitleScreenAnimationPosition;
+global_variable Texture2D MrFrecklesBanner;
+global_variable Vector2 MrFrecklesBannerPosition;
+global_variable Texture2D DuelOfTheEightsBanner;
+global_variable Vector2 DuelOfTheEightsBannerPosition;
 
 // Background Texture(s) / Animation(s) / Position(s)
 global_variable Texture2D BorderTexture;
@@ -106,6 +116,9 @@ void
 LoadCharacterTextures(Image *tempImage, Vector2 *imageVector);
 
 void
+LoadLogoScreen(Image *tempImage, Vector2 *imageVector);
+
+void
 LoadTitleScreen(Image *tempImage, Vector2 *imageVector);
 
 void
@@ -118,16 +131,16 @@ void
 UnloadTextures();
 
 void
-Render();
-
-void
 DrawHorizontalCardArea(Texture2D texture, Vector2 area, int card_count, float x_shift);
 
 void
 DrawFaceCard(Poker_Card card, int x, int y);
 
 void
-RenderScene(Poker_Game* game_state, Game_Input_State *game_input_state, unsigned int scene);
+RenderScene(Poker_Game* game_state, Game_Input_State *game_input_state, Game_Scene_State *game_scene_state);
+
+void
+RenderLogoScreen(Game_Scene_State* game_scene_state);
 
 void
 RenderTitleScreen();
@@ -164,7 +177,7 @@ main(void)
         {
             UpdateSounds();
             ProcessInput(&game_state, &game_scene_state, &game_input_state);
-            RenderScene(&game_state, &game_input_state, game_scene_state.current_scene);
+            RenderScene(&game_state, &game_input_state, &game_scene_state);
             if (WindowShouldClose())
             {
                 GlobalRunning = 0;
@@ -482,17 +495,36 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
 }
 
 inline void
+LoadLogoScreen(Image *tempImage, Vector2 *imageVector)
+{
+    *tempImage = LoadImage("assets/textures/Logos/Pewko-logo.png");
+    PewkoLogoTexture = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+    *tempImage = LoadImage("assets/textures/Logos/HiddenPixelLargeDarkRed.png");
+    HiddenPixelLogoTexture = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+}
+
+inline void
 LoadTitleScreen(Image *tempImage, Vector2 *imageVector)
 {
     *tempImage = LoadImage("assets/textures/Titlescreen/title-screen-spritesheet.png");
     imageVector->x = tempImage->width;
     imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 2.0f);
+    *imageVector = Vector2Scale(*imageVector, 1.5f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     TitleScreenSpriteSheet = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
-    TitleScreenSpriteAnimation = CreateSpriteAnimation(28, 1, 28, 10, TitleScreenSpriteSheet.width, TitleScreenSpriteSheet.height);
+    TitleScreenSpriteAnimation = CreateSpriteAnimationWithPause(28, 1, 28, 10, TitleScreenSpriteSheet.width, TitleScreenSpriteSheet.height, 28, 500);
+
+    *tempImage = LoadImage("assets/textures/Titlescreen/mr-freckles-banner.png");
+    MrFrecklesBanner = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+
+    *tempImage = LoadImage("assets/textures/Titlescreen/duel-of-the-8s-banner.png");
+    DuelOfTheEightsBanner = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
 }
 
 inline void
@@ -501,8 +533,16 @@ SetPositions()
     // Set center screen position
     CenterScreenPosition.x = (GlobalWindowWidth / 2.0f);
     CenterScreenPosition.y = (GlobalWindowHeight / 2.0f);
-
+    // Set all logo screen position(s)
+    PewkoLogoPosition.x = CenterScreenPosition.x - (PewkoLogoTexture.width / 2.0f);
+    PewkoLogoPosition.y = CenterScreenPosition.y - (PewkoLogoTexture.height / 2.0f);
+    HiddenPixelLogoPosition.x = CenterScreenPosition.x - (HiddenPixelLogoTexture.width / 2.0f);
+    HiddenPixelLogoPosition.y = CenterScreenPosition.y - (HiddenPixelLogoTexture.height / 2.0f);
     // Set all title screen position(s)
+    MrFrecklesBannerPosition.x = CenterScreenPosition.x - (MrFrecklesBanner.width / 2.0f);
+    MrFrecklesBannerPosition.y = GameScreen_LocalUnitsToScreen(10.0f);
+    DuelOfTheEightsBannerPosition.x = CenterScreenPosition.x - (DuelOfTheEightsBanner.width / 2.0f) + GameScreen_LocalUnitsToScreen(1.0f);
+    DuelOfTheEightsBannerPosition.y = GlobalWindowHeight - (DuelOfTheEightsBanner.height + GameScreen_LocalUnitsToScreen(10.0f));
     TitleScreenAnimationPosition.x = CenterScreenPosition.x - (TitleScreenSpriteSheet.width / TitleScreenSpriteAnimation.totalHorizontalFrames) * 0.5f;
     TitleScreenAnimationPosition.y = CenterScreenPosition.y - (TitleScreenSpriteSheet.height / TitleScreenSpriteAnimation.totalVerticalFrames) * 0.5f;
     // Set all game background positions
@@ -566,6 +606,9 @@ LoadTextures()
     Image tempImage = { 0 };
     Vector2 imageVector = { 0 };
 
+    // NOTE: load logo screen textures
+    LoadLogoScreen(&tempImage, &imageVector);
+
     // NOTE: load title screen textures
     LoadTitleScreen(&tempImage, &imageVector);
 
@@ -595,14 +638,41 @@ UnloadTextures()
 }
 
 void
+RenderLogoScreen(Game_Scene_State* game_scene_state)
+{
+    local_persist int currentFrame = 0;
+    // NOTE: give each logo five seconds of rendering
+    int nextFrameTime = (GlobalTargetFPS * 5);
+    BeginDrawing();
+    {
+        ClearBackground(BLACK);
+        if (currentFrame <= nextFrameTime) 
+        {
+            DrawTexture(PewkoLogoTexture, PewkoLogoPosition.x, PewkoLogoPosition.y, WHITE);
+        }
+        else if (currentFrame <= nextFrameTime * 2)
+        {
+            DrawTexture(HiddenPixelLogoTexture, HiddenPixelLogoPosition.x, HiddenPixelLogoPosition.y, WHITE);
+        }
+        else
+        {
+            game_scene_state->current_scene = Scene_TitleScreen;
+        }
+    }
+    EndDrawing();
+    currentFrame++;
+}
+
+void
 RenderTitleScreen()
 {
     // TODO(nick):
     // 1) add slide in animation code.
-    // 2) static draw after first animation loop - then start again at a particular time set interval
     BeginDrawing();
     {
         ClearBackground(BLACK);
+        DrawTexture(MrFrecklesBanner, MrFrecklesBannerPosition.x, MrFrecklesBannerPosition.y, WHITE);
+        DrawTexture(DuelOfTheEightsBanner, DuelOfTheEightsBannerPosition.x, DuelOfTheEightsBannerPosition.y, WHITE);
         DrawAnimationFrame(&TitleScreenSpriteSheet, &TitleScreenSpriteAnimation, &TitleScreenAnimationPosition, GlobalTargetFPS);
     }
     EndDrawing();
@@ -681,18 +751,23 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
 }
 
 void
-RenderScene(Poker_Game *game_state, Game_Input_State *game_input_state, Scene scene)
+RenderScene(Poker_Game *game_state, Game_Input_State *game_input_state, Game_Scene_State *game_scene_state)
 {
-    switch (scene)
+    switch (game_scene_state->current_scene)
     {
+        case Scene_LogoScreen:
+        {
+            RenderLogoScreen(game_scene_state);
+        } break;
+
+        case Scene_TitleScreen:
+        {
+            RenderTitleScreen();
+        } break;
+
         case Scene_MainPokerTable:
         {
             RenderGame(game_state, game_input_state);
-        } break;
-
-        default:
-        {
-            RenderTitleScreen();
         } break;
     }
 }

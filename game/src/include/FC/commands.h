@@ -11,8 +11,6 @@ typedef void
 typedef void
 (*Func_GameOver)(Poker_Hand /* dealer_hand */, Poker_Hand /* player_hand */);
 
-extern Func_CardHold_Pressed Command_OnCardHoldPressed;
-extern Func_CardHold_Complete Command_OnCardHoldComplete;
-extern Func_GameOver Command_OnGameOver;
-
-
+Func_CardHold_Pressed Command_OnCardHoldPressed;
+Func_CardHold_Complete Command_OnCardHoldComplete;
+Func_GameOver Command_OnGameOver;

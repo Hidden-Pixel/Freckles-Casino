@@ -5,8 +5,11 @@
 
 #include <FC/defines.h>
 #include <FC/input.h>
+#include <FC/commands.h>
 
 #include <stdbool.h>
+#include <assert.h>
+#include <FC/ai-behavior.h>
 
 void
 Init_Input_State(Game_Input_State *game_input_state)
@@ -71,6 +74,42 @@ ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_
                 {
                     game_input_state->hold_cursor_selects[game_input_state->hold_cursor_index] = CURSOR_SELECTED;
                 }
+
+                assert(Command_OnCardHoldPressed);
+                Command_OnCardHoldPressed(game_poker_state->player_hand,
+                                     game_input_state->hold_cursor_index,
+                                     game_input_state->hold_cursor_selects[game_input_state->hold_cursor_index]);
+
+            }
+            // TODO(Alex): No idea if this makes sense for moving on. "Are you sure?" might be appropriate here.
+            if (IsKeyPressed(KEY_SPACE))
+            {
+                assert(Command_OnCardHoldComplete);
+                AI_FiveCardDraw_MakeHoldDecision(game_poker_state->dealer_hand);
+                Command_OnCardHoldComplete(game_poker_state->dealer_hand, CardState_Hidden, 5);
+                Command_OnCardHoldComplete(game_poker_state->player_hand, CardState_Shown, 5);
+                game_poker_state->dealer_hand_type = Poker_FindBestHand(game_poker_state->dealer_hand, 5);
+                game_poker_state->player_hand_type = Poker_FindBestHand(game_poker_state->player_hand, 5);
+                game_input_state->hold_cursor_selects[0] = CURSOR_NONE;
+                game_input_state->hold_cursor_selects[1] = CURSOR_NONE;
+                game_input_state->hold_cursor_selects[2] = CURSOR_NONE;
+                game_input_state->hold_cursor_selects[3] = CURSOR_NONE;
+                game_input_state->hold_cursor_selects[4] = CURSOR_NONE;
+                game_poker_state->poker_state = PokerState_ExchangeCards;
+            }
+        }
+        if (game_poker_state->poker_state == PokerState_ExchangeCards) {
+            if (IsKeyPressed(KEY_SPACE)) {
+                Poker_RevealHand(game_poker_state->dealer_hand, 5);
+                game_poker_state->poker_state = PokerState_GameOver;
+                Command_OnGameOver(game_poker_state->player_hand_type,
+                        game_poker_state->dealer_hand_type);
+            }
+        }
+
+        if (game_poker_state->poker_state == PokerState_GameOver) {
+            if (IsKeyPressed(KEY_N)) {
+                Poker_StartNewRound(game_poker_state);
             }
         }
     }

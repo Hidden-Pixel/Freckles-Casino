@@ -4,7 +4,12 @@
 
 #define CardFace_Count 13
 #define CardSuit_Count  4
-#define PokerHand_Count 9
+#define PokerHand_Count 10
+
+extern const char* CardSuit_Names[CardSuit_Count];
+extern const char* CardFace_ShortNames[CardFace_Count];
+extern const char* CardFace_FullNames[CardFace_Count];
+extern const char* Hand_Names[PokerHand_Count];
 
 typedef enum _poker_CardSuit
 {
@@ -32,6 +37,8 @@ typedef enum poker_CardFace
     CardFace_King   =  11,
     CardFace_Ace    =  12,
 } Poker_CardFace;
+
+
 
 typedef enum poker_GameType
 {
@@ -74,8 +81,14 @@ typedef enum _poker_Hand
     PokerHand_FullHouse     =  6,
     PokerHand_FourOfAKind   =  7,
     PokerHand_StraightFlush =  8,
-    PokerHand_RoyalFlush = 9
+    PokerHand_RoyalFlush    =  9
 } Poker_Hand;
+
+typedef enum _poker_CardHoldState
+{
+    HoldState_NotHeld = 0,
+    HoldState_Held = 2
+} Poker_CardHoldState;
 
 typedef struct _poker_Card
 {
@@ -84,6 +97,16 @@ typedef struct _poker_Card
     Poker_CardState state;
     unsigned char   hold;
 } Poker_Card;
+
+// Performance Note: This is probably not well-aligned
+// The cards could be pointers if it's ever a problem.
+typedef struct _poker_RankedHand_5
+{
+    Poker_Hand hand_type;
+    int card_counts[CardFace_Count];
+    // 0 is the highest ranked card.
+    Poker_Card ranked_cards[5];
+} Poker_RankedHand_5;
 
 typedef struct _poker_Game
 {
@@ -122,6 +145,9 @@ internal void
 Poker_DealCards(Poker_Game *game_state);
 
 void
+Poker_RevealHand(Poker_Card* hand, int hand_size);
+
+void
 Poker_StartNewRound(Poker_Game *game_state);
 
 void
@@ -150,6 +176,9 @@ typedef struct
     Poker_LinkedListNode* first;
     Poker_LinkedListNode* last;
 } Poker_CardList;
+
+int
+Poker_CardRank(Poker_Card card);
 
 void
 Poker_CacheHands();

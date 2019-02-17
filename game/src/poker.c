@@ -1,5 +1,6 @@
 #include <FC/poker.h>
 #include <FC/buffer.h>
+#include <FC/commands.h>
 
 #include <assert.h>
 #include <stdlib.h>
@@ -12,11 +13,44 @@
 #define MAX_HAND_COMBOS 22
 #define MAX_HOLDS 5
 #define DEFAULT_ANTE 25
-#define STRAIGHT_HANDS 9
+#define STRAIGHT_HANDS 10
 
-// TODO: populate with possible straights.
+const char* CardSuit_Names[CardSuit_Count] =
+        {
+                "C", "D", "H", "S"
+        };
+
+const char* CardFace_ShortNames[CardFace_Count] =
+        {
+                "2", "3", "4", "5",
+                "6", "7", "8", "9",
+                "10", "J", "Q", "K",
+                "A"
+        };
+
+const char* CardFace_FullNames[CardFace_Count] =
+        {
+            "Two", "Three", "Four", "Five",
+            "Six", "Seven", "Eight", "Nine",
+            "Ten", "Jack", "Queen", "King",
+            "Ace"
+        };
+
+const char* Hand_Names[PokerHand_Count] =
+        {
+            "High Card",
+            "Pair",
+            "Two Pair",
+            "Three of a Kind",
+            "Straight",
+            "Flush",
+            "Full House",
+            "Four of a Kind",
+            "Straight Flush",
+            "Royal Flush"
+        };
+
 local_persist int Straights[STRAIGHT_HANDS];
-
 local_persist Poker_Card DealersDeck[DECK_SIZE];
 local_persist Poker_Card SampleDeck[DECK_SIZE];
 local_persist int deck_index = 0;
@@ -43,13 +77,35 @@ Init_Poker_Card()
 void
 Poker_CacheHands()
 {
-    for (int i = 0; i < STRAIGHT_HANDS; ++i) {
+    // Create all values for hands with a straight in them
+    for (int i = 0; i < STRAIGHT_HANDS-1; ++i) {
         // NOTE: Assumes little endian
         int straight = 0;
         for (int j = i; j < i + 5; ++j) {
             straight |= (1 << j);
         }
         Straights[i] = straight;
+    }
+
+    // For Ace-2-3-4-5
+    int fiveHighStraight = (1 << CardFace_Ace) | (1 << CardFace_Two) | (1 << CardFace_Three) | (1 << CardFace_Four) | (1 << CardFace_Five);
+    Straights[STRAIGHT_HANDS-1] = fiveHighStraight;
+}
+
+internal void
+Poker_ToggleCardHold(Poker_Card* card_hand, int card_index, unsigned char hold_state)
+{
+    card_hand[card_index].hold = hold_state;
+}
+
+internal void
+Poker_FiveCard_FinishCardHold(Poker_Card* card_hand, Poker_CardState card_visibility, int hand_size)
+{
+    for (int i = 0; i < hand_size; ++i) {
+        Poker_Card card = card_hand[i];
+        if (card.hold == HoldState_NotHeld) {
+            card_hand[i] = Poker_DrawOne(card_visibility);
+        }
     }
 }
 
@@ -72,12 +128,14 @@ Poker_Init(Poker_Game *game_state, Poker_GameType game_type)
     }
     for (int i = 0; i < DECK_SIZE; ++i)
     {
-            SampleDeck[i].suit = (Poker_CardSuit)((i % CardSuit_Count) + 1);
-            SampleDeck[i].face_value = (Poker_CardFace)((i % CardFace_Count) + 2);
+            SampleDeck[i].suit = (Poker_CardSuit)(i % CardSuit_Count);
+            SampleDeck[i].face_value = (Poker_CardFace)(i % CardFace_Count);
             SampleDeck[i].state = CardState_Hidden;
     }
     srand(time(NULL));
     Poker_CacheHands();
+    Command_OnCardHoldPressed = &Poker_ToggleCardHold;
+    Command_OnCardHoldComplete = &Poker_FiveCard_FinishCardHold;
 }
 
 internal inline void
@@ -119,7 +177,7 @@ Poker_Init_Holdem(Poker_Game *game_state)
     game_state->dealer_score = 0;
 }
 
-inline int
+int
 Poker_CardRank(Poker_Card card) {
     return card.suit * 13 + card.face_value;
 }
@@ -135,6 +193,8 @@ Poker_FindBestHand(Poker_Card* player_hand, int hand_size)
     for (int i = 0; i < hand_size; ++i) {
         card_counts[player_hand[i].face_value] += 1;
         suit_counts[player_hand[i].suit] += 1;
+        // 13 bit flags for cards in hand.
+        // 0 0000 0001 1111 would be a low straight.
         hand_bits |= (1 << player_hand[i].face_value);
     }
 
@@ -260,13 +320,21 @@ Poker_DealCards(Poker_Game *game_state)
     }
     if (game_state->poker_type == GameType_Holdem)
     {
-        for (int i = 0; i < 5; ++i) 
+        for (int j = 0; j < 5; ++j)
         {
             game_state->house_hand[i].state = CardState_Hidden;
         }
     }
-    // TODO(nick): determine hand types
+
     game_state->poker_state = PokerState_PlayerCardsDealt;
+}
+
+void
+Poker_RevealHand(Poker_Card* hand, int hand_size)
+{
+    for (int i = 0; i < hand_size; ++i) {
+        hand[i].state = CardState_Shown;
+    }
 }
 
 void
@@ -345,7 +413,7 @@ Poker_ProcessFiveCardState(Poker_Game *game_state)
 
         case PokerState_GameOver:
         {
-            // TODO(nick): ...
+
         } break;
     }
 }

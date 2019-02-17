@@ -11,8 +11,10 @@
 #include <FC/character-state.h>
 #include <FC/sound.h>
 #include <FC/input.h>
+#include <FC/commands.h>
 
 #include <stdio.h>
+#include <assert.h>
 
 #include "raylib.h"
 #include "raymath.h"
@@ -41,6 +43,11 @@ global_variable Texture2D PewkoLogoTexture;
 global_variable Vector2 PewkoLogoPosition;
 global_variable Texture2D HiddenPixelLogoTexture;
 global_variable Vector2 HiddenPixelLogoPosition;
+
+// Font
+global_variable SpriteFont GameFont;
+
+global_variable char MessageBuffer[256];
 
 // Title Screen Texture(s) / Animation(s) / Position(s)
 global_variable Texture2D TitleScreenSpriteSheet;
@@ -163,6 +170,24 @@ InitSounds();
 void
 ExitGame();
 
+// TODO(Alex): Pass MessageBuffer to PokerInit
+void
+FiveCard_OnGameOver(Poker_Hand player_hand, Poker_Hand dealer_hand)
+{
+    if (player_hand > dealer_hand) {
+        sprintf(MessageBuffer, "Freckle's Hand: %s, Your Hand: %s - You Win!",
+                Hand_Names[dealer_hand], Hand_Names[player_hand]);
+    } else if (player_hand < dealer_hand) {
+        sprintf(MessageBuffer, "Freckle's Hand: %s, Your Hand: %s - You Lose.",
+                Hand_Names[dealer_hand], Hand_Names[player_hand]);
+    } else {
+        // TODO(Alex): Check other cards in the hand.
+        sprintf(MessageBuffer, "Freckle's Hand: %s, Your Hand: %s - Tie!",
+                Hand_Names[dealer_hand], Hand_Names[player_hand]);
+    }
+
+}
+
 int
 main(void)
 {
@@ -199,9 +224,10 @@ GameInit(Poker_Game *game_state, Game_Scene_State *game_scene_state, Game_Input_
     InitWindow(GlobalWindowWidth, GlobalWindowHeight, GlobalWindowTitle);
     SetTargetFPS(GlobalTargetFPS);
     LoadTextures();
-    InitAudioDevice();
-    LoadSounds();
-    InitSounds();
+    //InitAudioDevice();
+    //LoadSounds();
+    //InitSounds();
+    Command_OnGameOver = &FiveCard_OnGameOver;
 }
 
 void
@@ -297,50 +323,50 @@ LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
     // Back of Card
     LoadCardTexture("assets/textures/Cards/BackOfCard/BackOfCard.png", BackOfCardTexture);
 
-    // Hearts
-    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/2Hearts.png", &CardTextures[0]);
-    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/3Hearts.png", &CardTextures[1]);
-    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/4Hearts.png", &CardTextures[2]);
-    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/5Hearts.png", &CardTextures[3]);
-    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/6Hearts.png", &CardTextures[4]);
-    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/7Hearts.png", &CardTextures[5]);
-    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/8Hearts.png", &CardTextures[6]);
-    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/9Hearts.png", &CardTextures[7]);
-    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/10Hearts.png", &CardTextures[8]);
-    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/JackHearts.png", &CardTextures[9]);
-    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/QueenHearts.png", &CardTextures[10]);
-    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/KingHearts.png", &CardTextures[11]);
-    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/AceHearts.png", &CardTextures[12]);
-
     // Clubs
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/2Clubs.png", &CardTextures[13]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/3Clubs.png", &CardTextures[14]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/4Clubs.png", &CardTextures[15]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/5Clubs.png", &CardTextures[16]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/6Clubs.png", &CardTextures[17]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/7Clubs.png", &CardTextures[18]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/8Clubs.png", &CardTextures[19]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/9Clubs.png", &CardTextures[20]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/10Clubs.png", &CardTextures[21]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/JackClubs.png", &CardTextures[22]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/QueenClubs.png", &CardTextures[23]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/KingClubs.png", &CardTextures[24]);
-    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/AceClubs.png", &CardTextures[25]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/2Clubs.png", &CardTextures[0]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/3Clubs.png", &CardTextures[1]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/4Clubs.png", &CardTextures[2]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/5Clubs.png", &CardTextures[3]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/6Clubs.png", &CardTextures[4]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/7Clubs.png", &CardTextures[5]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/8Clubs.png", &CardTextures[6]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/9Clubs.png", &CardTextures[7]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/10Clubs.png", &CardTextures[8]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/JackClubs.png", &CardTextures[9]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/QueenClubs.png", &CardTextures[10]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/KingClubs.png", &CardTextures[11]);
+    LoadCardTexture("assets/textures/Cards/Clubs/Pngs/AceClubs.png", &CardTextures[12]);
 
     // Diamonds
-    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/2Dia.png", &CardTextures[26]);
-    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/3Dia.png", &CardTextures[27]);
-    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/4Dia.png", &CardTextures[28]);
-    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/5Dia.png", &CardTextures[29]);
-    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/6Dia.png", &CardTextures[30]);
-    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/7Dia.png", &CardTextures[31]);
-    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/8Dia.png", &CardTextures[32]);
-    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/9Dia.png", &CardTextures[33]);
-    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/10Dia.png", &CardTextures[34]);
-    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/JackDia.png", &CardTextures[35]);
-    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/QueenDia.png", &CardTextures[36]);
-    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/KingDia.png", &CardTextures[37]);
-    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/AceDia.png", &CardTextures[38]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/2Dia.png", &CardTextures[13]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/3Dia.png", &CardTextures[14]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/4Dia.png", &CardTextures[15]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/5Dia.png", &CardTextures[16]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/6Dia.png", &CardTextures[17]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/7Dia.png", &CardTextures[18]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/8Dia.png", &CardTextures[19]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/9Dia.png", &CardTextures[20]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/10Dia.png", &CardTextures[21]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/JackDia.png", &CardTextures[22]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/QueenDia.png", &CardTextures[23]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/KingDia.png", &CardTextures[24]);
+    LoadCardTexture("assets/textures/Cards/Diamonds/Pngs/AceDia.png", &CardTextures[25]);
+
+    // Hearts
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/2Hearts.png", &CardTextures[26]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/3Hearts.png", &CardTextures[27]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/4Hearts.png", &CardTextures[28]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/5Hearts.png", &CardTextures[29]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/6Hearts.png", &CardTextures[30]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/7Hearts.png", &CardTextures[31]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/8Hearts.png", &CardTextures[32]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/9Hearts.png", &CardTextures[33]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/10Hearts.png", &CardTextures[34]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/JackHearts.png", &CardTextures[35]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/QueenHearts.png", &CardTextures[36]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/KingHearts.png", &CardTextures[37]);
+    LoadCardTexture("assets/textures/Cards/Hearts/Pngs/AceHearts.png", &CardTextures[38]);
 
     // Spades
     LoadCardTexture("assets/textures/Cards/Spades/Pngs/2Spades.png", &CardTextures[39]);
@@ -600,6 +626,12 @@ SetPositions()
     }
 }
 
+internal void
+LoadGameFont()
+{
+    GameFont = LoadFontEx("assets/fonts/Pixellari.ttf", 12, 0, NULL);
+}
+
 void
 LoadTextures()
 {
@@ -623,6 +655,8 @@ LoadTextures()
 
     // NOTE: set positions
     SetPositions();
+
+    LoadGameFont();
 }
 
 // TODO(nick): update this function to unload all loaded in texture ...
@@ -635,6 +669,7 @@ UnloadTextures()
     {
         UnloadTexture(MrFrecklesSpritesheets[i]);
     }
+    UnloadFont(GameFont);
 }
 
 void
@@ -735,6 +770,7 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
         Texture2D *currentCharacterSpritesheet = NULL;
         SpriteAnimation *currentCharacterAnimation = NULL;
         Vector2 *currentCharacterSpritePosition = NULL;
+
         switch (CurrentCharacterId)
         {
             case MrFreckles:
@@ -745,6 +781,29 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
             } break;
         }
         DrawAnimationFrame(currentCharacterSpritesheet, currentCharacterAnimation, currentCharacterSpritePosition, GlobalTargetFPS);
+
+        Vector2 messagePosition = { .x = NamePlatePosition.x - 20,
+                                    .y = NamePlatePosition.y - 20};
+
+        DrawTextEx(GameFont, MessageBuffer, messagePosition, 16.f, 0.f, BLACK);
+#if DEBUG
+        if (game_state->poker_state != PokerState_NotStarted) {
+            Vector2 vec = {.x = 50, .y = 50};
+            char buf[50];
+            sprintf(buf, "Freckle's Hand: %s%s %s%s %s%s %s%s %s%s",
+                    CardFace_ShortNames[game_state->dealer_hand[0].face_value],
+                    CardSuit_Names[game_state->dealer_hand[0].suit],
+                    CardFace_ShortNames[game_state->dealer_hand[1].face_value],
+                    CardSuit_Names[game_state->dealer_hand[1].suit],
+                    CardFace_ShortNames[game_state->dealer_hand[2].face_value],
+                    CardSuit_Names[game_state->dealer_hand[2].suit],
+                    CardFace_ShortNames[game_state->dealer_hand[3].face_value],
+                    CardSuit_Names[game_state->dealer_hand[3].suit],
+                    CardFace_ShortNames[game_state->dealer_hand[4].face_value],
+                    CardSuit_Names[game_state->dealer_hand[4].suit]);
+            DrawTextEx(GameFont, buf, vec, 16.f, 0.f, BLACK);
+        }
+#endif
     }
     EndDrawing();
     GlobalFrameCount++;
@@ -784,33 +843,8 @@ DrawHorizontalCardArea(Texture2D texture, Vector2 area, int card_count, float x_
 void
 DrawFaceCard(Poker_Card card, int x, int y)
 {
-    int cardIndex = 0;
-    switch (card.suit)
-    {
-        case CardSuit_Heart:
-        {
-            cardIndex = 0;
-        } break;
-
-        case CardSuit_Club:
-        {
-            cardIndex = 13;
-        } break;
-
-        case CardSuit_Diamond:
-        {
-            cardIndex = 26;
-        } break;
-
-        case CardSuit_Spade:
-        {
-            cardIndex = 39;
-        } break;
-    }
-    if (card.face_value > CardFace_Two)
-    {
-        cardIndex += (card.face_value - 2);
-    }
+    int cardIndex = Poker_CardRank(card);
+    assert(cardIndex < 52);
     DrawTexture(CardTextures[cardIndex], x, y, WHITE);
 }
 

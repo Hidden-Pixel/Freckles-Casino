@@ -12,7 +12,9 @@ else()
     target_compile_features(Freckles_Casino PUBLIC c_std_11)
 endif()
 
-
+IF(CMAKE_BUILD_TYPE MATCHES "Debug")
+    target_compile_definitions(Freckles_Casino PUBLIC DEBUG)
+ENDIF(CMAKE_BUILD_TYPE MATCHES "Debug")
 
 if (WIN32)
     add_library(raylib STATIC IMPORTED)
@@ -67,5 +69,7 @@ target_sources(Freckles_Casino PRIVATE
         src/sound.c
         src/sprite-animation.c
         src/input.c
+        src/commands.c
+        src/ai-behavior.c
         )
 target_include_directories(Freckles_Casino PUBLIC src/include)

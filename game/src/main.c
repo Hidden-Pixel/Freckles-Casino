@@ -103,6 +103,9 @@ global_variable SoundMeta CharacterThemeMusicMeta[5];
 global_variable Music MrFrecklesDialogue[26];
 global_variable SoundMeta MrFrecklesDialogueMeta[26];
 
+global_variable Font ArcadePixFont;
+global_variable Font PixellariFont;
+
 const char* CreditsText = "CREDITS";
 const char* JackpotText = "JACKPOT";
 const char* BetText     = "BET";
@@ -168,6 +171,12 @@ void
 InitSounds();
 
 void
+LoadFonts();
+
+void
+UnloadFonts();
+
+void
 ExitGame();
 
 // TODO(Alex): Pass MessageBuffer to PokerInit
@@ -229,6 +238,8 @@ GameInit(Poker_Game *game_state, Game_Scene_State *game_scene_state, Game_Input_
     LoadSounds();
     InitSounds();
 #endif
+    // TODO(nick): load font assets
+    LoadFonts();
     Command_OnGameOver = &FiveCard_OnGameOver;
 }
 
@@ -738,6 +749,10 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
         DrawTexture(NamePlateTexture, NamePlatePosition.x, NamePlatePosition.y, WHITE);
         DrawTexture(FrecklesNamePlateTexture, FrecklesNamePlatePosition.x, FrecklesNamePlatePosition.y, WHITE);
         DrawTexture(BankTexture, BankPosition.x, BankPosition.y, WHITE);
+        // TODO(nick):
+        // - fix positioning
+        // - set an actual amount
+        DrawTextEx(ArcadePixFont, "0.00", BankPosition, 100.0f, 0.0f, WHITE);
         DrawTexture(BorderTexture, BorderPosition.x, BorderPosition.y, WHITE);
         for (unsigned int i = 0; i < len(CardSlotPositions); i++)
         {
@@ -933,9 +948,24 @@ InitSounds()
 }
 
 void
+LoadFonts()
+{
+    ArcadePixFont = LoadFont("assets/fonts/Arcadepix-Plus.ttf");
+    PixellariFont = LoadFont("assets/fonts/Pixellari.ttf");
+}
+
+void
+UnloadFonts()
+{
+    UnloadFont(ArcadePixFont);
+    UnloadFont(PixellariFont);
+}
+
+void
 ExitGame()
 {
     UnloadTextures();
+    UnloadFonts();
     UnloadSounds();
     CloseAudioDevice();
     CloseWindow();

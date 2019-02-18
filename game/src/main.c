@@ -224,9 +224,11 @@ GameInit(Poker_Game *game_state, Game_Scene_State *game_scene_state, Game_Input_
     InitWindow(GlobalWindowWidth, GlobalWindowHeight, GlobalWindowTitle);
     SetTargetFPS(GlobalTargetFPS);
     LoadTextures();
-    //InitAudioDevice();
-    //LoadSounds();
-    //InitSounds();
+#ifdef GAME_SOUND_ENABLED
+    InitAudioDevice();
+    LoadSounds();
+    InitSounds();
+#endif
     Command_OnGameOver = &FiveCard_OnGameOver;
 }
 
@@ -286,6 +288,15 @@ LoadTableAndBackgroundTextures(Image *tempImage, Vector2 *imageVector)
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     NamePlateTexture = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+
+    // NOTE: load freckles name plate texture
+    *tempImage = LoadImage("assets/textures/Misc/freckles-plate.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    FrecklesNamePlateTexture = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
 
     // NOTE: load score frame texture
@@ -587,6 +598,8 @@ SetPositions()
         .x = CenterScreenPosition.x - (CardSlotTexture.width * 0.5f) - (CardSlotTexture.width * 3.0f),
         .y = CenterScreenPosition.y - (CardSlotTexture.height * 2.5f),
     };
+    FrecklesNamePlatePosition.x = NamePlatePosition.x;
+    FrecklesNamePlatePosition.y = CardSlotStartingPositionTop.y - (FrecklesNamePlateTexture.height * 1.2f); 
     Vector2 CardSlotStartingPositionBottom = 
     {
         .x = CardSlotStartingPositionTop.x,
@@ -723,6 +736,7 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
         DrawTexture(RedCurtainTexture, RedCurtainPosition.x, RedCurtainPosition.y, WHITE);
         DrawTexture(GreenTableTexture, GreenTablePosition.x, GreenTablePosition.y, WHITE);
         DrawTexture(NamePlateTexture, NamePlatePosition.x, NamePlatePosition.y, WHITE);
+        DrawTexture(FrecklesNamePlateTexture, FrecklesNamePlatePosition.x, FrecklesNamePlatePosition.y, WHITE);
         DrawTexture(BankTexture, BankPosition.x, BankPosition.y, WHITE);
         DrawTexture(BorderTexture, BorderPosition.x, BorderPosition.y, WHITE);
         for (unsigned int i = 0; i < len(CardSlotPositions); i++)
@@ -908,6 +922,7 @@ UnloadSounds()
     }
 }
 
+// TODO(nick): refine this process
 void
 InitSounds()
 {

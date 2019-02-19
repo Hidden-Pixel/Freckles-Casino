@@ -734,7 +734,8 @@ void
 RenderTitleScreen()
 {
     // TODO(nick):
-    // 1) add slide in animation code.
+    // 1) add fade in / out for logos - raylib has a function named "Fade"
+    // 2) add slide in animation code.
     BeginDrawing();
     {
         ClearBackground(BLACK);

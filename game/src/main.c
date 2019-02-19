@@ -75,6 +75,7 @@ global_variable Texture2D NamePlateTexture;
 global_variable Vector2 NamePlatePosition;
 global_variable Texture2D BankTexture;
 global_variable Vector2 BankPosition;
+global_variable Vector2 BankTextPosition;
 global_variable Texture2D HoldCursorTexture;
 global_variable BlinkAnimation CurrentHoldCursorBlinkAnimation;
 global_variable Vector2 HoldCursorPositions[5];
@@ -104,6 +105,9 @@ global_variable Music MrFrecklesDialogue[26];
 global_variable SoundMeta MrFrecklesDialogueMeta[26];
 
 global_variable Font ArcadePixFont;
+global_variable float BankFontSize = 45.0f;
+global_variable float BankFontSpacing = 0.0f;
+global_variable int BankAmount = 0;
 global_variable Font PixellariFont;
 
 const char* CreditsText = "CREDITS";
@@ -232,14 +236,13 @@ GameInit(Poker_Game *game_state, Game_Scene_State *game_scene_state, Game_Input_
     *game_scene_state = Init_Game_Scene_State();
     InitWindow(GlobalWindowWidth, GlobalWindowHeight, GlobalWindowTitle);
     SetTargetFPS(GlobalTargetFPS);
+    LoadFonts();
     LoadTextures();
 #ifdef GAME_SOUND_ENABLED
     InitAudioDevice();
     LoadSounds();
     InitSounds();
 #endif
-    // TODO(nick): load font assets
-    LoadFonts();
     Command_OnGameOver = &FiveCard_OnGameOver;
 }
 
@@ -604,6 +607,11 @@ SetPositions()
     NamePlatePosition.y = (GreenTablePosition.y + GameScreen_LocalUnitsToScreen(10.0f));
     BankPosition.x = BorderPosition.x + GameScreen_LocalUnitsToScreen(20.0f);
     BankPosition.y = GreenTablePosition.y - BankTexture.height - GameScreen_LocalUnitsToScreen(20.0f);
+    // TODO(nick): this will more than likely need to be updated on windows
+    // - create an update position function
+    Vector2 TextSize = MeasureTextEx(ArcadePixFont, "1,000,000", BankFontSize, BankFontSpacing);
+    BankTextPosition.x = BankPosition.x + BankTexture.width - TextSize.x - (GameScreen_LocalUnitsToScreen(2.0f));
+    BankTextPosition.y = BankPosition.y + (TextSize.y / 2); 
     Vector2 CardSlotStartingPositionTop =
     {
         .x = CenterScreenPosition.x - (CardSlotTexture.width * 0.5f) - (CardSlotTexture.width * 3.0f),
@@ -752,7 +760,7 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
         // TODO(nick):
         // - fix positioning
         // - set an actual amount
-        DrawTextEx(ArcadePixFont, "0.00", BankPosition, 100.0f, 0.0f, WHITE);
+        DrawTextEx(ArcadePixFont, "1,000,000", BankTextPosition, BankFontSize, BankFontSpacing, WHITE);
         DrawTexture(BorderTexture, BorderPosition.x, BorderPosition.y, WHITE);
         for (unsigned int i = 0; i < len(CardSlotPositions); i++)
         {

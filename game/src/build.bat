@@ -1,3 +1,5 @@
+@echo off
+
 IF EXIST ..\build RMDIR ..\build /S /Q
 IF NOT EXIST ..\build MKDIR ..\build
 PUSHD ..\build
@@ -8,7 +10,7 @@ dir
 set PreprocessorFlags=-DDEBUG_FRECKLES
 ::set PreprocessorFlags=-DDEBUG_FRECKLES -DGAME_SOUND_ENABLED
 
-cl /MT /Zi /FC /nologo^
+cl /MDd /Zi /FC /nologo^
  ..\..\src\main.c^
  ..\..\src\sound.c^
  ..\..\src\scene.c^
@@ -20,8 +22,8 @@ cl /MT /Zi /FC /nologo^
  ..\..\src\ai-behavior.c^
  ..\..\src\commands.c^
  %PreprocessorFlags%^
- /I ..\..\src\include /link /ignore:4099 /incremental:no^
- ..\..\src\libs\win32\msvc\raylib_static.lib ..\..\src\libs\win32\msvc\glfw3.lib gdi32.lib user32.lib shell32.lib
+ /I ..\..\src\include /link /verbose:lib /ignore:4099 /incremental:no^
+ ..\..\src\libs\win32\msvc\raylib.lib ..\..\src\libs\win32\msvc\glfw3.lib gdi32.lib user32.lib shell32.lib
 
 IF NOT EXIST .\assets mkdir .\assets
 

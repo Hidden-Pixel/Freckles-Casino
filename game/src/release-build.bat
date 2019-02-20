@@ -1,3 +1,5 @@
+@echo off
+
 IF EXIST ..\build RMDIR ..\build /S /Q
 IF NOT EXIST ..\build MKDIR ..\build
 PUSHD ..\build
@@ -7,7 +9,7 @@ dir
 
 set PreprocessorFlags=-DGAME_SOUND_ENABLED
 
-cl /GS /TC /MT /O2 /FC /nologo^
+cl /MDd /GS /TC /O2 /FC /nologo^
  ..\..\src\main.c^
  ..\..\src\sound.c^
  ..\..\src\scene.c^
@@ -20,7 +22,7 @@ cl /GS /TC /MT /O2 /FC /nologo^
  ..\..\src\commands.c^
  %PreprocessorFlags%^
  /I ..\..\src\include /link /ignore:4099 /incremental:no^
- ..\..\src\libs\win32\msvc\raylib_static.lib ..\..\src\libs\win32\msvc\glfw3.lib legacy_stdio_definitions.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+ ..\..\src\libs\win32\msvc\raylib.lib ..\..\src\libs\win32\msvc\glfw3.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
 
 IF NOT EXIST .\assets mkdir .\assets
 

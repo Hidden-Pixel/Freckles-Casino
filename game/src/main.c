@@ -57,6 +57,7 @@ global_variable Texture2D MrFrecklesBanner;
 global_variable Vector2 MrFrecklesBannerPosition;
 global_variable Texture2D DuelOfTheEightsBanner;
 global_variable Vector2 DuelOfTheEightsBannerPosition;
+global_variable Vector2 StartTextPosition;
 
 // Background Texture(s) / Animation(s) / Position(s)
 global_variable Texture2D BorderTexture;
@@ -107,6 +108,8 @@ global_variable SoundMeta MrFrecklesDialogueMeta[26];
 global_variable Font ArcadePixFont;
 global_variable float BankFontSize = 45.0f;
 global_variable float BankFontSpacing = 0.0f;
+global_variable float StartTextSize = 80.0f;
+global_variable float StartTextSpacing = 0.0f;
 global_variable int BankAmount = 0;
 global_variable Font PixellariFont;
 
@@ -562,7 +565,6 @@ LoadTitleScreen(Image *tempImage, Vector2 *imageVector)
     *tempImage = LoadImage("assets/textures/Titlescreen/title-screen-spritesheet.png");
     imageVector->x = tempImage->width;
     imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 1.5f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     TitleScreenSpriteSheet = LoadTextureFromImage(*tempImage);
@@ -574,6 +576,10 @@ LoadTitleScreen(Image *tempImage, Vector2 *imageVector)
     UnloadImage(*tempImage);
 
     *tempImage = LoadImage("assets/textures/Titlescreen/duel-of-the-8s-banner.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 1.8f);
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     DuelOfTheEightsBanner = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
 }
@@ -592,10 +598,13 @@ SetPositions()
     // Set all title screen position(s)
     MrFrecklesBannerPosition.x = CenterScreenPosition.x - (MrFrecklesBanner.width / 2.0f);
     MrFrecklesBannerPosition.y = GameScreen_LocalUnitsToScreen(10.0f);
+    TitleScreenAnimationPosition.x = (CenterScreenPosition.x - (TitleScreenSpriteSheet.width / TitleScreenSpriteAnimation.totalHorizontalFrames) * 0.5f);
+    TitleScreenAnimationPosition.y = (CenterScreenPosition.y - (TitleScreenSpriteSheet.height / TitleScreenSpriteAnimation.totalVerticalFrames) * 0.5f) - GameScreen_LocalUnitsToScreen(30.0f);
     DuelOfTheEightsBannerPosition.x = CenterScreenPosition.x - (DuelOfTheEightsBanner.width / 2.0f) + GameScreen_LocalUnitsToScreen(1.0f);
-    DuelOfTheEightsBannerPosition.y = GlobalWindowHeight - (DuelOfTheEightsBanner.height + GameScreen_LocalUnitsToScreen(10.0f));
-    TitleScreenAnimationPosition.x = CenterScreenPosition.x - (TitleScreenSpriteSheet.width / TitleScreenSpriteAnimation.totalHorizontalFrames) * 0.5f;
-    TitleScreenAnimationPosition.y = CenterScreenPosition.y - (TitleScreenSpriteSheet.height / TitleScreenSpriteAnimation.totalVerticalFrames) * 0.5f;
+    DuelOfTheEightsBannerPosition.y = GlobalWindowHeight - (DuelOfTheEightsBanner.height + GameScreen_LocalUnitsToScreen(10.0f)) - GameScreen_LocalUnitsToScreen(20.0f);
+    Vector2 TextSize = MeasureTextEx(ArcadePixFont, "PRESS START", StartTextSize, StartTextSpacing);
+    StartTextPosition.x = CenterScreenPosition.x - (TextSize.x / 2.0f);
+    StartTextPosition.y = GlobalWindowHeight - (TextSize.y) - GameScreen_LocalUnitsToScreen(10.0f);
     // Set all game background positions
     BorderPosition.x = 0;
     BorderPosition.y = 0;
@@ -609,7 +618,7 @@ SetPositions()
     BankPosition.y = GreenTablePosition.y - BankTexture.height - GameScreen_LocalUnitsToScreen(20.0f);
     // TODO(nick): this will more than likely need to be updated on windows
     // - create an update position function
-    Vector2 TextSize = MeasureTextEx(ArcadePixFont, "1,000,000", BankFontSize, BankFontSpacing);
+    TextSize = MeasureTextEx(ArcadePixFont, "1,000,000", BankFontSize, BankFontSpacing);
     BankTextPosition.x = BankPosition.x + BankTexture.width - TextSize.x - (GameScreen_LocalUnitsToScreen(2.0f));
     BankTextPosition.y = BankPosition.y + (TextSize.y / 2); 
     Vector2 CardSlotStartingPositionTop =
@@ -742,6 +751,7 @@ RenderTitleScreen()
         DrawTexture(MrFrecklesBanner, MrFrecklesBannerPosition.x, MrFrecklesBannerPosition.y, WHITE);
         DrawTexture(DuelOfTheEightsBanner, DuelOfTheEightsBannerPosition.x, DuelOfTheEightsBannerPosition.y, WHITE);
         DrawAnimationFrame(&TitleScreenSpriteSheet, &TitleScreenSpriteAnimation, &TitleScreenAnimationPosition, GlobalTargetFPS);
+        DrawTextEx(ArcadePixFont, "PRESS START", StartTextPosition, StartTextSize, StartTextSpacing, MAGENTA);
     }
     EndDrawing();
 }

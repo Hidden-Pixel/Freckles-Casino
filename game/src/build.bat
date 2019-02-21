@@ -22,7 +22,7 @@ cl /MDd /Zi /FC /nologo^
  ..\..\src\ai-behavior.c^
  ..\..\src\commands.c^
  %PreprocessorFlags%^
- /I ..\..\src\include /link /verbose:lib /ignore:4099 /incremental:no^
+ /I ..\..\src\include /link /ignore:4099 /incremental:no^
  ..\..\src\libs\win32\msvc\raylib.lib ..\..\src\libs\win32\msvc\glfw3.lib gdi32.lib user32.lib shell32.lib
 
 IF NOT EXIST .\assets mkdir .\assets

@@ -25,7 +25,8 @@ AI_FiveCardDraw_RankHand(const Poker_Card* hand) {
     for (int i = 0; i < 5; ++i) {
         result.card_counts[sorted_hand[i].face_value]++;
     }
-    result.hand_type = Poker_FindBestHand(sorted_hand, 5);
+    Poker_ScoredHand_5 scoredHand = Poker_ScoreHand_5(sorted_hand);
+    result.hand_type = scoredHand.hand_type;
     result.ranked_cards[0] = sorted_hand[0];
     result.ranked_cards[1] = sorted_hand[1];
     result.ranked_cards[2] = sorted_hand[2];

@@ -88,8 +88,11 @@ ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_
                 AI_FiveCardDraw_MakeHoldDecision(game_poker_state->dealer_hand);
                 Command_OnCardHoldComplete(game_poker_state->dealer_hand, CardState_Hidden, 5);
                 Command_OnCardHoldComplete(game_poker_state->player_hand, CardState_Shown, 5);
-                game_poker_state->dealer_hand_type = Poker_FindBestHand(game_poker_state->dealer_hand, 5);
-                game_poker_state->player_hand_type = Poker_FindBestHand(game_poker_state->player_hand, 5);
+
+                Poker_ScoredHand_5 dealerScoredHand = Poker_ScoreHand_5(game_poker_state->dealer_hand);
+                Poker_ScoredHand_5 playerScoredHand = Poker_ScoreHand_5(game_poker_state->player_hand);
+                game_poker_state->dealer_hand_type = dealerScoredHand.hand_type;
+                game_poker_state->player_hand_type = playerScoredHand.hand_type;
                 game_input_state->hold_cursor_selects[0] = CURSOR_NONE;
                 game_input_state->hold_cursor_selects[1] = CURSOR_NONE;
                 game_input_state->hold_cursor_selects[2] = CURSOR_NONE;

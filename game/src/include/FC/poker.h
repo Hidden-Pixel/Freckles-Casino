@@ -108,6 +108,12 @@ typedef struct _poker_RankedHand_5
     Poker_Card ranked_cards[5];
 } Poker_RankedHand_5;
 
+typedef struct _poker_ScoredHand_5
+{
+    Poker_Hand hand_type;
+    Poker_Card cards_for_hand[5];
+} Poker_ScoredHand_5;
+
 typedef struct _poker_Game
 {
     Poker_GameState poker_state;
@@ -192,5 +198,5 @@ Poker_AddCardToList(Poker_CardList* card_list, Poker_Card card);
 void
 Poker_DestroyCardList(Poker_CardList* card_list);
 
-Poker_Hand
-Poker_FindBestHand(Poker_Card* player_hand, int hand_size);
+Poker_ScoredHand_5
+Poker_ScoreHand_5(Poker_Card* player_hand);

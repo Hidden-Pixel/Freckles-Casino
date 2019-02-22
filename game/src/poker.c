@@ -134,6 +134,8 @@ Poker_Init(Poker_Game *game_state, Poker_GameType game_type)
     }
     srand(time(NULL));
     Poker_CacheHands();
+
+    // Wire-up command callbacks
     Command_OnCardHoldPressed = &Poker_ToggleCardHold;
     Command_OnCardHoldComplete = &Poker_FiveCard_FinishCardHold;
 }
@@ -182,15 +184,17 @@ Poker_CardRank(Poker_Card card) {
     return card.suit * 13 + card.face_value;
 }
 
-Poker_Hand
-Poker_FindBestHand(Poker_Card* player_hand, int hand_size)
+Poker_ScoredHand_5
+Poker_ScoreHand_5(Poker_Card* player_hand)
 {
+    static int HandSize = 5;
     int card_counts[CardFace_Count] = { 0 };
     int suit_counts[CardSuit_Count] = { 0 };
     int hand_flags[PokerHand_Count] = { 0 };
     int hand_bits = 0;
+    Poker_ScoredHand_5 hand_result;
 
-    for (int i = 0; i < hand_size; ++i) {
+    for (int i = 0; i < HandSize; ++i) {
         card_counts[player_hand[i].face_value] += 1;
         suit_counts[player_hand[i].suit] += 1;
         // 13 bit flags for cards in hand.
@@ -214,22 +218,44 @@ Poker_FindBestHand(Poker_Card* player_hand, int hand_size)
 
     // Figure out if we have a straight flush or royal flush
     if (hand_flags[PokerHand_Straight] > 0 && hand_flags[PokerHand_Flush] > 0) {
+        hand_result.cards_for_hand[0] = player_hand[0];
+        hand_result.cards_for_hand[1] = player_hand[1];
+        hand_result.cards_for_hand[2] = player_hand[2];
+        hand_result.cards_for_hand[3] = player_hand[3];
+        hand_result.cards_for_hand[4] = player_hand[4];
+
         if (card_counts[CardFace_Ace] > 0) {
-            return PokerHand_RoyalFlush;
+            hand_result.hand_type = PokerHand_RoyalFlush;
         }
 
-        return PokerHand_StraightFlush;
+        hand_result.hand_type = PokerHand_StraightFlush;
+        return hand_result;
     }
 
     if (hand_flags[PokerHand_Flush] > 0) {
-        return PokerHand_Flush;
+        hand_result.cards_for_hand[0] = player_hand[0];
+        hand_result.cards_for_hand[1] = player_hand[1];
+        hand_result.cards_for_hand[2] = player_hand[2];
+        hand_result.cards_for_hand[3] = player_hand[3];
+        hand_result.cards_for_hand[4] = player_hand[4];
+
+        hand_result.hand_type = PokerHand_Flush;
+        return hand_result;
     }
 
     if (hand_flags[PokerHand_Straight] > 0) {
-        return PokerHand_Straight;
+        hand_result.cards_for_hand[0] = player_hand[0];
+        hand_result.cards_for_hand[1] = player_hand[1];
+        hand_result.cards_for_hand[2] = player_hand[2];
+        hand_result.cards_for_hand[3] = player_hand[3];
+        hand_result.cards_for_hand[4] = player_hand[4];
+
+        hand_result.hand_type = PokerHand_Straight;
+        return hand_result;
     }
 
     for (int i = 0; i < CardFace_Count; ++i) {
+        // TODO(Alex): graph of card face to hand index
         if (card_counts[i] == 2) {
             hand_flags[PokerHand_Pair] += 1;
         }
@@ -242,26 +268,43 @@ Poker_FindBestHand(Poker_Card* player_hand, int hand_size)
     }
 
     if (hand_flags[PokerHand_Pair] > 0 && hand_flags[PokerHand_ThreeOfAKind] > 0) {
-        return PokerHand_FullHouse;
+        hand_result.cards_for_hand[0] = player_hand[0];
+        hand_result.cards_for_hand[1] = player_hand[1];
+        hand_result.cards_for_hand[2] = player_hand[2];
+        hand_result.cards_for_hand[3] = player_hand[3];
+        hand_result.cards_for_hand[4] = player_hand[4];
+        hand_result.hand_type = PokerHand_FullHouse;
+        return hand_result;
     }
 
     if (hand_flags[PokerHand_FourOfAKind] > 0) {
-        return PokerHand_FourOfAKind;
+        hand_result.hand_type = PokerHand_FourOfAKind;
+        return hand_result;
     }
 
     if (hand_flags[PokerHand_ThreeOfAKind] > 0) {
-        return PokerHand_ThreeOfAKind;
+
+        hand_result.hand_type = PokerHand_ThreeOfAKind;
+        return hand_result;
     }
 
     if (hand_flags[PokerHand_Pair] == 2) {
-        return PokerHand_TwoPair;
+        hand_result.hand_type = PokerHand_TwoPair;
+        return hand_result;
     }
 
     if (hand_flags[PokerHand_Pair] > 0) {
-        return PokerHand_Pair;
+        hand_result.hand_type = PokerHand_Pair;
+        return hand_result;
     }
 
-    return PokerHand_HighCard;
+    hand_result.cards_for_hand[0] = player_hand[0];
+    hand_result.cards_for_hand[1] = player_hand[1];
+    hand_result.cards_for_hand[2] = player_hand[2];
+    hand_result.cards_for_hand[3] = player_hand[3];
+    hand_result.cards_for_hand[4] = player_hand[4];
+    hand_result.hand_type = PokerHand_HighCard;
+    return hand_result;
 }
 
 Poker_Card

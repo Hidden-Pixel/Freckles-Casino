@@ -3,6 +3,7 @@
  *
  */
 
+#include <FC/font-info.h>
 #include <FC/sprite-animation.h>
 
 typedef enum _spritesheetPosition
@@ -114,7 +115,7 @@ CreateBlinkAnimation(int blinksPerSecond)
 }
 
 void
-DrawBlinkAnimation(Texture2D *spritesheet, BlinkAnimation *blinkAnimation, Vector2 *spritePosition, int gameFPS) 
+DrawBlinkAnimation(void *asset, AssetType assetType, BlinkAnimation *blinkAnimation, Vector2 *position, int gameFPS) 
 {
     int frameBlink = (gameFPS / blinkAnimation->blinksPerSecond);
     blinkAnimation->frameCounter++;
@@ -129,6 +130,23 @@ DrawBlinkAnimation(Texture2D *spritesheet, BlinkAnimation *blinkAnimation, Vecto
     }
     if (blinkAnimation->blinkDurationFrames == 0)
     {
-        DrawTexture(*spritesheet, spritePosition->x, spritePosition->y, WHITE);
+        switch (assetType)
+        {
+            case AssetType_Texture2D:
+            {
+                DrawTexture(*((Texture2D*)asset), position->x, position->y, WHITE);
+            } break;
+
+            case AssetType_Text:
+            {
+                FontInfo *fontInfo = ((FontInfo *)asset);
+                DrawTextEx(fontInfo->Font, fontInfo->Text, *position, fontInfo->Size, fontInfo->SpacingSize, fontInfo->Color);
+            } break;
+
+            default:
+            {
+                // TODO(nick): logging - bad!
+            } break;
+        }
     }
 }

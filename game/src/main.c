@@ -12,6 +12,7 @@
 #include <FC/sound.h>
 #include <FC/input.h>
 #include <FC/commands.h>
+#include <FC/font-info.h>
 
 #include <stdio.h>
 #include <assert.h>
@@ -110,6 +111,7 @@ global_variable float BankFontSize = 45.0f;
 global_variable float BankFontSpacing = 0.0f;
 global_variable float StartTextSize = 80.0f;
 global_variable float StartTextSpacing = 0.0f;
+global_variable BlinkAnimation StartTextBlinkAnimation;
 global_variable int BankAmount = 0;
 global_variable Font PixellariFont;
 
@@ -343,6 +345,9 @@ LoadTableAndBackgroundTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     SpeechBubbleTexture = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
+
+    // NOTE: blink animation for text
+    StartTextBlinkAnimation = CreateBlinkAnimation(1);
 }
 
 inline void
@@ -751,7 +756,16 @@ RenderTitleScreen()
         DrawTexture(MrFrecklesBanner, MrFrecklesBannerPosition.x, MrFrecklesBannerPosition.y, WHITE);
         DrawTexture(DuelOfTheEightsBanner, DuelOfTheEightsBannerPosition.x, DuelOfTheEightsBannerPosition.y, WHITE);
         DrawAnimationFrame(&TitleScreenSpriteSheet, &TitleScreenSpriteAnimation, &TitleScreenAnimationPosition, GlobalTargetFPS);
-        DrawTextEx(ArcadePixFont, "PRESS START", StartTextPosition, StartTextSize, StartTextSpacing, MAGENTA);
+        FontInfo fontInfo = 
+        {
+            .Font            = ArcadePixFont,
+            .Size            = StartTextSize,
+            .SpacingSize     = StartTextSpacing,
+            .Color           = MAGENTA,
+            .Text            = "PRESS START",
+        };
+        DrawBlinkAnimation(&fontInfo, AssetType_Text, &StartTextBlinkAnimation, &StartTextPosition, GlobalTargetFPS);
+        //DrawTextEx(ArcadePixFont, "PRESS START", StartTextPosition, StartTextSize, StartTextSpacing, MAGENTA);
     }
     EndDrawing();
 }
@@ -784,7 +798,7 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
                 // NOTE: always draw the current icon as blinking
                 if (i == game_input_state->hold_cursor_index)
                 {
-                    DrawBlinkAnimation(&HoldCursorTexture, &CurrentHoldCursorBlinkAnimation, &HoldCursorPositions[i], GlobalTargetFPS);
+                    DrawBlinkAnimation(&HoldCursorTexture, AssetType_Texture2D, &CurrentHoldCursorBlinkAnimation, &HoldCursorPositions[i], GlobalTargetFPS);
                 }
                 else if (game_input_state->hold_cursor_selects[i] == CURSOR_SELECTED)
                 {

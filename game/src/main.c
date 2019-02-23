@@ -914,8 +914,7 @@ void
 LoadSounds()
 {
     // NOTE: load theme music
-    CharacterThemeMusic[MrFreckles] = LoadMusicStream("assets/sounds/music/ogg/Mr_Freckles.ogg");
-
+    CharacterThemeMusic[MrFreckles] = LoadMusicStream("assets/sounds/music/ogg/Freckles-Theme-8-bit.ogg");
     InitializeSoundMeta(CharacterThemeMusic, CharacterThemeMusicMeta, len(CharacterThemeMusic));
 
     // NOTE: load Mr. Freckles dialogue

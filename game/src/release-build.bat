@@ -10,7 +10,8 @@ dir
 set BuildNumber=v0.1.3-Alpha
 set PreprocessorFlags=-DGAME_SOUND_ENABLED
 
-cl /MDd /GS /TC /O2 /FC /Fe"Freckles-Casino-%BuildNumber%.exe" /nologo^
+:: /MDd, crt debug lib
+cl /MD /GS /TC /O2 /FC /Fe"Freckles-Casino-%BuildNumber%.exe" /nologo^
  ..\..\src\main.c^
  ..\..\src\sound.c^
  ..\..\src\scene.c^

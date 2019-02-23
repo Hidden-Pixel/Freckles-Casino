@@ -12,6 +12,7 @@
 internal unsigned int SoundBufferSize = 0;
 internal Music *SoundBuffer[SOUND_BUFFER_MAX];
 internal SoundMeta *SoundMetaBuffer[SOUND_BUFFER_MAX];
+internal float DefaultVolumeLevel = 0.5f;
 
 void
 InitializeSoundMeta(Music *soundArray, SoundMeta *soundMetaArray, int length)
@@ -20,13 +21,13 @@ InitializeSoundMeta(Music *soundArray, SoundMeta *soundMetaArray, int length)
     {
         if (soundArray[i] != NULL)
         {
-            soundMetaArray[i] = CreateSoundMeta(&soundArray[i]);
+            soundMetaArray[i] = CreateSoundMeta(&soundArray[i], DefaultVolumeLevel);
         }
     }
 }
 
 SoundMeta
-CreateSoundMeta(Music *sound)
+CreateSoundMeta(Music *sound, float volume)
 {
     SoundMeta s = (SoundMeta)
     {
@@ -34,7 +35,9 @@ CreateSoundMeta(Music *sound)
         .playLimit              = 0,
         .entirePlayLength       = GetMusicTimeLength(*sound),
         .lastPlayTime           = 0.0f,
+        .volume                 = volume,
     };
+    SetMusicVolume(*sound, s.volume);
     return s;
 }
 
@@ -48,6 +51,7 @@ UpdateSoundMeta(Music *sound, SoundMeta *soundMeta)
         soundMeta->totalPlays++;
     }
     soundMeta->lastPlayTime = currentPlayTime;
+    SetMusicVolume(*sound, soundMeta->volume);
 }
 
 // TODO(nick): handle overflow of add request by removing

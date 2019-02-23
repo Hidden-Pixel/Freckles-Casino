@@ -14,13 +14,14 @@ typedef struct _soundMeta
     int             playLimit;
     float           entirePlayLength;
     float           lastPlayTime;
+    float           volume;
 } SoundMeta;
 
 void
 InitializeSoundMeta(Music *soundArray, SoundMeta *soundMetaArray, int length);
 
 SoundMeta
-CreateSoundMeta(Music *sound);
+CreateSoundMeta(Music *sound, float volume);
 
 void
 AddSoundToBuffer(Music *sound, SoundMeta *soundMeta);

@@ -3,6 +3,7 @@
  *
  */
 
+#include <FC/font-info.h>
 #include <FC/sprite-animation.h>
 
 typedef enum _spritesheetPosition
@@ -114,7 +115,7 @@ CreateBlinkAnimation(int blinksPerSecond)
 }
 
 void
-DrawBlinkAnimation(Texture2D *spritesheet, BlinkAnimation *blinkAnimation, Vector2 *spritePosition, int gameFPS) 
+DrawBlinkAnimation(void *asset, AssetType assetType, BlinkAnimation *blinkAnimation, Vector2 *position, int gameFPS) 
 {
     int frameBlink = (gameFPS / blinkAnimation->blinksPerSecond);
     blinkAnimation->frameCounter++;
@@ -129,6 +130,66 @@ DrawBlinkAnimation(Texture2D *spritesheet, BlinkAnimation *blinkAnimation, Vecto
     }
     if (blinkAnimation->blinkDurationFrames == 0)
     {
-        DrawTexture(*spritesheet, spritePosition->x, spritePosition->y, WHITE);
+        switch (assetType)
+        {
+            case AssetType_Texture2D:
+            {
+                DrawTexture(*((Texture2D *)asset), position->x, position->y, WHITE);
+            } break;
+
+            case AssetType_Text:
+            {
+                FontInfo *fontInfo = ((FontInfo *)asset);
+                DrawTextEx(fontInfo->Font, fontInfo->Text, *position, fontInfo->Size, fontInfo->SpacingSize, fontInfo->Color);
+            } break;
+
+            default:
+            {
+                // TODO(nick): logging - bad!
+            } break;
+        }
     }
+}
+
+FadeAnimation
+CreateFadeAnimation(unsigned int frameRenderDurationSeconds, unsigned int fadeInDurationFrames, unsigned int fadeOutDurationFrames)
+{
+    FadeAnimation fadeAnimation = (FadeAnimation)
+    {
+        .frameRenderDurationSeconds = frameRenderDurationSeconds,
+        .fadeInDurationFrames       = fadeInDurationFrames,
+        .fadeOutDurationFrames      = fadeOutDurationFrames,
+        .fadeCurrentAlphaValue      = 0.0f,
+        .frameCounter               = 0,
+    };
+    return fadeAnimation;
+}
+
+void
+DrawFadeAnimation(void *asset, AssetType assetType, FadeAnimation *fade, Vector2 *position, int gameFPS)
+{
+    switch(assetType) 
+    {
+        case AssetType_Texture2D:
+        {
+            if (fade->frameCounter <= fade->fadeInDurationFrames)
+            {
+                DrawTexture(*((Texture2D *)asset), position->x, position->y, Fade(WHITE, fade->fadeCurrentAlphaValue));
+                // TODO(nick): actually compute the values in the CreateFadeAnimation function ...
+                fade->fadeCurrentAlphaValue += 0.01f;
+            }
+            else if (fade->frameCounter <= fade->fadeOutDurationFrames)
+            {
+                DrawTexture(*((Texture2D *)asset), position->x, position->y, Fade(WHITE, fade->fadeCurrentAlphaValue));
+                // TODO(nick): actually compute the values in the CreateFadeAnimation function ...
+                fade->fadeCurrentAlphaValue -= 0.01f;
+            }
+        } break;
+
+        default:
+        {
+            // TODO(nick): logging - bad!
+        } break;
+    }
+    fade->frameCounter++;
 }

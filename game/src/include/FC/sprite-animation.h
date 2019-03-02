@@ -5,6 +5,13 @@
 
 #include "raylib.h"
 
+// TODO(nick): place in another file?
+typedef enum _assetType
+{
+    AssetType_Texture2D     = 0x00,
+    AssetType_Text          = 0x01,
+} AssetType;
+
 typedef struct _spriteAnimation 
 {
     unsigned int    totalFrames;
@@ -38,6 +45,15 @@ typedef struct _slideAnimation
     unsigned int    frameCounter;
 } SlideAnimation;
 
+typedef struct _fadeAnimation
+{
+    unsigned int    frameRenderDurationSeconds;
+    unsigned int    fadeInDurationFrames;
+    unsigned int    fadeOutDurationFrames;
+    float           fadeCurrentAlphaValue;
+    unsigned int    frameCounter;
+} FadeAnimation;
+
 SpriteAnimation
 CreateSpriteAnimation(int totalFrames, int verticalFrames, int horizontalFrames, int frameSpeed, int sheetWidth, int sheetHeight);
 
@@ -48,7 +64,13 @@ void
 DrawAnimationFrame(Texture2D *spritesheet, SpriteAnimation *spriteAnimation, Vector2 *spritePosition, int gameFPS);
 
 void
-DrawBlinkAnimation(Texture2D *spritesheet, BlinkAnimation *blinkAnimation, Vector2 *spritePosition, int gameFPS);
+DrawBlinkAnimation(void *spritesheet, AssetType assetType, BlinkAnimation *blinkAnimation, Vector2 *spritePosition, int gameFPS);
 
 BlinkAnimation
 CreateBlinkAnimation(int blinksPerSecond);
+
+FadeAnimation
+CreateFadeAnimation(unsigned int frameRenderDurationSeconds, unsigned int fadeInDurationFrames, unsigned int fadeOutDurationFrames);
+
+void
+DrawFadeAnimation(void *asset, AssetType assetType, FadeAnimation *fade, Vector2 *position, int gameFPS);

@@ -12,6 +12,7 @@
 #include <FC/sound.h>
 #include <FC/input.h>
 #include <FC/commands.h>
+#include <FC/font-info.h>
 
 #include <stdio.h>
 #include <assert.h>
@@ -38,11 +39,13 @@ global_variable int GlobalTargetFPS = 60;
 
 global_variable Vector2 CenterScreenPosition;
 
-// Logos Texture(s) / Position(s)S
+// Logos Texture(s) / Position(s)
 global_variable Texture2D PewkoLogoTexture;
 global_variable Vector2 PewkoLogoPosition;
+global_variable FadeAnimation PewkoLogoFadeAnimation;
 global_variable Texture2D HiddenPixelLogoTexture;
 global_variable Vector2 HiddenPixelLogoPosition;
+global_variable FadeAnimation HiddenPixelLogoFadeAnimation;
 
 // Font
 global_variable SpriteFont GameFont;
@@ -57,6 +60,7 @@ global_variable Texture2D MrFrecklesBanner;
 global_variable Vector2 MrFrecklesBannerPosition;
 global_variable Texture2D DuelOfTheEightsBanner;
 global_variable Vector2 DuelOfTheEightsBannerPosition;
+global_variable Vector2 StartTextPosition;
 
 // Background Texture(s) / Animation(s) / Position(s)
 global_variable Texture2D BorderTexture;
@@ -75,6 +79,7 @@ global_variable Texture2D NamePlateTexture;
 global_variable Vector2 NamePlatePosition;
 global_variable Texture2D BankTexture;
 global_variable Vector2 BankPosition;
+global_variable Vector2 BankTextPosition;
 global_variable Texture2D HoldCursorTexture;
 global_variable BlinkAnimation CurrentHoldCursorBlinkAnimation;
 global_variable Vector2 HoldCursorPositions[5];
@@ -102,6 +107,15 @@ global_variable SoundMeta CharacterThemeMusicMeta[5];
 
 global_variable Music MrFrecklesDialogue[26];
 global_variable SoundMeta MrFrecklesDialogueMeta[26];
+
+global_variable Font ArcadePixFont;
+global_variable float BankFontSize = 45.0f;
+global_variable float BankFontSpacing = 0.0f;
+global_variable float StartTextSize = 80.0f;
+global_variable float StartTextSpacing = 0.0f;
+global_variable BlinkAnimation StartTextBlinkAnimation;
+global_variable int BankAmount = 0;
+global_variable Font PixellariFont;
 
 const char* CreditsText = "CREDITS";
 const char* JackpotText = "JACKPOT";
@@ -168,6 +182,12 @@ void
 InitSounds();
 
 void
+LoadFonts();
+
+void
+UnloadFonts();
+
+void
 ExitGame();
 
 // TODO(Alex): Pass MessageBuffer to PokerInit
@@ -223,10 +243,13 @@ GameInit(Poker_Game *game_state, Game_Scene_State *game_scene_state, Game_Input_
     *game_scene_state = Init_Game_Scene_State();
     InitWindow(GlobalWindowWidth, GlobalWindowHeight, GlobalWindowTitle);
     SetTargetFPS(GlobalTargetFPS);
+    LoadFonts();
     LoadTextures();
-    //InitAudioDevice();
-    //LoadSounds();
-    //InitSounds();
+#ifdef GAME_SOUND_ENABLED
+    InitAudioDevice();
+    LoadSounds();
+    InitSounds();
+#endif
     Command_OnGameOver = &FiveCard_OnGameOver;
 }
 
@@ -288,6 +311,15 @@ LoadTableAndBackgroundTextures(Image *tempImage, Vector2 *imageVector)
     NamePlateTexture = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
 
+    // NOTE: load freckles name plate texture
+    *tempImage = LoadImage("assets/textures/Misc/freckles-plate.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
+    FrecklesNamePlateTexture = LoadTextureFromImage(*tempImage);
+    UnloadImage(*tempImage);
+
     // NOTE: load score frame texture
     *tempImage = LoadImage("assets/textures/Misc/bank.png");
     imageVector->x = tempImage->width;
@@ -315,6 +347,9 @@ LoadTableAndBackgroundTextures(Image *tempImage, Vector2 *imageVector)
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     SpeechBubbleTexture = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
+
+    // NOTE: blink animation for text
+    StartTextBlinkAnimation = CreateBlinkAnimation(1);
 }
 
 inline void
@@ -526,9 +561,13 @@ LoadLogoScreen(Image *tempImage, Vector2 *imageVector)
     *tempImage = LoadImage("assets/textures/Logos/Pewko-logo.png");
     PewkoLogoTexture = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
+    // TODO(nick): frame duration will be 3 seconds
+    int frameDuration = GlobalTargetFPS * 3;
+    PewkoLogoFadeAnimation = CreateFadeAnimation(frameDuration, frameDuration / 2, frameDuration);
     *tempImage = LoadImage("assets/textures/Logos/HiddenPixelLargeDarkRed.png");
     HiddenPixelLogoTexture = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
+    HiddenPixelLogoFadeAnimation = CreateFadeAnimation(frameDuration, frameDuration / 2, frameDuration);
 }
 
 inline void
@@ -537,7 +576,6 @@ LoadTitleScreen(Image *tempImage, Vector2 *imageVector)
     *tempImage = LoadImage("assets/textures/Titlescreen/title-screen-spritesheet.png");
     imageVector->x = tempImage->width;
     imageVector->y = tempImage->height;
-    *imageVector = Vector2Scale(*imageVector, 1.5f);
     *imageVector = Vector2Scale(*imageVector, GameScreen_ScreenUnitScale());
     ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     TitleScreenSpriteSheet = LoadTextureFromImage(*tempImage);
@@ -549,6 +587,10 @@ LoadTitleScreen(Image *tempImage, Vector2 *imageVector)
     UnloadImage(*tempImage);
 
     *tempImage = LoadImage("assets/textures/Titlescreen/duel-of-the-8s-banner.png");
+    imageVector->x = tempImage->width;
+    imageVector->y = tempImage->height;
+    *imageVector = Vector2Scale(*imageVector, 1.8f);
+    ImageResizeNN(tempImage, imageVector->x, imageVector->y);
     DuelOfTheEightsBanner = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
 }
@@ -567,10 +609,13 @@ SetPositions()
     // Set all title screen position(s)
     MrFrecklesBannerPosition.x = CenterScreenPosition.x - (MrFrecklesBanner.width / 2.0f);
     MrFrecklesBannerPosition.y = GameScreen_LocalUnitsToScreen(10.0f);
+    TitleScreenAnimationPosition.x = (CenterScreenPosition.x - (TitleScreenSpriteSheet.width / TitleScreenSpriteAnimation.totalHorizontalFrames) * 0.5f);
+    TitleScreenAnimationPosition.y = (CenterScreenPosition.y - (TitleScreenSpriteSheet.height / TitleScreenSpriteAnimation.totalVerticalFrames) * 0.5f) - GameScreen_LocalUnitsToScreen(30.0f);
     DuelOfTheEightsBannerPosition.x = CenterScreenPosition.x - (DuelOfTheEightsBanner.width / 2.0f) + GameScreen_LocalUnitsToScreen(1.0f);
-    DuelOfTheEightsBannerPosition.y = GlobalWindowHeight - (DuelOfTheEightsBanner.height + GameScreen_LocalUnitsToScreen(10.0f));
-    TitleScreenAnimationPosition.x = CenterScreenPosition.x - (TitleScreenSpriteSheet.width / TitleScreenSpriteAnimation.totalHorizontalFrames) * 0.5f;
-    TitleScreenAnimationPosition.y = CenterScreenPosition.y - (TitleScreenSpriteSheet.height / TitleScreenSpriteAnimation.totalVerticalFrames) * 0.5f;
+    DuelOfTheEightsBannerPosition.y = GlobalWindowHeight - (DuelOfTheEightsBanner.height + GameScreen_LocalUnitsToScreen(10.0f)) - GameScreen_LocalUnitsToScreen(20.0f);
+    Vector2 TextSize = MeasureTextEx(ArcadePixFont, "PRESS START", StartTextSize, StartTextSpacing);
+    StartTextPosition.x = CenterScreenPosition.x - (TextSize.x / 2.0f);
+    StartTextPosition.y = GlobalWindowHeight - (TextSize.y) - GameScreen_LocalUnitsToScreen(10.0f);
     // Set all game background positions
     BorderPosition.x = 0;
     BorderPosition.y = 0;
@@ -582,11 +627,18 @@ SetPositions()
     NamePlatePosition.y = (GreenTablePosition.y + GameScreen_LocalUnitsToScreen(10.0f));
     BankPosition.x = BorderPosition.x + GameScreen_LocalUnitsToScreen(20.0f);
     BankPosition.y = GreenTablePosition.y - BankTexture.height - GameScreen_LocalUnitsToScreen(20.0f);
+    // TODO(nick): this will more than likely need to be updated on windows
+    // - create an update position function
+    TextSize = MeasureTextEx(ArcadePixFont, "1,000,000", BankFontSize, BankFontSpacing);
+    BankTextPosition.x = BankPosition.x + BankTexture.width - TextSize.x - (GameScreen_LocalUnitsToScreen(2.0f));
+    BankTextPosition.y = BankPosition.y + (TextSize.y / 2); 
     Vector2 CardSlotStartingPositionTop =
     {
         .x = CenterScreenPosition.x - (CardSlotTexture.width * 0.5f) - (CardSlotTexture.width * 3.0f),
         .y = CenterScreenPosition.y - (CardSlotTexture.height * 2.5f),
     };
+    FrecklesNamePlatePosition.x = NamePlatePosition.x;
+    FrecklesNamePlatePosition.y = CardSlotStartingPositionTop.y - (FrecklesNamePlateTexture.height * 1.2f); 
     Vector2 CardSlotStartingPositionBottom = 
     {
         .x = CardSlotStartingPositionTop.x,
@@ -676,18 +728,18 @@ void
 RenderLogoScreen(Game_Scene_State* game_scene_state)
 {
     local_persist int currentFrame = 0;
-    // NOTE: give each logo five seconds of rendering
-    int nextFrameTime = (GlobalTargetFPS * 5);
+    // NOTE: give each logo 3 seconds of rendering
+    int nextFrameTime = (GlobalTargetFPS * 3);
     BeginDrawing();
     {
         ClearBackground(BLACK);
         if (currentFrame <= nextFrameTime) 
         {
-            DrawTexture(PewkoLogoTexture, PewkoLogoPosition.x, PewkoLogoPosition.y, WHITE);
+            DrawFadeAnimation((void *)&PewkoLogoTexture, AssetType_Texture2D, &PewkoLogoFadeAnimation, &PewkoLogoPosition, GlobalTargetFPS);
         }
         else if (currentFrame <= nextFrameTime * 2)
         {
-            DrawTexture(HiddenPixelLogoTexture, HiddenPixelLogoPosition.x, HiddenPixelLogoPosition.y, WHITE);
+            DrawFadeAnimation((void *)&HiddenPixelLogoTexture, AssetType_Texture2D, &HiddenPixelLogoFadeAnimation, &HiddenPixelLogoPosition, GlobalTargetFPS);
         }
         else
         {
@@ -702,13 +754,24 @@ void
 RenderTitleScreen()
 {
     // TODO(nick):
-    // 1) add slide in animation code.
+    // 1) add fade in / out for logos - raylib has a function named "Fade"
+    // 2) add slide in animation code.
     BeginDrawing();
     {
         ClearBackground(BLACK);
         DrawTexture(MrFrecklesBanner, MrFrecklesBannerPosition.x, MrFrecklesBannerPosition.y, WHITE);
         DrawTexture(DuelOfTheEightsBanner, DuelOfTheEightsBannerPosition.x, DuelOfTheEightsBannerPosition.y, WHITE);
         DrawAnimationFrame(&TitleScreenSpriteSheet, &TitleScreenSpriteAnimation, &TitleScreenAnimationPosition, GlobalTargetFPS);
+        FontInfo fontInfo = 
+        {
+            .Font            = ArcadePixFont,
+            .Size            = StartTextSize,
+            .SpacingSize     = StartTextSpacing,
+            .Color           = MAGENTA,
+            .Text            = "PRESS START",
+        };
+        DrawBlinkAnimation(&fontInfo, AssetType_Text, &StartTextBlinkAnimation, &StartTextPosition, GlobalTargetFPS);
+        //DrawTextEx(ArcadePixFont, "PRESS START", StartTextPosition, StartTextSize, StartTextSpacing, MAGENTA);
     }
     EndDrawing();
 }
@@ -723,7 +786,12 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
         DrawTexture(RedCurtainTexture, RedCurtainPosition.x, RedCurtainPosition.y, WHITE);
         DrawTexture(GreenTableTexture, GreenTablePosition.x, GreenTablePosition.y, WHITE);
         DrawTexture(NamePlateTexture, NamePlatePosition.x, NamePlatePosition.y, WHITE);
+        DrawTexture(FrecklesNamePlateTexture, FrecklesNamePlatePosition.x, FrecklesNamePlatePosition.y, WHITE);
         DrawTexture(BankTexture, BankPosition.x, BankPosition.y, WHITE);
+        // TODO(nick):
+        // - fix positioning
+        // - set an actual amount
+        DrawTextEx(ArcadePixFont, "1,000,000", BankTextPosition, BankFontSize, BankFontSpacing, WHITE);
         DrawTexture(BorderTexture, BorderPosition.x, BorderPosition.y, WHITE);
         for (unsigned int i = 0; i < len(CardSlotPositions); i++)
         {
@@ -736,7 +804,7 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
                 // NOTE: always draw the current icon as blinking
                 if (i == game_input_state->hold_cursor_index)
                 {
-                    DrawBlinkAnimation(&HoldCursorTexture, &CurrentHoldCursorBlinkAnimation, &HoldCursorPositions[i], GlobalTargetFPS);
+                    DrawBlinkAnimation(&HoldCursorTexture, AssetType_Texture2D, &CurrentHoldCursorBlinkAnimation, &HoldCursorPositions[i], GlobalTargetFPS);
                 }
                 else if (game_input_state->hold_cursor_selects[i] == CURSOR_SELECTED)
                 {
@@ -852,8 +920,7 @@ void
 LoadSounds()
 {
     // NOTE: load theme music
-    CharacterThemeMusic[MrFreckles] = LoadMusicStream("assets/sounds/music/ogg/Mr_Freckles.ogg");
-
+    CharacterThemeMusic[MrFreckles] = LoadMusicStream("assets/sounds/music/ogg/Freckles-Theme-8-bit.ogg");
     InitializeSoundMeta(CharacterThemeMusic, CharacterThemeMusicMeta, len(CharacterThemeMusic));
 
     // NOTE: load Mr. Freckles dialogue
@@ -908,6 +975,7 @@ UnloadSounds()
     }
 }
 
+// TODO(nick): refine this process
 void
 InitSounds()
 {
@@ -918,9 +986,24 @@ InitSounds()
 }
 
 void
+LoadFonts()
+{
+    ArcadePixFont = LoadFont("assets/fonts/Arcadepix-Plus.ttf");
+    PixellariFont = LoadFont("assets/fonts/Pixellari.ttf");
+}
+
+void
+UnloadFonts()
+{
+    UnloadFont(ArcadePixFont);
+    UnloadFont(PixellariFont);
+}
+
+void
 ExitGame()
 {
     UnloadTextures();
+    UnloadFonts();
     UnloadSounds();
     CloseAudioDevice();
     CloseWindow();

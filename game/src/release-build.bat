@@ -7,7 +7,7 @@ IF NOT EXIST .\win32 MKDIR win32
 PUSHD win32
 dir
 
-set BuildNumber=v0.1.3-Alpha
+set BuildNumber=v0.1.4-Alpha
 set PreprocessorFlags=-DGAME_SOUND_ENABLED
 
 :: /MDd, crt debug lib

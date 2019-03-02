@@ -39,11 +39,13 @@ global_variable int GlobalTargetFPS = 60;
 
 global_variable Vector2 CenterScreenPosition;
 
-// Logos Texture(s) / Position(s)S
+// Logos Texture(s) / Position(s)
 global_variable Texture2D PewkoLogoTexture;
 global_variable Vector2 PewkoLogoPosition;
+global_variable FadeAnimation PewkoLogoFadeAnimation;
 global_variable Texture2D HiddenPixelLogoTexture;
 global_variable Vector2 HiddenPixelLogoPosition;
+global_variable FadeAnimation HiddenPixelLogoFadeAnimation;
 
 // Font
 global_variable SpriteFont GameFont;
@@ -559,9 +561,13 @@ LoadLogoScreen(Image *tempImage, Vector2 *imageVector)
     *tempImage = LoadImage("assets/textures/Logos/Pewko-logo.png");
     PewkoLogoTexture = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
+    // TODO(nick): frame duration will be 3 seconds
+    int frameDuration = GlobalTargetFPS * 3;
+    PewkoLogoFadeAnimation = CreateFadeAnimation(frameDuration, frameDuration / 2, frameDuration);
     *tempImage = LoadImage("assets/textures/Logos/HiddenPixelLargeDarkRed.png");
     HiddenPixelLogoTexture = LoadTextureFromImage(*tempImage);
     UnloadImage(*tempImage);
+    HiddenPixelLogoFadeAnimation = CreateFadeAnimation(frameDuration, frameDuration / 2, frameDuration);
 }
 
 inline void
@@ -722,18 +728,18 @@ void
 RenderLogoScreen(Game_Scene_State* game_scene_state)
 {
     local_persist int currentFrame = 0;
-    // NOTE: give each logo five seconds of rendering
-    int nextFrameTime = (GlobalTargetFPS * 5);
+    // NOTE: give each logo 3 seconds of rendering
+    int nextFrameTime = (GlobalTargetFPS * 3);
     BeginDrawing();
     {
         ClearBackground(BLACK);
         if (currentFrame <= nextFrameTime) 
         {
-            DrawTexture(PewkoLogoTexture, PewkoLogoPosition.x, PewkoLogoPosition.y, WHITE);
+            DrawFadeAnimation((void *)&PewkoLogoTexture, AssetType_Texture2D, &PewkoLogoFadeAnimation, &PewkoLogoPosition, GlobalTargetFPS);
         }
         else if (currentFrame <= nextFrameTime * 2)
         {
-            DrawTexture(HiddenPixelLogoTexture, HiddenPixelLogoPosition.x, HiddenPixelLogoPosition.y, WHITE);
+            DrawFadeAnimation((void *)&HiddenPixelLogoTexture, AssetType_Texture2D, &HiddenPixelLogoFadeAnimation, &HiddenPixelLogoPosition, GlobalTargetFPS);
         }
         else
         {

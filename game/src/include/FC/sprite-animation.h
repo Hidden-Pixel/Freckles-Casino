@@ -45,6 +45,15 @@ typedef struct _slideAnimation
     unsigned int    frameCounter;
 } SlideAnimation;
 
+typedef struct _fadeAnimation
+{
+    unsigned int    frameRenderDurationSeconds;
+    unsigned int    fadeInDurationFrames;
+    unsigned int    fadeOutDurationFrames;
+    float           fadeCurrentAlphaValue;
+    unsigned int    frameCounter;
+} FadeAnimation;
+
 SpriteAnimation
 CreateSpriteAnimation(int totalFrames, int verticalFrames, int horizontalFrames, int frameSpeed, int sheetWidth, int sheetHeight);
 
@@ -59,3 +68,9 @@ DrawBlinkAnimation(void *spritesheet, AssetType assetType, BlinkAnimation *blink
 
 BlinkAnimation
 CreateBlinkAnimation(int blinksPerSecond);
+
+FadeAnimation
+CreateFadeAnimation(unsigned int frameRenderDurationSeconds, unsigned int fadeInDurationFrames, unsigned int fadeOutDurationFrames);
+
+void
+DrawFadeAnimation(void *asset, AssetType assetType, FadeAnimation *fade, Vector2 *position, int gameFPS);

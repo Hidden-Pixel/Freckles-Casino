@@ -115,6 +115,8 @@ global_variable float BankFontSize = 45.0f;
 global_variable float BankFontSpacing = 0.0f;
 global_variable float StartTextSize = 80.0f;
 global_variable float StartTextSpacing = 0.0f;
+global_variable float GeneralTextSize = 60.0f;
+global_variable float GeneralTextSpacing = 0.0f;
 global_variable BlinkAnimation StartTextBlinkAnimation;
 global_variable int BankAmount = 0;
 global_variable Font PixellariFont;
@@ -158,6 +160,9 @@ DrawHorizontalCardArea(Texture2D texture, Vector2 area, int card_count, float x_
 
 void
 DrawFaceCard(Poker_Card card, int x, int y);
+
+void
+DrawDialogueBox(Vector2 size, Vector2 position, Color dialogueColor, const char *text, Color textColor);
 
 void
 RenderScene(Poker_Game* game_state, Game_Input_State *game_input_state, Game_Scene_State *game_scene_state);
@@ -772,10 +777,10 @@ RenderTitleScreen()
             .Text            = "PRESS START",
         };
         DrawBlinkAnimation(&fontInfo, AssetType_Text, &StartTextBlinkAnimation, &StartTextPosition, GlobalTargetFPS);
-        //DrawTextEx(ArcadePixFont, "PRESS START", StartTextPosition, StartTextSize, StartTextSpacing, MAGENTA);
     }
     EndDrawing();
 }
+
 
 // TODO(nick): possible start storing hold states in game state instead of game input state
 void
@@ -881,7 +886,7 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
             // TODO(nick):
             // - render betting text
             // - set amount and confirmation of amount
-            DrawRectangleV(BettingWindowPosition, BettingWindowSize, Fade(BLACK, 0.75f));
+            DrawDialogueBox(BettingWindowSize, BettingWindowPosition, Fade(BLACK, 0.75f), "Place Your Bet!", Fade(GOLD, 0.75f));
         }
     }
     EndDrawing();
@@ -925,6 +930,31 @@ DrawFaceCard(Poker_Card card, int x, int y)
     int cardIndex = Poker_CardRank(card);
     assert(cardIndex < 52);
     DrawTexture(CardTextures[cardIndex], x, y, WHITE);
+}
+
+// TODO(nick): add basis position and replace with CenterScreenPosition ...
+void
+DrawDialogueBox(Vector2 size, Vector2 position, Color dialogueColor, const char *text, Color textColor)
+{
+    Vector2 TextSize = MeasureTextEx(ArcadePixFont, text, GeneralTextSize, GeneralTextSpacing);
+    // NOTE(nick): check if the text is too large for the dialogue box and resize
+    if (TextSize.x >= size.x)
+    {
+        size.x = (size.x + GameScreen_LocalUnitsToScreen(50.0f));
+        position.x = (CenterScreenPosition.x - (size.x / 2));
+    }
+    if (TextSize.y >= size.y)
+    {
+        size.y = (size.y + GameScreen_LocalUnitsToScreen(50.0f));
+        position.y = (CenterScreenPosition.y - (size.y / 2));
+    }
+    Vector2 TextPosition = 
+    {
+        .x = position.x,
+        .y = position.y,
+    };
+    DrawRectangleV(position, size, dialogueColor);
+    DrawTextEx(ArcadePixFont, text, TextPosition, GeneralTextSize, GeneralTextSpacing, textColor);
 }
 
 void

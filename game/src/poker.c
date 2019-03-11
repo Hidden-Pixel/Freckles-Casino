@@ -152,6 +152,7 @@ Poker_Init_FiveCard(Poker_Game *game_state)
     game_state->dealer_score = 1000;
     game_state->betting_round = 0;
     game_state->chances_left = 3;
+    game_state->current_pot_size = 0;
 }
 
 internal inline void
@@ -398,7 +399,8 @@ Poker_ProcessFiveCardState(Poker_Game *game_state)
             if (game_state->betting_round == 1)
             {
                 // TODO(nick):
-                game_state->poker_state = PokerState_SelectHolds;
+                // - only switch to hold state when betting has been completed
+                //game_state->poker_state = PokerState_SelectHolds;
             }
             else
             {

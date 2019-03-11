@@ -86,6 +86,8 @@ global_variable Vector2 HoldCursorPositions[5];
 global_variable unsigned char CurrentHoldCursorIndex;
 global_variable Texture2D SpeechBubbleTexture;
 global_variable Vector2 SpeechBubblePosition;
+global_variable Vector2 BettingWindowSize;
+global_variable Vector2 BettingWindowPosition;
 
 // Card Texture(s) / Position(s)
 global_variable Texture2D BackOfCardTexture;
@@ -627,11 +629,10 @@ SetPositions()
     NamePlatePosition.y = (GreenTablePosition.y + GameScreen_LocalUnitsToScreen(10.0f));
     BankPosition.x = BorderPosition.x + GameScreen_LocalUnitsToScreen(20.0f);
     BankPosition.y = GreenTablePosition.y - BankTexture.height - GameScreen_LocalUnitsToScreen(20.0f);
-    // TODO(nick): this will more than likely need to be updated on windows
-    // - create an update position function
-    TextSize = MeasureTextEx(ArcadePixFont, "1,000,000", BankFontSize, BankFontSpacing);
-    BankTextPosition.x = BankPosition.x + BankTexture.width - TextSize.x - (GameScreen_LocalUnitsToScreen(2.0f));
-    BankTextPosition.y = BankPosition.y + (TextSize.y / 2); 
+    BettingWindowSize.x = GameScreen_LocalUnitsToScreen(150.0f);
+    BettingWindowSize.y = GameScreen_LocalUnitsToScreen(100.0f);
+    BettingWindowPosition.x = CenterScreenPosition.x - (BettingWindowSize.x / 2);
+    BettingWindowPosition.y = CenterScreenPosition.y - (BettingWindowSize.y / 2);
     Vector2 CardSlotStartingPositionTop =
     {
         .x = CenterScreenPosition.x - (CardSlotTexture.width * 0.5f) - (CardSlotTexture.width * 3.0f),
@@ -788,10 +789,12 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
         DrawTexture(NamePlateTexture, NamePlatePosition.x, NamePlatePosition.y, WHITE);
         DrawTexture(FrecklesNamePlateTexture, FrecklesNamePlatePosition.x, FrecklesNamePlatePosition.y, WHITE);
         DrawTexture(BankTexture, BankPosition.x, BankPosition.y, WHITE);
-        // TODO(nick):
-        // - fix positioning
-        // - set an actual amount
-        DrawTextEx(ArcadePixFont, "1,000,000", BankTextPosition, BankFontSize, BankFontSpacing, WHITE);
+        char buffer[64] = { 0 };
+        sprintf(buffer, "%d", game_state->player_score);
+        Vector2 TextSize = MeasureTextEx(ArcadePixFont, buffer, BankFontSize, BankFontSpacing);
+        BankTextPosition.x = BankPosition.x + BankTexture.width - TextSize.x - (GameScreen_LocalUnitsToScreen(2.0f));
+        BankTextPosition.y = BankPosition.y + (TextSize.y / 2); 
+        DrawTextEx(ArcadePixFont, buffer, BankTextPosition, BankFontSize, BankFontSpacing, WHITE);
         DrawTexture(BorderTexture, BorderPosition.x, BorderPosition.y, WHITE);
         for (unsigned int i = 0; i < len(CardSlotPositions); i++)
         {
@@ -872,6 +875,14 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
             DrawTextEx(GameFont, buf, vec, 16.f, 0.f, BLACK);
         }
 #endif
+        // NOTE(nick): betting window has to be rendered on top of the other assets
+        if (game_state->poker_state == PokerState_Betting)
+        {
+            // TODO(nick):
+            // - render betting text
+            // - set amount and confirmation of amount
+            DrawRectangleV(BettingWindowPosition, BettingWindowSize, Fade(BLACK, 0.75f));
+        }
     }
     EndDrawing();
     GlobalFrameCount++;
@@ -1005,6 +1016,5 @@ ExitGame()
     UnloadTextures();
     UnloadFonts();
     UnloadSounds();
-    CloseAudioDevice();
-    CloseWindow();
+    CloseAudioDevice(); CloseWindow();
 }

@@ -46,6 +46,19 @@ ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_
     }
     if (game_poker_state->poker_state >= PokerState_PlayerCardsDealt)
     {
+        if (game_poker_state->poker_state == PokerState_Betting) 
+        {
+            if (IsKeyPressed(KEY_UP))
+            {
+                // TODO(nick): increase bet amount
+            }
+
+            if (IsKeyPressed(KEY_DOWN))
+            {
+                // TODO(nick): decrease bet amount
+            }
+        }
+
         if (game_poker_state->poker_state == PokerState_SelectHolds)
         {
             if (IsKeyPressed(KEY_RIGHT))
@@ -98,7 +111,9 @@ ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_
                 game_poker_state->poker_state = PokerState_ExchangeCards;
             }
         }
-        if (game_poker_state->poker_state == PokerState_ExchangeCards) {
+
+        if (game_poker_state->poker_state == PokerState_ExchangeCards) 
+        {
             if (IsKeyPressed(KEY_SPACE)) {
                 Poker_RevealHand(game_poker_state->dealer_hand, 5);
                 game_poker_state->poker_state = PokerState_GameOver;
@@ -107,7 +122,8 @@ ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_
             }
         }
 
-        if (game_poker_state->poker_state == PokerState_GameOver) {
+        if (game_poker_state->poker_state == PokerState_GameOver)
+        {
             if (IsKeyPressed(KEY_N)) {
                 Poker_StartNewRound(game_poker_state);
             }

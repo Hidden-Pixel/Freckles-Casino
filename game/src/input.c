@@ -48,17 +48,34 @@ ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_
     {
         if (game_poker_state->poker_state == PokerState_Betting) 
         {
+            // TODO(nick): 
+            // - have a game state increment amount?
+            // - make sure to reset current_player_bet on confirmation of bet
             if (IsKeyPressed(KEY_UP))
             {
-                // TODO(nick): increase bet amount
+                if (game_poker_state->current_player_bet < game_poker_state->player_score) 
+                {
+                    game_poker_state->current_player_bet += 25;
+                }
             }
-
             if (IsKeyPressed(KEY_DOWN))
             {
-                // TODO(nick): decrease bet amount
+                if (game_poker_state->current_player_bet > 0) 
+                {
+                    game_poker_state->current_player_bet -= 25;
+                }
+            }
+            if (IsKeyPressed(KEY_ENTER))
+            {
+                if (game_poker_state->current_player_bet > 0)
+                {
+                    game_poker_state->poker_state = PokerState_Bets_Placed;
+                    // TODO(nick): account for the AI bets as well
+                    game_poker_state->current_pot_size += game_poker_state->current_player_bet;
+                    game_poker_state->current_player_bet = 0;
+                }
             }
         }
-
         if (game_poker_state->poker_state == PokerState_SelectHolds)
         {
             if (IsKeyPressed(KEY_RIGHT))

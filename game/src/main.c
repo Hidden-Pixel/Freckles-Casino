@@ -162,7 +162,7 @@ void
 DrawFaceCard(Poker_Card card, int x, int y);
 
 void
-DrawDialogueBox(Vector2 size, Vector2 position, Color dialogueColor, const char *text, Color textColor);
+DrawDialogueBox(Vector2 size, Vector2 position, Color dialogueColor, const char *topText, Color topTextColor, const char *centerText, Color centerTextColor);
 
 void
 RenderScene(Poker_Game* game_state, Game_Input_State *game_input_state, Game_Scene_State *game_scene_state);
@@ -634,7 +634,7 @@ SetPositions()
     NamePlatePosition.y = (GreenTablePosition.y + GameScreen_LocalUnitsToScreen(10.0f));
     BankPosition.x = BorderPosition.x + GameScreen_LocalUnitsToScreen(20.0f);
     BankPosition.y = GreenTablePosition.y - BankTexture.height - GameScreen_LocalUnitsToScreen(20.0f);
-    BettingWindowSize.x = GameScreen_LocalUnitsToScreen(150.0f);
+    BettingWindowSize.x = GameScreen_LocalUnitsToScreen(200.0f);
     BettingWindowSize.y = GameScreen_LocalUnitsToScreen(100.0f);
     BettingWindowPosition.x = CenterScreenPosition.x - (BettingWindowSize.x / 2);
     BettingWindowPosition.y = CenterScreenPosition.y - (BettingWindowSize.y / 2);
@@ -886,7 +886,9 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
             // TODO(nick):
             // - render betting text
             // - set amount and confirmation of amount
-            DrawDialogueBox(BettingWindowSize, BettingWindowPosition, Fade(BLACK, 0.75f), "Place Your Bet!", Fade(GOLD, 0.75f));
+            char buffer[50] = { 0 };
+            sprintf(buffer, "Amount: $%d", game_state->current_player_bet);
+            DrawDialogueBox(BettingWindowSize, BettingWindowPosition, Fade(BLACK, 0.75f), "Place Your Bet!", Fade(GOLD, 0.75f), buffer, Fade(GREEN, 0.75f));
         }
     }
     EndDrawing();
@@ -932,29 +934,72 @@ DrawFaceCard(Poker_Card card, int x, int y)
     DrawTexture(CardTextures[cardIndex], x, y, WHITE);
 }
 
-// TODO(nick): add basis position and replace with CenterScreenPosition ...
+// TODO(nick): 
+// - add basis position and replace with CenterScreenPosition 
+// - add resizing of dialogue in seperate function to replace current resizing code?
+// - add bounding box around dialogue box
 void
-DrawDialogueBox(Vector2 size, Vector2 position, Color dialogueColor, const char *text, Color textColor)
+DrawDialogueBox(Vector2 size, Vector2 position, Color dialogueColor, const char *topText, Color topTextColor, const char *centerText, Color centerTextColor)
 {
-    Vector2 TextSize = MeasureTextEx(ArcadePixFont, text, GeneralTextSize, GeneralTextSpacing);
+    Vector2 TopTextSize = MeasureTextEx(ArcadePixFont, topText, GeneralTextSize, GeneralTextSpacing);
+    Vector2 CenterTextSize = MeasureTextEx(ArcadePixFont, centerText, GeneralTextSize, GeneralTextSpacing);
     // NOTE(nick): check if the text is too large for the dialogue box and resize
-    if (TextSize.x >= size.x)
+    if (TopTextSize.x >= size.x)
     {
         size.x = (size.x + GameScreen_LocalUnitsToScreen(50.0f));
         position.x = (CenterScreenPosition.x - (size.x / 2));
     }
-    if (TextSize.y >= size.y)
+    if (TopTextSize.y >= size.y)
     {
         size.y = (size.y + GameScreen_LocalUnitsToScreen(50.0f));
         position.y = (CenterScreenPosition.y - (size.y / 2));
     }
-    Vector2 TextPosition = 
+    int HorizontalTopPadding = ((size.x - TopTextSize.x) / 2);
+    Vector2 TopTextPosition = 
     {
-        .x = position.x,
+        .x = position.x + HorizontalTopPadding,
         .y = position.y,
     };
+    int HorizontalCenterPadding = ((size.x - CenterTextSize.x) / 2); 
+    Vector2 CenterTextPosition = 
+    {
+        .x = position.x + HorizontalTopPadding,
+        .y = position.x + TopTextSize.y + CenterTextSize.y, 
+    };
+    // NOTE(nick): main dialogue box
     DrawRectangleV(position, size, dialogueColor);
-    DrawTextEx(ArcadePixFont, text, TextPosition, GeneralTextSize, GeneralTextSpacing, textColor);
+    // NOTE(nick: draw dialogue bounding box
+    // TODO(nick): 
+    // - add color to parameters?
+    // - break out to a for loop or a funciton?
+    Vector2 BoundingBoxSize = 
+    {
+        .x = size.x,
+        .y = GameScreen_LocalUnitsToScreen(10.0f),
+    };
+    Vector2 BoundingPosition = 
+    {
+        .x = position.x,
+        .y = position.y - BoundingBoxSize.y,
+    };
+    // NOTE(nick): top bounding box rect
+    DrawRectangleV(BoundingPosition, BoundingBoxSize, Fade(WHITE, 0.85f));
+    // NOTE(nick): bottom bounding box rect
+    BoundingPosition.y = (position.y + size.y);
+    DrawRectangleV(BoundingPosition, BoundingBoxSize, Fade(WHITE, 0.85f));
+    // NOTE(nick): set new size for vertical boudning box portion
+    int priorYValue = BoundingBoxSize.y;
+    BoundingBoxSize.y = (size.y + (priorYValue * 2));
+    BoundingBoxSize.x = GameScreen_LocalUnitsToScreen(10.0f);
+    // NOTE(nick): left bounding box rect
+    BoundingPosition.x = position.x - BoundingBoxSize.x;
+    BoundingPosition.y = position.y - priorYValue;
+    DrawRectangleV(BoundingPosition, BoundingBoxSize, Fade(WHITE, 0.85f));
+    // NOTE(nick): right bounding box rect
+    BoundingPosition.x = position.x + size.x;
+    DrawRectangleV(BoundingPosition, BoundingBoxSize, Fade(WHITE, 0.85f));
+    DrawTextEx(ArcadePixFont, topText, TopTextPosition, GeneralTextSize, GeneralTextSpacing, topTextColor);
+    DrawTextEx(ArcadePixFont, centerText, CenterTextPosition, GeneralTextSize, GeneralTextSpacing, centerTextColor);
 }
 
 void

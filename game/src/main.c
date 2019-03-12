@@ -224,6 +224,9 @@ main(void)
     GameInit(&game_state, &game_scene_state, &game_input_state);
     if (IsWindowReady())
     {
+#ifdef FULL_SCREEN
+        ToggleFullscreen();
+#endif
         PlaySounds();
         while (GlobalRunning)
         {
@@ -816,7 +819,7 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
                 }
                 else if (game_input_state->hold_cursor_selects[i] == CURSOR_SELECTED)
                 {
-                    DrawTexture(HoldCursorTexture, HoldCursorPositions[i].x, HoldCursorPositions[i].y, WHITE);
+                    DrawTexture(HoldCursorTexture, HoldCursorPositions[i].x, HoldCursorPositions[i].y, RED);
                 }
             }
         }
@@ -881,6 +884,8 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
         }
 #endif
         // NOTE(nick): betting window has to be rendered on top of the other assets
+        // TODO(nick):
+        // - deal animation for cards and pause for card confirmation
         if (game_state->poker_state == PokerState_Betting)
         {
             // TODO(nick):

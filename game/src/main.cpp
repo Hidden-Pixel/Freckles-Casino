@@ -20,200 +20,177 @@
 #include "raylib.h"
 #include "raymath.h"
 
+using namespace freckles;
+
 // Our actual screen size
-#define WIDTH 1280
-#define HEIGHT 800
+const int ScreenWidth = 1280;
+const int ScreenHeight = 800;
 
 // Our target game size
 // This gives us 102240 (240p) units to work with
 // Classic old-school resolution.
-#define GAME_WIDTH 320
-#define GAME_HEIGHT 240
+const int GameWidth = 320;
+const int GameHeight = 240;
 
-global_variable int GlobalWindowWidth = WIDTH;
-global_variable int GlobalWindowHeight = HEIGHT;
-global_variable const char *GlobalWindowTitle = "Mr. FC Casino";
-global_variable unsigned char GlobalRunning = 1;
-global_variable int GlobalFrameCount = 0;
-global_variable int GlobalTargetFPS = 60;
+int GlobalWindowWidth = ScreenWidth;
+int GlobalWindowHeight = ScreenHeight;
+const char *GlobalWindowTitle = "Mr. FC Casino";
+unsigned char GlobalRunning = 1;
+int GlobalFrameCount = 0;
+int GlobalTargetFPS = 60;
 
-global_variable Vector2 CenterScreenPosition;
+Vector2 CenterScreenPosition;
 
 // Logos Texture(s) / Position(s)
-global_variable Texture2D PewkoLogoTexture;
-global_variable Vector2 PewkoLogoPosition;
-global_variable FadeAnimation PewkoLogoFadeAnimation;
-global_variable Texture2D HiddenPixelLogoTexture;
-global_variable Vector2 HiddenPixelLogoPosition;
-global_variable FadeAnimation HiddenPixelLogoFadeAnimation;
+Texture2D PewkoLogoTexture;
+Vector2 PewkoLogoPosition;
+FadeAnimation PewkoLogoFadeAnimation;
+Texture2D HiddenPixelLogoTexture;
+Vector2 HiddenPixelLogoPosition;
+FadeAnimation HiddenPixelLogoFadeAnimation;
 
 // Font
-global_variable SpriteFont GameFont;
+SpriteFont GameFont;
 
-global_variable char MessageBuffer[256];
+char MessageBuffer[256];
 
 // Title Screen Texture(s) / Animation(s) / Position(s)
-global_variable Texture2D TitleScreenSpriteSheet;
-global_variable SpriteAnimation TitleScreenSpriteAnimation;
-global_variable Vector2 TitleScreenAnimationPosition;
-global_variable Texture2D MrFrecklesBanner;
-global_variable Vector2 MrFrecklesBannerPosition;
-global_variable Texture2D DuelOfTheEightsBanner;
-global_variable Vector2 DuelOfTheEightsBannerPosition;
-global_variable Vector2 StartTextPosition;
+Texture2D TitleScreenSpriteSheet;
+SpriteAnimation TitleScreenSpriteAnimation;
+Vector2 TitleScreenAnimationPosition;
+Texture2D MrFrecklesBanner;
+Vector2 MrFrecklesBannerPosition;
+Texture2D DuelOfTheEightsBanner;
+Vector2 DuelOfTheEightsBannerPosition;
+Vector2 StartTextPosition;
 
 // Background Texture(s) / Animation(s) / Position(s)
-global_variable Texture2D BorderTexture;
-global_variable Vector2 BorderPosition;
-global_variable Texture2D RedCurtainTexture;
-global_variable Vector2 RedCurtainPosition;
-global_variable Texture2D GreenTableTexture;
-global_variable Vector2 GreenTablePosition;
-global_variable Texture2D CardSlotTexture;
-global_variable Vector2 CardSlotPositions[10];
+Texture2D BorderTexture;
+Vector2 BorderPosition;
+Texture2D RedCurtainTexture;
+Vector2 RedCurtainPosition;
+Texture2D GreenTableTexture;
+Vector2 GreenTablePosition;
+Texture2D CardSlotTexture;
+Vector2 CardSlotPositions[10];
 
 // Misc Texture(s) / Position(s)
-global_variable Texture2D FrecklesNamePlateTexture;
-global_variable Vector2 FrecklesNamePlatePosition;
-global_variable Texture2D NamePlateTexture;
-global_variable Vector2 NamePlatePosition;
-global_variable Texture2D BankTexture;
-global_variable Vector2 BankPosition;
-global_variable Vector2 BankTextPosition;
-global_variable Texture2D HoldCursorTexture;
-global_variable BlinkAnimation CurrentHoldCursorBlinkAnimation;
-global_variable Vector2 HoldCursorPositions[5];
-global_variable unsigned char CurrentHoldCursorIndex;
-global_variable Texture2D SpeechBubbleTexture;
-global_variable Vector2 SpeechBubblePosition;
+Texture2D FrecklesNamePlateTexture;
+Vector2 FrecklesNamePlatePosition;
+Texture2D NamePlateTexture;
+Vector2 NamePlatePosition;
+Texture2D BankTexture;
+Vector2 BankPosition;
+Vector2 BankTextPosition;
+Texture2D HoldCursorTexture;
+BlinkAnimation CurrentHoldCursorBlinkAnimation;
+Vector2 HoldCursorPositions[5];
+unsigned char CurrentHoldCursorIndex;
+Texture2D SpeechBubbleTexture;
+Vector2 SpeechBubblePosition;
 
 // Card Texture(s) / Position(s)
-global_variable Texture2D BackOfCardTexture;
-global_variable Texture2D CardTextures[CardSuit_Count * CardFace_Count];
-global_variable Vector2 CardPositions[10];
+Texture2D BackOfCardTexture;
+Texture2D CardTextures[poker::CardSuitCount * poker::CardFaceCount];
+Vector2 CardPositions[10];
 
 // Character Texture(s) / Animation(s) / Position(s)
-global_variable Texture2D MrFrecklesSpritesheets[13];
-global_variable SpriteAnimation MrFrecklesSpriteAnimation[13];
-global_variable Vector2 MrFrecklesPosition[13];
+Texture2D MrFrecklesSpritesheets[13];
+SpriteAnimation MrFrecklesSpriteAnimation[13];
+Vector2 MrFrecklesPosition[13];
 
-global_variable unsigned int MrFrecklesActiveState = Idle;
-global_variable unsigned int CurrentCharacterId = MrFreckles;
+unsigned int MrFrecklesActiveState = Idle;
+unsigned int CurrentCharacterId = MrFreckles;
 
-global_variable bool GameStarted = false;
+bool GameStarted = false;
 
-global_variable Music CharacterThemeMusic[5];
-global_variable SoundMeta CharacterThemeMusicMeta[5];
+Music CharacterThemeMusic[5];
+SoundMeta CharacterThemeMusicMeta[5];
 
-global_variable Music MrFrecklesDialogue[26];
-global_variable SoundMeta MrFrecklesDialogueMeta[26];
+Music MrFrecklesDialogue[26];
+SoundMeta MrFrecklesDialogueMeta[26];
 
-global_variable Font ArcadePixFont;
-global_variable float BankFontSize = 45.0f;
-global_variable float BankFontSpacing = 0.0f;
-global_variable float StartTextSize = 80.0f;
-global_variable float StartTextSpacing = 0.0f;
-global_variable BlinkAnimation StartTextBlinkAnimation;
-global_variable int BankAmount = 0;
-global_variable Font PixellariFont;
+Font ArcadePixFont;
+float BankFontSize = 45.0f;
+float BankFontSpacing = 0.0f;
+float StartTextSize = 80.0f;
+float StartTextSpacing = 0.0f;
+BlinkAnimation StartTextBlinkAnimation;
+int BankAmount = 0;
+Font PixellariFont;
 
 const char* CreditsText = "CREDITS";
 const char* JackpotText = "JACKPOT";
 const char* BetText     = "BET";
 
-void
-GameInit(Poker_Game *game_state, Game_Scene_State *game_scene_state, Game_Input_State *game_input_state);
+void GameInit(poker::Game* game_state, Game_Scene_State* game_scene_state, Game_Input_State* game_input_state);
 
-void
-LoadTextures();
+void LoadTextures();
 
-void
-LoadCardTexture(char *filePath, Texture2D *texture);
+void LoadCardTexture(char* filePath, Texture2D* texture);
 
-void
-LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture);
+void LoadCardsTextures(Texture2D CardTextures[52], Texture2D* BackOfCardTexture);
 
-void
-LoadCharacterTextures(Image *tempImage, Vector2 *imageVector);
+void LoadCharacterTextures(Image* tempImage, Vector2* imageVector);
 
-void
-LoadLogoScreen(Image *tempImage, Vector2 *imageVector);
+void LoadLogoScreen(Image* tempImage, Vector2* imageVector);
 
-void
-LoadTitleScreen(Image *tempImage, Vector2 *imageVector);
+void LoadTitleScreen(Image* tempImage, Vector2* imageVector);
 
-void
-LoadTableAndBackgroundTextures(Image *tempImage, Vector2 *imageVector);
+void LoadTableAndBackgroundTextures(Image* tempImage, Vector2* imageVector);
 
-void
-SetPositions();
+void SetPositions();
 
-void
-UnloadTextures();
+void UnloadTextures();
 
-void
-DrawHorizontalCardArea(Texture2D texture, Vector2 area, int card_count, float x_shift);
+void DrawHorizontalCardArea(Texture2D texture, Vector2 area, int card_count, float x_shift);
 
-void
-DrawFaceCard(Poker_Card card, int x, int y);
+void DrawFaceCard(poker::Card card, int x, int y);
 
-void
-RenderScene(Poker_Game* game_state, Game_Input_State *game_input_state, Game_Scene_State *game_scene_state);
+void RenderScene(poker::Game* game_state, Game_Input_State* game_input_state, Game_Scene_State* game_scene_state);
 
-void
-RenderLogoScreen(Game_Scene_State* game_scene_state);
+void RenderLogoScreen(Game_Scene_State* game_scene_state);
 
-void
-RenderTitleScreen();
+void RenderTitleScreen();
 
-void
-RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state);
+void RenderGame(poker::Game* game_state, Game_Input_State *game_input_state);
 
-void
-DrawFaceCard(Poker_Card card, int x, int y);
+void DrawFaceCard(poker::Card card, int x, int y);
 
-void
-LoadSounds();
+void LoadSounds();
 
-void
-UnloadSounds();
+void UnloadSounds();
 
-void
-InitSounds();
+void InitSounds();
 
-void
-LoadFonts();
+void LoadFonts();
 
-void
-UnloadFonts();
+void UnloadFonts();
 
-void
-ExitGame();
+void ExitGame();
 
 // TODO(Alex): Pass MessageBuffer to PokerInit
-void
-FiveCard_OnGameOver(Poker_Hand player_hand, Poker_Hand dealer_hand)
+void FiveCard_OnGameOver(poker::HandResult player_hand, poker::HandResult dealer_hand)
 {
     if (player_hand > dealer_hand) {
         sprintf(MessageBuffer, "Freckle's Hand: %s, Your Hand: %s - You Win!",
-                Hand_Names[dealer_hand], Hand_Names[player_hand]);
+                poker::Hand_Names[dealer_hand], poker::Hand_Names[player_hand]);
     } else if (player_hand < dealer_hand) {
         sprintf(MessageBuffer, "Freckle's Hand: %s, Your Hand: %s - You Lose.",
-                Hand_Names[dealer_hand], Hand_Names[player_hand]);
+                poker::Hand_Names[dealer_hand], poker::Hand_Names[player_hand]);
     } else {
         // TODO(Alex): Check other cards in the hand.
         sprintf(MessageBuffer, "Freckle's Hand: %s, Your Hand: %s - Tie!",
-                Hand_Names[dealer_hand], Hand_Names[player_hand]);
+                poker::Hand_Names[dealer_hand], poker::Hand_Names[player_hand]);
     }
 
 }
 
-int
-main(void)
+int main(void)
 {
-    local_persist Poker_Game game_state;
-    local_persist Game_Scene_State game_scene_state;
-    local_persist Game_Input_State game_input_state;
+    static poker::Game game_state;
+    static Game_Scene_State game_scene_state;
+    static Game_Input_State game_input_state;
     GameInit(&game_state, &game_scene_state, &game_input_state);
     if (IsWindowReady())
     {
@@ -233,13 +210,12 @@ main(void)
     return 0;
 }
 
-inline void
-GameInit(Poker_Game *game_state, Game_Scene_State *game_scene_state, Game_Input_State *game_input_state)
+void GameInit(poker::Game* game_state, Game_Scene_State* game_scene_state, Game_Input_State* game_input_state)
 {
     Init_Input_State(game_input_state);
-    GameScreen_Init(GlobalWindowWidth, GlobalWindowHeight, GAME_WIDTH, GAME_HEIGHT);
+    GameScreen_Init(GlobalWindowWidth, GlobalWindowHeight, GameWidth, GameHeight);
     // TODO(nick): create a main menu that allows user to pick game type
-    Poker_Init(game_state, GameType_FiveCard);
+    poker::start_five_card_draw(*game_state);
     *game_scene_state = Init_Game_Scene_State();
     InitWindow(GlobalWindowWidth, GlobalWindowHeight, GlobalWindowTitle);
     SetTargetFPS(GlobalTargetFPS);
@@ -250,11 +226,10 @@ GameInit(Poker_Game *game_state, Game_Scene_State *game_scene_state, Game_Input_
     LoadSounds();
     InitSounds();
 #endif
-    Command_OnGameOver = &FiveCard_OnGameOver;
+    game_state->on_game_over = &FiveCard_OnGameOver;
 }
 
-void
-LoadCardTexture(char *filePath, Texture2D *texture) 
+void LoadCardTexture(char *filePath, Texture2D *texture)
 {
     float cardScale = 2.0f;
     float vectorScale = 2.5f;
@@ -272,8 +247,7 @@ LoadCardTexture(char *filePath, Texture2D *texture)
     UnloadImage(tempImage);
 }
 
-inline void
-LoadTableAndBackgroundTextures(Image *tempImage, Vector2 *imageVector)
+void LoadTableAndBackgroundTextures(Image* tempImage, Vector2* imageVector)
 {
     // NOTE: load border texture
     *tempImage = LoadImage("assets/textures/Background/border.png");
@@ -352,8 +326,7 @@ LoadTableAndBackgroundTextures(Image *tempImage, Vector2 *imageVector)
     StartTextBlinkAnimation = CreateBlinkAnimation(1);
 }
 
-inline void
-LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
+void LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
 {
     // Back of Card
     LoadCardTexture("assets/textures/Cards/BackOfCard/BackOfCard.png", BackOfCardTexture);
@@ -419,8 +392,7 @@ LoadCardsTextures(Texture2D CardTextures[52], Texture2D *BackOfCardTexture)
     LoadCardTexture("assets/textures/Cards/Spades/Pngs/AceSpades.png", &CardTextures[51]);
 }
 
-inline void
-LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
+void LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
 {
     // NOTE: Mr. Freckles Spritesheets Begin
     *tempImage = LoadImage("assets/textures/Characters/Spritesheets/MrFreckles/freckles-idle.png");
@@ -555,8 +527,7 @@ LoadCharacterTextures(Image *tempImage, Vector2 *imageVector)
     // NOTE: Mr. Freckles Spritesheets End
 }
 
-inline void
-LoadLogoScreen(Image *tempImage, Vector2 *imageVector)
+void LoadLogoScreen(Image *tempImage, Vector2 *imageVector)
 {
     *tempImage = LoadImage("assets/textures/Logos/Pewko-logo.png");
     PewkoLogoTexture = LoadTextureFromImage(*tempImage);
@@ -570,8 +541,7 @@ LoadLogoScreen(Image *tempImage, Vector2 *imageVector)
     HiddenPixelLogoFadeAnimation = CreateFadeAnimation(frameDuration, frameDuration / 2, frameDuration);
 }
 
-inline void
-LoadTitleScreen(Image *tempImage, Vector2 *imageVector)
+void LoadTitleScreen(Image *tempImage, Vector2 *imageVector)
 {
     *tempImage = LoadImage("assets/textures/Titlescreen/title-screen-spritesheet.png");
     imageVector->x = tempImage->width;
@@ -595,8 +565,7 @@ LoadTitleScreen(Image *tempImage, Vector2 *imageVector)
     UnloadImage(*tempImage);
 }
 
-inline void
-SetPositions()
+void SetPositions()
 {
     // Set center screen position
     CenterScreenPosition.x = (GlobalWindowWidth / 2.0f);
@@ -678,14 +647,12 @@ SetPositions()
     }
 }
 
-internal void
-LoadGameFont()
+void LoadGameFont()
 {
     GameFont = LoadFontEx("assets/fonts/Pixellari.ttf", 12, 0, NULL);
 }
 
-void
-LoadTextures()
+void LoadTextures()
 {
     Image tempImage = { 0 };
     Vector2 imageVector = { 0 };
@@ -712,8 +679,7 @@ LoadTextures()
 }
 
 // TODO(nick): update this function to unload all loaded in texture ...
-void
-UnloadTextures()
+void UnloadTextures()
 {
     UnloadTexture(BackOfCardTexture);
     int i = 0;
@@ -724,10 +690,9 @@ UnloadTextures()
     UnloadFont(GameFont);
 }
 
-void
-RenderLogoScreen(Game_Scene_State* game_scene_state)
+void RenderLogoScreen(Game_Scene_State* game_scene_state)
 {
-    local_persist int currentFrame = 0;
+    static int currentFrame = 0;
     // NOTE: give each logo 3 seconds of rendering
     int nextFrameTime = (GlobalTargetFPS * 3);
     BeginDrawing();
@@ -750,8 +715,7 @@ RenderLogoScreen(Game_Scene_State* game_scene_state)
     currentFrame++;
 }
 
-void
-RenderTitleScreen()
+void RenderTitleScreen()
 {
     // TODO(nick):
     // 1) add fade in / out for logos - raylib has a function named "Fade"
@@ -777,8 +741,7 @@ RenderTitleScreen()
 }
 
 // TODO(nick): possible start storing hold states in game state instead of game input state
-void
-RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
+void RenderGame(poker::Game* game_state, Game_Input_State *game_input_state)
 {
     BeginDrawing();
     {
@@ -817,20 +780,20 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
         {
             // TODO(nick): game state needs to change as poker rules have changed 
             // no longer texas hold'em, just straight 5 card
-            if (game_state->dealer_hand[i].state == CardState_Hidden)
+            if (game_state->dealer_hand[i].state == poker::CardState::Hidden)
             {
                 DrawTexture(BackOfCardTexture, CardPositions[i].x, CardPositions[i].y, WHITE);
             }
-            else if (game_state->dealer_hand[i].state == CardState_Shown)
+            else if (game_state->dealer_hand[i].state == poker::CardState::Shown)
             {
                 DrawFaceCard(game_state->dealer_hand[i], CardPositions[i].x, CardPositions[i].y);
             }
 
-            if (game_state->player_hand[i].state == CardState_Hidden)
+            if (game_state->player_hand[i].state == poker::CardState::Hidden)
             {
                 DrawTexture(BackOfCardTexture, CardPositions[i + offset].x, CardPositions[i + offset].y, WHITE);
             }
-            else if (game_state->player_hand[i].state == CardState_Shown)
+            else if (game_state->player_hand[i].state == poker::CardState::Shown)
             {
                 DrawFaceCard(game_state->player_hand[i], CardPositions[i + offset].x, CardPositions[i + offset].y);
             }
@@ -855,20 +818,20 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
 
         DrawTextEx(GameFont, MessageBuffer, messagePosition, 16.f, 0.f, BLACK);
 #if DEBUG
-        if (game_state->poker_state != PokerState_NotStarted) {
+        if (game_state->poker_state != poker::PokerState::NotStarted) {
             Vector2 vec = {.x = 50, .y = 50};
             char buf[50];
             sprintf(buf, "Freckle's Hand: %s%s %s%s %s%s %s%s %s%s",
-                    CardFace_ShortNames[game_state->dealer_hand[0].face_value],
-                    CardSuit_Names[game_state->dealer_hand[0].suit],
-                    CardFace_ShortNames[game_state->dealer_hand[1].face_value],
-                    CardSuit_Names[game_state->dealer_hand[1].suit],
-                    CardFace_ShortNames[game_state->dealer_hand[2].face_value],
-                    CardSuit_Names[game_state->dealer_hand[2].suit],
-                    CardFace_ShortNames[game_state->dealer_hand[3].face_value],
-                    CardSuit_Names[game_state->dealer_hand[3].suit],
-                    CardFace_ShortNames[game_state->dealer_hand[4].face_value],
-                    CardSuit_Names[game_state->dealer_hand[4].suit]);
+                    poker::CardFace_ShortNames[game_state->dealer_hand[0].face_value],
+                    poker::CardSuit_Names[game_state->dealer_hand[0].suit],
+                    poker::CardFace_ShortNames[game_state->dealer_hand[1].face_value],
+                    poker::CardSuit_Names[game_state->dealer_hand[1].suit],
+                    poker::CardFace_ShortNames[game_state->dealer_hand[2].face_value],
+                    poker::CardSuit_Names[game_state->dealer_hand[2].suit],
+                    poker::CardFace_ShortNames[game_state->dealer_hand[3].face_value],
+                    poker::CardSuit_Names[game_state->dealer_hand[3].suit],
+                    poker::CardFace_ShortNames[game_state->dealer_hand[4].face_value],
+                    poker::CardSuit_Names[game_state->dealer_hand[4].suit]);
             DrawTextEx(GameFont, buf, vec, 16.f, 0.f, BLACK);
         }
 #endif
@@ -877,8 +840,7 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
     GlobalFrameCount++;
 }
 
-void
-RenderScene(Poker_Game *game_state, Game_Input_State *game_input_state, Game_Scene_State *game_scene_state)
+void RenderScene(poker::Game* game_state, Game_Input_State* game_input_state, Game_Scene_State* game_scene_state)
 {
     switch (game_scene_state->current_scene)
     {
@@ -899,8 +861,7 @@ RenderScene(Poker_Game *game_state, Game_Input_State *game_input_state, Game_Sce
     }
 }
 
-void
-DrawHorizontalCardArea(Texture2D texture, Vector2 area, int card_count, float x_shift)
+void DrawHorizontalCardArea(Texture2D texture, Vector2 area, int card_count, float x_shift)
 {
     for (int i = 0; i < card_count; ++i) 
     {
@@ -908,16 +869,14 @@ DrawHorizontalCardArea(Texture2D texture, Vector2 area, int card_count, float x_
     }
 }
 
-void
-DrawFaceCard(Poker_Card card, int x, int y)
+void DrawFaceCard(poker::Card card, int x, int y)
 {
-    int cardIndex = Poker_CardRank(card);
+    int cardIndex = poker::rank_card(card);
     assert(cardIndex < 52);
     DrawTexture(CardTextures[cardIndex], x, y, WHITE);
 }
 
-void
-LoadSounds()
+void LoadSounds()
 {
     // NOTE: load theme music
     CharacterThemeMusic[MrFreckles] = LoadMusicStream("assets/sounds/music/ogg/Freckles-Theme-8-bit.ogg");
@@ -954,8 +913,7 @@ LoadSounds()
     InitializeSoundMeta(MrFrecklesDialogue, MrFrecklesDialogueMeta, len(MrFrecklesDialogue));
 }
 
-void
-UnloadSounds()
+void UnloadSounds()
 {
     int i;
     for (i = 0; i < len(CharacterThemeMusic); i++)
@@ -976,8 +934,7 @@ UnloadSounds()
 }
 
 // TODO(nick): refine this process
-void
-InitSounds()
+void InitSounds()
 {
     CharacterThemeMusicMeta[MrFreckles].playLimit = INFINITE_PLAY;
     AddSoundToBuffer(&CharacterThemeMusic[MrFreckles], &CharacterThemeMusicMeta[MrFreckles]);
@@ -985,22 +942,19 @@ InitSounds()
     //AddSoundToBuffer(&MrFrecklesDialogue[18], &MrFrecklesDialogueMeta[18]);
 }
 
-void
-LoadFonts()
+void LoadFonts()
 {
     ArcadePixFont = LoadFont("assets/fonts/Arcadepix-Plus.ttf");
     PixellariFont = LoadFont("assets/fonts/Pixellari.ttf");
 }
 
-void
-UnloadFonts()
+void UnloadFonts()
 {
     UnloadFont(ArcadePixFont);
     UnloadFont(PixellariFont);
 }
 
-void
-ExitGame()
+void ExitGame()
 {
     UnloadTextures();
     UnloadFonts();

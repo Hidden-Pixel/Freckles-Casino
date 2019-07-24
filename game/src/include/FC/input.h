@@ -7,6 +7,7 @@
 
 #include <FC/poker.h>
 #include <FC/scene.h>
+#include <FC/commands.h>
 
 #include "raylib.h"
 

@@ -5,6 +5,8 @@
 
 #include <FC/font-info.h>
 #include <FC/sprite-animation.h>
+#include <cstdint>
+#include <limits>
 
 typedef enum _spritesheetPosition
 {
@@ -14,7 +16,11 @@ typedef enum _spritesheetPosition
 } SpritesheetPosition;
 
 SpriteAnimation
-CreateSpriteAnimation(int totalFrames, int verticalFrames, int horizontalFrames, int frameSpeed, int sheetWidth, int sheetHeight)
+CreateSpriteAnimation(unsigned int totalFrames,
+        unsigned int verticalFrames,
+        unsigned int horizontalFrames,
+        unsigned int frameSpeed,
+        int sheetWidth, int sheetHeight)
 {
     SpriteAnimation spriteAnimation = (SpriteAnimation)
     {
@@ -27,7 +33,7 @@ CreateSpriteAnimation(int totalFrames, int verticalFrames, int horizontalFrames,
         .frameSpeed             = frameSpeed,
         .frameWidth             = ((float)sheetWidth / (float)horizontalFrames),
         .frameHeight            = ((float)sheetHeight / (float)verticalFrames),
-        .pauseFrame             = -1,
+        .pauseFrame             = std::numeric_limits<unsigned int>::max(),
         .pauseFrameDuration     = 0,
         .paused                 = false,
     };
@@ -35,7 +41,13 @@ CreateSpriteAnimation(int totalFrames, int verticalFrames, int horizontalFrames,
 }
 
 SpriteAnimation
-CreateSpriteAnimationWithPause(int totalFrames, int verticalFrames, int horizontalFrames, int frameSpeed, int sheetWidth, int sheetHeight, int pauseFrame, int pauseFrameDuration)
+CreateSpriteAnimationWithPause(unsigned int totalFrames,
+        unsigned int verticalFrames,
+        unsigned int horizontalFrames,
+        unsigned int frameSpeed,
+        int sheetWidth, int sheetHeight,
+        unsigned int pauseFrame,
+        unsigned int pauseFrameDuration)
 {
     SpriteAnimation spriteAnimation = (SpriteAnimation)
     {
@@ -103,7 +115,7 @@ DrawAnimationFrame(Texture2D *spritesheet, SpriteAnimation *spriteAnimation, Vec
 }
 
 BlinkAnimation
-CreateBlinkAnimation(int blinksPerSecond)
+CreateBlinkAnimation(unsigned int blinksPerSecond)
 {
     BlinkAnimation blinkAnimation = (BlinkAnimation)
     {

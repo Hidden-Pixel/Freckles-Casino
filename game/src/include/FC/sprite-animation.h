@@ -55,10 +55,20 @@ typedef struct _fadeAnimation
 } FadeAnimation;
 
 SpriteAnimation
-CreateSpriteAnimation(int totalFrames, int verticalFrames, int horizontalFrames, int frameSpeed, int sheetWidth, int sheetHeight);
+CreateSpriteAnimation(unsigned int totalFrames,
+        unsigned int verticalFrames,
+        unsigned int horizontalFrames,
+        unsigned int frameSpeed,
+        int sheetWidth, int sheetHeight);
 
 SpriteAnimation
-CreateSpriteAnimationWithPause(int totalFrames, int verticalFrames, int horizontalFrames, int frameSpeed, int sheetWidth, int sheetHeight, int pauseFrame, int pauseFrameDuration);
+CreateSpriteAnimationWithPause(unsigned int totalFrames,
+        unsigned int verticalFrames,
+        unsigned int horizontalFrames,
+        unsigned int frameSpeed,
+        int sheetWidth, int sheetHeight,
+        unsigned int pauseFrame,
+        unsigned int pauseFrameDuration);
 
 void
 DrawAnimationFrame(Texture2D *spritesheet, SpriteAnimation *spriteAnimation, Vector2 *spritePosition, int gameFPS);
@@ -67,7 +77,7 @@ void
 DrawBlinkAnimation(void *spritesheet, AssetType assetType, BlinkAnimation *blinkAnimation, Vector2 *spritePosition, int gameFPS);
 
 BlinkAnimation
-CreateBlinkAnimation(int blinksPerSecond);
+CreateBlinkAnimation(unsigned int blinksPerSecond);
 
 FadeAnimation
 CreateFadeAnimation(unsigned int frameRenderDurationSeconds, unsigned int fadeInDurationFrames, unsigned int fadeOutDurationFrames);

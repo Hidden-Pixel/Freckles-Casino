@@ -11,16 +11,16 @@
 #include <assert.h>
 #include <FC/ai-behavior.h>
 
-void
-Init_Input_State(Game_Input_State *game_input_state)
+using namespace freckles;
+
+void Init_Input_State(Game_Input_State *game_input_state)
 {
     game_input_state->hold_cursor_index = 0;
     game_input_state->hold_cursor_index_max = 5;
     zero_array(game_input_state->hold_cursor_selects);
 }
 
-void
-ProcessInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_state, Game_Input_State *game_input_state)
+void ProcessInput(poker::Game* game_poker_state, Game_Scene_State* game_scene_state, Game_Input_State* game_input_state)
 {
     switch (game_scene_state->current_scene)
     {
@@ -36,17 +36,16 @@ ProcessInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_state, G
     }
 }
 
-void
-ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_state, Game_Input_State *game_input_state)
+void ProcessGamePlayInput(poker::Game* game_poker_state, Game_Scene_State* game_scene_state, Game_Input_State* game_input_state)
 {
     if (IsKeyPressed(KEY_SPACE) &&
-        game_poker_state->poker_state == PokerState_NotStarted)
+        game_poker_state->poker_state == poker::PokerState::NotStarted)
     {
-        game_poker_state->poker_state = PokerState_Started;
+        game_poker_state->poker_state = poker::PokerState::Started;
     }
-    if (game_poker_state->poker_state >= PokerState_PlayerCardsDealt)
+    if (game_poker_state->poker_state >= poker::PokerState::PlayerCardsDealt)
     {
-        if (game_poker_state->poker_state == PokerState_SelectHolds)
+        if (game_poker_state->poker_state == poker::PokerState::SelectHolds)
         {
             if (IsKeyPressed(KEY_RIGHT))
             {
@@ -75,51 +74,51 @@ ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_
                     game_input_state->hold_cursor_selects[game_input_state->hold_cursor_index] = CURSOR_SELECTED;
                 }
 
-                assert(Command_OnCardHoldPressed);
-                Command_OnCardHoldPressed(game_poker_state->player_hand,
-                                     game_input_state->hold_cursor_index,
+                assert(game_poker_state->on_cardhold_pressed);
+                game_poker_state->on_cardhold_pressed(game_poker_state->player_hand[game_input_state->hold_cursor_index],                                     ,
                                      game_input_state->hold_cursor_selects[game_input_state->hold_cursor_index]);
 
             }
             // TODO(Alex): No idea if this makes sense for moving on. "Are you sure?" might be appropriate here.
             if (IsKeyPressed(KEY_SPACE))
             {
-                assert(Command_OnCardHoldComplete);
+                assert(game_poker_state->on_cardhold_pressed);
                 AI_FiveCardDraw_MakeHoldDecision(game_poker_state->dealer_hand);
-                Command_OnCardHoldComplete(game_poker_state->dealer_hand, CardState_Hidden, 5);
-                Command_OnCardHoldComplete(game_poker_state->player_hand, CardState_Shown, 5);
-                game_poker_state->dealer_hand_type = Poker_FindBestHand(game_poker_state->dealer_hand, 5);
-                game_poker_state->player_hand_type = Poker_FindBestHand(game_poker_state->player_hand, 5);
+                game_poker_state->on_cardhold_complete(game_poker_state->dealer_hand, poker::CardState::Hidden);
+                game_poker_state->on_cardhold_complete(game_poker_state->player_hand, poker::CardState::Shown);
+                game_poker_state->dealer_hand_type = poker::find_best_hand(game_poker_state->dealer_hand);
+                game_poker_state->player_hand_type = poker::find_best_hand(game_poker_state->player_hand);
                 game_input_state->hold_cursor_selects[0] = CURSOR_NONE;
                 game_input_state->hold_cursor_selects[1] = CURSOR_NONE;
                 game_input_state->hold_cursor_selects[2] = CURSOR_NONE;
                 game_input_state->hold_cursor_selects[3] = CURSOR_NONE;
                 game_input_state->hold_cursor_selects[4] = CURSOR_NONE;
-                game_poker_state->poker_state = PokerState_ExchangeCards;
+                game_poker_state->poker_state = poker::PokerState::ExchangeCards;
             }
         }
-        if (game_poker_state->poker_state == PokerState_ExchangeCards) {
+        if (game_poker_state->poker_state == poker::PokerState::ExchangeCards) {
             if (IsKeyPressed(KEY_SPACE)) {
-                Poker_RevealHand(game_poker_state->dealer_hand, 5);
-                game_poker_state->poker_state = PokerState_GameOver;
-                Command_OnGameOver(game_poker_state->player_hand_type,
+                poker::reveal_hand(game_poker_state->dealer_hand, 5);
+                game_poker_state->poker_state = poker::PokerState::GameOver;
+                game_poker_state->on_game_over(game_poker_state->player_hand_type,
                         game_poker_state->dealer_hand_type);
             }
         }
 
-        if (game_poker_state->poker_state == PokerState_GameOver) {
+        if (game_poker_state->poker_state == poker::PokerState::GameOver) {
             if (IsKeyPressed(KEY_N)) {
-                Poker_StartNewRound(game_poker_state);
+                poker::start_new_round(*game_poker_state);
             }
         }
     }
-    Poker_ProcessState(game_poker_state);
+    
+    game_poker_state->on_state_change(*game_poker_state);
 }
 
 void
 ProcessTitleScreenInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_state, Game_Input_State *game_input_state)
 {
-    local_persist bool confirmPressed = false;
+    static bool confirmPressed = false;
     if (IsKeyPressed(KEY_S) && confirmPressed == true)
     {
         confirmPressed = false;

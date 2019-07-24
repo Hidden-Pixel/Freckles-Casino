@@ -5,27 +5,23 @@ get_property(BUILD_AS_LIB GLOBAL PROPERTY RUN_TESTS)
 
 if (BUILD_AS_LIB)
     add_library(Freckles_Casino STATIC "")
-    set_source_files_properties(src/poker.c src/game-screen.c src/buffer.c PROPERTIES LANGUAGE CXX)
-    target_compile_features(Freckles_Casino PUBLIC cxx_std_11)
+    set_source_files_properties(src/poker.cpp src/game-screen.cpp src/buffer.cpp PROPERTIES LANGUAGE CXX)
+    target_compile_features(Freckles_Casino PUBLIC cxx_std_14)
 else()
     add_executable(Freckles_Casino "")
-    target_compile_features(Freckles_Casino PUBLIC c_std_11)
+    target_compile_features(Freckles_Casino PUBLIC cxx_std_14)
 endif()
 
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
     target_compile_definitions(Freckles_Casino PUBLIC DEBUG)
 ENDIF(CMAKE_BUILD_TYPE MATCHES "Debug")
 
-if (WIN32)
-    add_library(raylib STATIC IMPORTED)
+add_subdirectory(src/external/raylib)
 
+if (WIN32)
     if(MINGW)
         find_package(OpenAL REQUIRED)
         find_package(glfw3 REQUIRED)
-        set_target_properties(raylib PROPERTIES
-                IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/src/libs/win32/mingw32/libraylib_static.a"
-                INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/src/libs/raylib")
-
         target_compile_definitions(Freckles_Casino PRIVATE _DEFAULT_SOURCE USE_GLFW=3)
         target_link_libraries(Freckles_Casino raylib glfw OpenAL)
     elseif(MSVC)
@@ -38,9 +34,6 @@ if (WIN32)
         set_target_properties(OpenAL PROPERTIES
                 IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/src/libs/win32/msvc/OpenAL32.dll"
                 INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/src/include/AL")
-        set_target_properties(raylib PROPERTIES
-                IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/src/libs/win32/msvc/raylib.lib"
-                INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/src/libs/raylib")
         target_link_libraries(Freckles_Casino glfw raylib OpenAL)
     endif()
 elseif(APPLE)
@@ -61,15 +54,15 @@ add_custom_command(
         ${CMAKE_CURRENT_BINARY_DIR}/assets)
 
 target_sources(Freckles_Casino PRIVATE
-        src/buffer.c
-        src/game-screen.c
-        src/main.c
-        src/poker.c
-        src/scene.c
-        src/sound.c
-        src/sprite-animation.c
-        src/input.c
-        src/commands.c
-        src/ai-behavior.c
+        src/buffer.cpp
+        src/game-screen.cpp
+        src/main.cpp
+        src/poker.cpp
+        src/scene.cpp
+        src/sound.cpp
+        src/sprite-animation.cpp
+        src/input.cpp
+        src/commands.cpp
+        src/ai-behavior.cpp
         )
 target_include_directories(Freckles_Casino PUBLIC src/include)

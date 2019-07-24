@@ -1,196 +1,158 @@
 #pragma once
 
 #include <FC/defines.h>
+#include <vector>
 
-#define CardFace_Count 13
-#define CardSuit_Count  4
-#define PokerHand_Count 10
+namespace freckles {
+    namespace poker {
 
-extern const char* CardSuit_Names[CardSuit_Count];
-extern const char* CardFace_ShortNames[CardFace_Count];
-extern const char* CardFace_FullNames[CardFace_Count];
-extern const char* Hand_Names[PokerHand_Count];
+        const int CardFaceCount = 13;
+        const int CardSuitCount = 4;
+        const int PossibleHandCount = 10;
 
-typedef enum _poker_CardSuit
-{
-    CardSuit_None       =  -1,
-    CardSuit_Club       =  0,
-    CardSuit_Diamond    =  1,
-    CardSuit_Heart      =  2,
-    CardSuit_Spade      =  3,
-} Poker_CardSuit;
+        extern const char* CardSuit_Names[CardSuitCount];
+        extern const char* CardFace_ShortNames[CardFaceCount];
+        extern const char* CardFace_FullNames[CardFaceCount];
+        extern const char* Hand_Names[PossibleHandCount];
 
-typedef enum poker_CardFace
-{
-    CardFace_None   =  -1,
-    CardFace_Two    =  0,
-    CardFace_Three  =  1,
-    CardFace_Four   =  2,
-    CardFace_Five   =  3,
-    CardFace_Six    =  4,
-    CardFace_Seven  =  5,
-    CardFace_Eight  =  6,
-    CardFace_Nine   =  7,
-    CardFace_Ten    =  8,
-    CardFace_Jack   =  9,
-    CardFace_Queen  =  10,
-    CardFace_King   =  11,
-    CardFace_Ace    =  12,
-} Poker_CardFace;
+        enum class CardSuit {
+            None = -1,
+            Club = 0,
+            Diamond = 1,
+            Heart = 2,
+            Spade = 3,
+        };
 
+        enum class CardFace {
+            None = -1,
+            Two = 0,
+            Three = 1,
+            Four = 2,
+            Five = 3,
+            Six = 4,
+            Seven = 5,
+            Eight = 6,
+            Nine = 7,
+            Ten = 8,
+            Jack = 9,
+            Queen = 10,
+            King = 11,
+            Ace = 12,
+        };
 
+        enum class GameType {
+            None = 0,
+            FiveCard = 1,
+            Holdem = 2,
+        };
 
-typedef enum poker_GameType
-{
-    GameType_None       = 0,
-    GameType_FiveCard   = 1,
-    GameType_Holdem     = 2,
-} Poker_GameType;
+        enum class CardState {
+            None = 0,
+            Hidden = 1,
+            Shown = 2,
+        };
 
-typedef enum _poker_CardState
-{
-    CardState_None      = 0,
-    CardState_Hidden    = 1,
-    CardState_Shown     = 2,
-} Poker_CardState;
+        enum class PokerState {
+            NotStarted = 0,
+            Started = 1,
+            Shuffled = 2,
+            PlayerCardsDealt = 3,
+            FlopCardsDealt = 4,
+            RiverCardsDealt = 5,
+            TurnCardsDealt = 6,
+            SelectHolds = 7,
+            Betting = 8,
+            GameOver = 9,
+            ExchangeCards = 10,
+        };
 
-typedef enum _poker_GameState
-{
-    PokerState_NotStarted       = 0,
-    PokerState_Started          = 1,
-    PokerState_Shuffled         = 2,
-    PokerState_PlayerCardsDealt = 3,
-    PokerState_FlopCardsDealt   = 4,
-    PokerState_RiverCardsDealt  = 5,
-    PokerState_TurnCardsDealt   = 6,
-    PokerState_SelectHolds      = 7,
-    PokerState_Betting          = 8,
-    PokerState_GameOver         = 9,
-    PokerState_ExchangeCards    = 10,
-} Poker_GameState;
+        enum class HandResult {
+            None = -1,
+            HighCard = 0,
+            Pair = 1,
+            TwoPair = 2,
+            ThreeOfAKind = 3,
+            Straight = 4,
+            Flush = 5,
+            FullHouse = 6,
+            FourOfAKind = 7,
+            StraightFlush = 8,
+            RoyalFlush = 9
+        };
 
-typedef enum _poker_Hand
-{
-    PokerHand_None          = -1,
-    PokerHand_HighCard      =  0,
-    PokerHand_Pair          =  1,
-    PokerHand_TwoPair       =  2,
-    PokerHand_ThreeOfAKind  =  3,
-    PokerHand_Straight      =  4,
-    PokerHand_Flush         =  5,
-    PokerHand_FullHouse     =  6,
-    PokerHand_FourOfAKind   =  7,
-    PokerHand_StraightFlush =  8,
-    PokerHand_RoyalFlush    =  9
-} Poker_Hand;
+        enum class CardHoldState {
+            NotHeld = 0,
+            Held = 2
+        };
 
-typedef enum _poker_CardHoldState
-{
-    HoldState_NotHeld = 0,
-    HoldState_Held = 2
-} Poker_CardHoldState;
+        struct Card {
+            Card(CardSuit suit = CardSuit::None,
+                    CardFace face_value = CardFace::None,
+                    CardState state = CardState::None,
+                    CardHoldState hold_state = CardHoldState::NotHeld)
+                    : suit(suit),
+                        face_value(face_value),
+                        state(state),
+                        hold(hold_state) {
+            }
 
-typedef struct _poker_Card
-{
-    Poker_CardSuit  suit;
-    Poker_CardFace  face_value;
-    Poker_CardState state;
-    unsigned char   hold;
-} Poker_Card;
+            CardSuit suit;
+            CardFace face_value;
+            CardState state;
+            CardHoldState hold;
+        };
 
-// Performance Note: This is probably not well-aligned
-// The cards could be pointers if it's ever a problem.
-typedef struct _poker_RankedHand_5
-{
-    Poker_Hand hand_type;
-    int card_counts[CardFace_Count];
-    // 0 is the highest ranked card.
-    Poker_Card ranked_cards[5];
-} Poker_RankedHand_5;
+        struct RankedHand {
+            HandResult hand_type;
+            std::vector<int> card_counts;
+            // 0 is the highest ranked card.
+            std::vector<Card> ranked_cards;
+        };
 
-typedef struct _poker_Game
-{
-    Poker_GameState poker_state;
-    Poker_GameType  poker_type;
-    Poker_Card      player_hand[5];
-    Poker_Card      dealer_hand[5];
-    Poker_Card      house_hand[5];
-    Poker_Hand      player_hand_type;
-    Poker_Hand      dealer_hand_type;
-    int             betting_round;
-    int             chances_left;
-    int             player_score;
-    int             dealer_score;
-} Poker_Game;
+        struct Game {
+            PokerState poker_state;
+            GameType poker_type;
+            std::vector<Card> player_hand;
+            std::vector<Card> dealer_hand;
+            HandResult player_hand_type;
+            HandResult dealer_hand_type;
+            int betting_round;
+            int chances_left;
+            int player_score;
+            int dealer_score;
 
-void
-Poker_Init(Poker_Game *game_state, Poker_GameType game_type);
+            std::function<void(Card& /* card */, CardHoldState /* cursor_state */)> on_cardhold_pressed;
+            std::function<void(std::vector<Card>& /* card_hand */, CardState /* card_visibility */)> on_cardhold_complete;
+            std::function<void(HandResult /* dealer_hand */, HandResult /* player_hand */)> on_game_over;
+            std::function<void(Game& /* game_state */)> on_state_change;
+        };
 
-internal inline void
-Poker_Init_FiveCard(Poker_Game *game_state);
+        void start_five_card_draw(Game& game_state);
 
-internal inline void
-Poker_Init_Holdem(Poker_Game *game_state);
+        void start_texas_holdem(Game& game_state);
 
-Poker_Hand
-Poker_FindAllHands(Poker_Card *player_hand, Poker_Card *house_cards, int house_card_count);
+        void start_new_round(Game& game_state);
 
-Poker_Card
-Poker_DrawOne(Poker_CardState state);
+        void process_game_state(Game& game_state);
 
-internal void
-Poker_Shuffle(Poker_Game *game_state);
+        void update(Game& game_state);
 
-internal void
-Poker_DealCards(Poker_Game *game_state);
+        HandResult find_all_hand_results(std::vector<Card> player_hand, std::vector<Card> house_cards,
+                int house_card_count);
 
-void
-Poker_RevealHand(Poker_Card* hand, int hand_size);
+        void deal(Game& game_state, int hand_size);
 
-void
-Poker_StartNewRound(Poker_Game *game_state);
+        Card draw_one(CardState state);
 
-void
-Poker_ProcessState(Poker_Game* game_state);
+        void shuffle_deck(std::vector<Card>& deck);
 
-internal void
-Poker_ProcessFiveCardState(Poker_Game *game_state);
+        void reveal_hand(std::vector<Card>& hand);
 
-internal void
-Poker_ProcessHoldemState(Poker_Game *game_state);
+        void cache_possible_hands();
 
-void
-Poker_Update(Poker_Game* game_state);
+        HandResult find_best_hand(const std::vector<Card>& player_hand);
 
-/* Linked list */
-struct node 
-{
-  Poker_Card value;
-  struct node* next;
-};
+        int rank_card(const Card& card);
 
-typedef struct node Poker_LinkedListNode;
-
-typedef struct 
-{
-    Poker_LinkedListNode* first;
-    Poker_LinkedListNode* last;
-} Poker_CardList;
-
-int
-Poker_CardRank(Poker_Card card);
-
-void
-Poker_CacheHands();
-
-Poker_CardList*
-Poker_CreateCardList(Poker_Card first_card);
-
-void
-Poker_AddCardToList(Poker_CardList* card_list, Poker_Card card);
-
-void
-Poker_DestroyCardList(Poker_CardList* card_list);
-
-Poker_Hand
-Poker_FindBestHand(Poker_Card* player_hand, int hand_size);
+    } // namespace poker
+} // namespace freckles

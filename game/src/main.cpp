@@ -123,7 +123,7 @@ const char* CreditsText = "CREDITS";
 const char* JackpotText = "JACKPOT";
 const char* BetText     = "BET";
 
-void GameInit(poker::Game* game_state, Game_Scene_State* game_scene_state, Game_Input_State* game_input_state);
+void GameInit(poker::Game* game_state, Game_Scene_State* game_scene_state);
 
 void LoadTextures();
 
@@ -147,13 +147,13 @@ void DrawHorizontalCardArea(Texture2D texture, Vector2 area, int card_count, flo
 
 void DrawFaceCard(poker::Card card, int x, int y);
 
-void RenderScene(poker::Game* game_state, Game_Input_State* game_input_state, Game_Scene_State* game_scene_state);
+void RenderScene(poker::Game* game_state, Game_Scene_State* game_scene_state);
 
 void RenderLogoScreen(Game_Scene_State* game_scene_state);
 
 void RenderTitleScreen();
 
-void RenderGame(poker::Game* game_state, Game_Input_State *game_input_state);
+void RenderGame(poker::Game* game_state);
 
 void DrawFaceCard(poker::Card card, int x, int y);
 
@@ -190,16 +190,15 @@ int main(void)
 {
     static poker::Game game_state;
     static Game_Scene_State game_scene_state;
-    static Game_Input_State game_input_state;
-    GameInit(&game_state, &game_scene_state, &game_input_state);
+    GameInit(&game_state, &game_scene_state);
     if (IsWindowReady())
     {
         PlaySounds();
         while (GlobalRunning)
         {
             UpdateSounds();
-            ProcessInput(&game_state, &game_scene_state, &game_input_state);
-            RenderScene(&game_state, &game_input_state, &game_scene_state);
+            freckles::input::update(&game_state, &game_scene_state);
+            RenderScene(&game_state, &game_scene_state);
             if (WindowShouldClose())
             {
                 GlobalRunning = 0;
@@ -210,9 +209,8 @@ int main(void)
     return 0;
 }
 
-void GameInit(poker::Game* game_state, Game_Scene_State* game_scene_state, Game_Input_State* game_input_state)
+void GameInit(poker::Game* game_state, Game_Scene_State* game_scene_state)
 {
-    Init_Input_State(game_input_state);
     GameScreen_Init(GlobalWindowWidth, GlobalWindowHeight, GameWidth, GameHeight);
     // TODO(nick): create a main menu that allows user to pick game type
     poker::start_five_card_draw(*game_state);
@@ -741,7 +739,7 @@ void RenderTitleScreen()
 }
 
 // TODO(nick): possible start storing hold states in game state instead of game input state
-void RenderGame(poker::Game* game_state, Game_Input_State *game_input_state)
+void RenderGame(poker::Game* game_state, GameInputState *game_input_state)
 {
     BeginDrawing();
     {
@@ -840,7 +838,7 @@ void RenderGame(poker::Game* game_state, Game_Input_State *game_input_state)
     GlobalFrameCount++;
 }
 
-void RenderScene(poker::Game* game_state, Game_Input_State* game_input_state, Game_Scene_State* game_scene_state)
+void RenderScene(poker::Game* game_state, GameInputState* game_input_state, Game_Scene_State* game_scene_state)
 {
     switch (game_scene_state->current_scene)
     {

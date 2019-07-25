@@ -121,11 +121,13 @@ namespace freckles {
             int player_score;
             int dealer_score;
 
-            std::function<void(Card& /* card */, CardHoldState /* cursor_state */)> on_cardhold_pressed;
+            std::function<void(Card& /* card */)> on_cardhold_pressed;
             std::function<void(std::vector<Card>& /* card_hand */, CardState /* card_visibility */)> on_cardhold_complete;
             std::function<void(HandResult /* dealer_hand */, HandResult /* player_hand */)> on_game_over;
-            std::function<void(Game& /* game_state */)> on_state_change;
+            std::function<void(PokerState /* old_state */, PokerState /* new_state */)> on_state_change;
         };
+
+        void change_poker_state(Game& game, PokerState new_state);
 
         void start_five_card_draw(Game& game_state);
 
@@ -153,6 +155,8 @@ namespace freckles {
         HandResult find_best_hand(const std::vector<Card>& player_hand);
 
         int rank_card(const Card& card);
+
+        void hold_card(Game& game_state, Card& card_to_hold);
 
     } // namespace poker
 } // namespace freckles

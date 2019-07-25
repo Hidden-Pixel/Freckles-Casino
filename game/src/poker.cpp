@@ -74,11 +74,6 @@ void freckles::poker::cache_possible_hands()
     Straights[StraightHands-1] = fiveHighStraight;
 }
 
-void hold_cards(std::vector<poker::Card>& card_hand, poker::CardState card_visibility)
-{
-
-}
-
 void freckles::poker::start_five_card_draw(freckles::poker::Game& game_state){
     for (int i = 0; i < DeckSize; ++i)
     {
@@ -338,4 +333,16 @@ void freckles::poker::update(freckles::poker::Game& game_state) {
 
         } break;
     }
+}
+
+void poker::change_poker_state(poker::Game& game, poker::PokerState new_state)
+{
+    auto old_state = game.poker_state;
+    game.poker_state = new_state;
+    game.on_state_change(old_state, new_state);
+}
+
+void poker::hold_card(poker::Game& game_state, poker::Card& card_to_hold)
+{
+    game_state.on_cardhold_pressed(card_to_hold);
 }

@@ -9,13 +9,13 @@
 
 #define SOUND_BUFFER_MAX 10
 
-internal unsigned int SoundBufferSize = 0;
-internal Music *SoundBuffer[SOUND_BUFFER_MAX];
-internal SoundMeta *SoundMetaBuffer[SOUND_BUFFER_MAX];
-internal float DefaultVolumeLevel = 0.5f;
+unsigned int SoundBufferSize = 0;
+Music* SoundBuffer[SOUND_BUFFER_MAX];
+SoundMeta* SoundMetaBuffer[SOUND_BUFFER_MAX];
+float DefaultVolumeLevel = 0.5f;
 
 void
-InitializeSoundMeta(Music *soundArray, SoundMeta *soundMetaArray, int length)
+InitializeSoundMeta(Music* soundArray, SoundMeta* soundMetaArray, int length)
 {
     for (int i = 0; i < length; i++)
     {
@@ -27,7 +27,7 @@ InitializeSoundMeta(Music *soundArray, SoundMeta *soundMetaArray, int length)
 }
 
 SoundMeta
-CreateSoundMeta(Music *sound, float volume)
+CreateSoundMeta(Music*sound, float volume)
 {
     SoundMeta s = (SoundMeta)
     {
@@ -42,7 +42,7 @@ CreateSoundMeta(Music *sound, float volume)
 }
 
 void
-UpdateSoundMeta(Music *sound, SoundMeta *soundMeta)
+UpdateSoundMeta(Music* sound, SoundMeta* soundMeta)
 {
     float currentPlayTime = GetMusicTimePlayed(*sound);
     float deltaPlayTime = currentPlayTime - soundMeta->lastPlayTime;
@@ -56,7 +56,7 @@ UpdateSoundMeta(Music *sound, SoundMeta *soundMeta)
 
 // TODO(nick): handle overflow of add request by removing
 void
-AddSoundToBuffer(Music *sound, SoundMeta *soundMeta)
+AddSoundToBuffer(Music* sound, SoundMeta* soundMeta)
 {
     SoundBuffer[SoundBufferSize] = sound;
     SoundMetaBuffer[SoundBufferSize] = soundMeta;

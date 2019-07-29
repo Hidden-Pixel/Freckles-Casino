@@ -172,16 +172,19 @@ void ExitGame();
 // TODO(Alex): Pass MessageBuffer to PokerInit
 void FiveCard_OnGameOver(poker::HandResult player_hand, poker::HandResult dealer_hand)
 {
-    if (player_hand > dealer_hand) {
+    auto dealerHandValue = static_cast<int>(dealer_hand);
+    auto playerHandValue = static_cast<int>(player_hand);
+
+    if (playerHandValue > dealerHandValue) {
         sprintf(MessageBuffer, "Freckle's Hand: %s, Your Hand: %s - You Win!",
-                poker::Hand_Names[dealer_hand], poker::Hand_Names[player_hand]);
-    } else if (player_hand < dealer_hand) {
+                poker::Hand_Names[dealerHandValue], poker::Hand_Names[playerHandValue]);
+    } else if (playerHandValue < dealerHandValue) {
         sprintf(MessageBuffer, "Freckle's Hand: %s, Your Hand: %s - You Lose.",
-                poker::Hand_Names[dealer_hand], poker::Hand_Names[player_hand]);
+                poker::Hand_Names[dealerHandValue], poker::Hand_Names[playerHandValue]);
     } else {
         // TODO(Alex): Check other cards in the hand.
         sprintf(MessageBuffer, "Freckle's Hand: %s, Your Hand: %s - Tie!",
-                poker::Hand_Names[dealer_hand], poker::Hand_Names[player_hand]);
+                poker::Hand_Names[dealerHandValue], poker::Hand_Names[playerHandValue]);
     }
 
 }
@@ -197,7 +200,7 @@ int main(void)
         while (GlobalRunning)
         {
             UpdateSounds();
-            freckles::input::update(&game_state, &game_scene_state);
+            freckles::input::update(game_state, &game_scene_state);
             RenderScene(&game_state, &game_scene_state);
             if (WindowShouldClose())
             {
@@ -231,11 +234,7 @@ void LoadCardTexture(char *filePath, Texture2D *texture)
 {
     float cardScale = 2.0f;
     float vectorScale = 2.5f;
-    Vector2 image_vector =
-    { 
-        .x = 0.0f,
-        .y = 0.0f,
-    };
+    Vector2 image_vector { 0.0f, 0.0f};
     Image tempImage = LoadImage(filePath);
     image_vector.x = tempImage.width * cardScale;
     image_vector.y = tempImage.height * cardScale;
@@ -739,7 +738,7 @@ void RenderTitleScreen()
 }
 
 // TODO(nick): possible start storing hold states in game state instead of game input state
-void RenderGame(poker::Game* game_state, GameInputState *game_input_state)
+void RenderGame(poker::Game* game_state)
 {
     BeginDrawing();
     {
@@ -760,14 +759,14 @@ void RenderGame(poker::Game* game_state, GameInputState *game_input_state)
         }
         if (CurrentHoldCursorIndex >= 0) 
         {
-            for (unsigned int i = 0; i < len(game_input_state->hold_cursor_selects); i++)
+            for (unsigned int i = 0; i < game_state->player_hand.size(); i++)
             {
                 // NOTE: always draw the current icon as blinking
-                if (i == game_input_state->hold_cursor_index)
+                if (game_state->player_hand[i].selected)
                 {
                     DrawBlinkAnimation(&HoldCursorTexture, AssetType_Texture2D, &CurrentHoldCursorBlinkAnimation, &HoldCursorPositions[i], GlobalTargetFPS);
                 }
-                else if (game_input_state->hold_cursor_selects[i] == CURSOR_SELECTED)
+                else if (game_state->player_hand[i].hold == poker::CardHoldState::Held)
                 {
                     DrawTexture(HoldCursorTexture, HoldCursorPositions[i].x, HoldCursorPositions[i].y, WHITE);
                 }
@@ -820,16 +819,16 @@ void RenderGame(poker::Game* game_state, GameInputState *game_input_state)
             Vector2 vec = {.x = 50, .y = 50};
             char buf[50];
             sprintf(buf, "Freckle's Hand: %s%s %s%s %s%s %s%s %s%s",
-                    poker::CardFace_ShortNames[game_state->dealer_hand[0].face_value],
-                    poker::CardSuit_Names[game_state->dealer_hand[0].suit],
-                    poker::CardFace_ShortNames[game_state->dealer_hand[1].face_value],
-                    poker::CardSuit_Names[game_state->dealer_hand[1].suit],
-                    poker::CardFace_ShortNames[game_state->dealer_hand[2].face_value],
-                    poker::CardSuit_Names[game_state->dealer_hand[2].suit],
-                    poker::CardFace_ShortNames[game_state->dealer_hand[3].face_value],
-                    poker::CardSuit_Names[game_state->dealer_hand[3].suit],
-                    poker::CardFace_ShortNames[game_state->dealer_hand[4].face_value],
-                    poker::CardSuit_Names[game_state->dealer_hand[4].suit]);
+                    poker::CardFace_ShortNames[static_cast<int>(game_state->dealer_hand[0].face_value)],
+                    poker::CardSuit_Names[static_cast<int>(game_state->dealer_hand[0].suit)],
+                    poker::CardFace_ShortNames[static_cast<int>(game_state->dealer_hand[1].face_value)],
+                    poker::CardSuit_Names[static_cast<int>(game_state->dealer_hand[1].suit)],
+                    poker::CardFace_ShortNames[static_cast<int>(game_state->dealer_hand[2].face_value)],
+                    poker::CardSuit_Names[static_cast<int>(game_state->dealer_hand[2].suit)],
+                    poker::CardFace_ShortNames[static_cast<int>(game_state->dealer_hand[3].face_value)],
+                    poker::CardSuit_Names[static_cast<int>(game_state->dealer_hand[3].suit)],
+                    poker::CardFace_ShortNames[static_cast<int>(game_state->dealer_hand[4].face_value)],
+                    poker::CardSuit_Names[static_cast<int>(game_state->dealer_hand[4].suit)]);
             DrawTextEx(GameFont, buf, vec, 16.f, 0.f, BLACK);
         }
 #endif
@@ -838,7 +837,7 @@ void RenderGame(poker::Game* game_state, GameInputState *game_input_state)
     GlobalFrameCount++;
 }
 
-void RenderScene(poker::Game* game_state, GameInputState* game_input_state, Game_Scene_State* game_scene_state)
+void RenderScene(poker::Game* game_state, Game_Scene_State* game_scene_state)
 {
     switch (game_scene_state->current_scene)
     {
@@ -854,7 +853,7 @@ void RenderScene(poker::Game* game_state, GameInputState* game_input_state, Game
 
         case Scene_MainPokerTable:
         {
-            RenderGame(game_state, game_input_state);
+            RenderGame(game_state);
         } break;
     }
 }

@@ -62,7 +62,6 @@ target_sources(Freckles_Casino PRIVATE
         src/sound.cpp
         src/sprite-animation.cpp
         src/input.cpp
-        src/commands.cpp
         src/ai-behavior.cpp
         )
 target_include_directories(Freckles_Casino PUBLIC src/include)

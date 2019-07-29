@@ -13,15 +13,15 @@ using namespace freckles;
 const int DeckSize = 52;
 const int MaxHandCombos = 22;
 const int MaxHolds = 5;
-const int DefaultAnte = 25
+const int DefaultAnte = 25;
 const int StraightHands = 10;
 
-const char* CardSuit_Names[poker::CardSuitCount] =
+const char* poker::CardSuit_Names[poker::CardSuitCount] =
         {
                 "C", "D", "H", "S"
         };
 
-const char* CardFace_ShortNames[poker::CardFaceCount] =
+const char* poker::CardFace_ShortNames[poker::CardFaceCount] =
         {
                 "2", "3", "4", "5",
                 "6", "7", "8", "9",
@@ -29,7 +29,7 @@ const char* CardFace_ShortNames[poker::CardFaceCount] =
                 "A"
         };
 
-const char* CardFace_FullNames[poker::CardFaceCount] =
+const char* poker::CardFace_FullNames[poker::CardFaceCount] =
         {
                 "Two", "Three", "Four", "Five",
                 "Six", "Seven", "Eight", "Nine",
@@ -37,7 +37,7 @@ const char* CardFace_FullNames[poker::CardFaceCount] =
                 "Ace"
         };
 
-const char* Hand_Names[poker::PossibleHandCount] =
+const char* poker::Hand_Names[poker::PossibleHandCount] =
         {
                 "High Card",
                 "Pair",
@@ -102,15 +102,23 @@ void freckles::poker::start_five_card_draw(freckles::poker::Game& game_state){
 
     srand(time(NULL));
     poker::cache_possible_hands();
-    game_state.on_cardhold_pressed = [](poker::Card& card, poker::CardHoldState state) -> {
-        card.hold = state;
+    game_state.on_cardhold_pressed = [](poker::Card& card) -> auto {
+        if (card.hold == poker::CardHoldState::NotHeld) {
+            card.hold = poker::CardHoldState::Held;
+        } else {
+            card.hold = poker::CardHoldState::NotHeld;
+        }
     };
-    game_state.on_cardhold_complete = [](std::vector<poker::Card>& card_hand, poker::CardState card_visibility) -> {
+    game_state.on_cardhold_complete = [](std::vector<poker::Card>& card_hand, poker::CardState card_visibility) -> auto {
         for (auto& card : card_hand) {
             if (card.hold == poker::CardHoldState::NotHeld) {
                 card = poker::draw_one(card_visibility);
             }
         }
+    };
+    game_state.on_cursor_change = [](poker::Card& last_selection, poker::Card& new_selection) -> auto {
+        last_selection.selected = false;
+        new_selection.selected = true;
     };
 }
 
@@ -135,7 +143,7 @@ freckles::poker::start_texas_holdem(freckles::poker::Game& game_state){
 }
 
 int freckles::poker::rank_card(const freckles::poker::Card& card){
-    return card.suit * 13 + card.face_value;
+    return static_cast<int>(card.suit) * 13 + static_cast<int>(card.face_value);
 }
 
 poker::HandResult freckles::poker::find_best_hand(const std::vector<freckles::poker::Card>& player_hand) {
@@ -145,8 +153,8 @@ poker::HandResult freckles::poker::find_best_hand(const std::vector<freckles::po
     int hand_bits = 0;
 
     for (int i = 0; i < player_hand.size(); ++i) {
-        card_counts[player_hand[i].face_value] += 1;
-        suit_counts[player_hand[i].suit] += 1;
+        card_counts[static_cast<int>(player_hand[i].face_value)] += 1;
+        suit_counts[static_cast<int>(player_hand[i].suit)] += 1;
         // 13 bit flags for cards in hand.
         // 0 0000 0001 1111 would be a low straight.
         hand_bits |= (1u << static_cast<unsigned>(player_hand[i].face_value));
@@ -276,9 +284,10 @@ void freckles::poker::reveal_hand(std::vector<freckles::poker::Card>& hand) {
 }
 
 void freckles::poker::start_new_round(freckles::poker::Game& game_state) {
-    game_state->poker_state = poker::PokerState::Started;
+    game_state.poker_state = poker::PokerState::Started;
     poker::shuffle_deck(DealersDeck);
-    poker::deal(game_state);
+    auto cardsToDeal = game_state.poker_type == poker::GameType::FiveCard ? 5 : 2;
+    poker::deal(game_state, cardsToDeal);
     game_state.betting_round = 0;
 }
 
@@ -287,7 +296,7 @@ void freckles::poker::update(freckles::poker::Game& game_state) {
     {
         case poker::PokerState::Started:
         {
-            if (game_state->player_score > DefaultAnte)
+            if (game_state.player_score > DefaultAnte)
             {
                 poker::start_new_round(game_state);
                 game_state.player_score -= DefaultAnte;

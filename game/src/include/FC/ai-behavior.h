@@ -2,9 +2,7 @@
 
 #include <FC/poker.h>
 
-Poker_RankedHand_5
-AI_FiveCardDraw_RankHand(const Poker_Card* hand);
+freckles::poker::RankedHand AI_FiveCardDraw_RankHand(const std::vector<freckles::poker::Card>& hand);
 
 // TODO(Alex): Is this easy difficulty?
-void
-AI_FiveCardDraw_MakeHoldDecision(Poker_Card* hand);
+void AI_FiveCardDraw_MakeHoldDecision(std::vector<freckles::poker::Card>& hand);

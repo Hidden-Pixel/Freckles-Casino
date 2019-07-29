@@ -15,7 +15,7 @@ using namespace freckles;
 
 static int card_cursor_index = 0;
 
-void ProcessGamePlayInput(poker::Game& game_poker_state, Game_Scene_State* game_scene_state, int max_index)
+void process_game_play_input(poker::Game& game_poker_state, Game_Scene_State* game_scene_state, int max_index)
 {
     if (IsKeyPressed(KEY_SPACE) &&
             game_poker_state.poker_state == poker::PokerState::NotStarted)
@@ -30,16 +30,20 @@ void ProcessGamePlayInput(poker::Game& game_poker_state, Game_Scene_State* game_
             {
                 if (card_cursor_index >= max_index)
                 {
+                    auto old_index = card_cursor_index;
                     card_cursor_index = 0;
+                    game_poker_state.on_cursor_change(game_poker_state.player_hand[old_index], game_poker_state.player_hand[card_cursor_index]);
                 }
             }
             if (IsKeyPressed(KEY_LEFT))
             {
+                auto old_index = card_cursor_index;
                 card_cursor_index--;
                 if (card_cursor_index < 0)
                 {
                     card_cursor_index = (max_index - 1);
                 }
+                game_poker_state.on_cursor_change(game_poker_state.player_hand[old_index], game_poker_state.player_hand[card_cursor_index]);
             }
             if (IsKeyPressed(KEY_H))
             {
@@ -49,7 +53,7 @@ void ProcessGamePlayInput(poker::Game& game_poker_state, Game_Scene_State* game_
             // TODO(Alex): No idea if this makes sense for moving on. "Are you sure?" might be appropriate here.
             if (IsKeyPressed(KEY_SPACE))
             {
-                assert(game_poker_state->on_cardhold_pressed);
+                assert(game_poker_state.on_cardhold_pressed);
                 AI_FiveCardDraw_MakeHoldDecision(game_poker_state.dealer_hand);
                 game_poker_state.on_cardhold_complete(game_poker_state.dealer_hand, poker::CardState::Hidden);
                 game_poker_state.on_cardhold_complete(game_poker_state.player_hand, poker::CardState::Shown);
@@ -67,7 +71,7 @@ void ProcessGamePlayInput(poker::Game& game_poker_state, Game_Scene_State* game_
             }
         }
 
-        if (game_poker_state->poker_state == poker::PokerState::GameOver) {
+        if (game_poker_state.poker_state == poker::PokerState::GameOver) {
             if (IsKeyPressed(KEY_N)) {
                 poker::start_new_round(game_poker_state);
             }
@@ -75,8 +79,7 @@ void ProcessGamePlayInput(poker::Game& game_poker_state, Game_Scene_State* game_
     }
 }
 
-void
-ProcessTitleScreenInput(poker::Game& game_poker_state, Game_Scene_State* game_scene_state)
+void process_title_screen_input(poker::Game& game_poker_state, Game_Scene_State* game_scene_state)
 {
     static bool confirmPressed = false;
     if (IsKeyPressed(KEY_S) && confirmPressed == true)
@@ -95,12 +98,12 @@ void freckles::input::update(poker::Game& game_poker_state, Game_Scene_State* ga
     {
         case Scene_MainPokerTable:
         {
-            ProcessGamePlayInput(game_poker_state, game_scene_state, 5);
+            process_game_play_input(game_poker_state, game_scene_state, 5);
         } break;
 
         case Scene_TitleScreen:
         {
-            ProcessTitleScreenInput(game_poker_state, game_scene_state);
+            process_title_screen_input(game_poker_state, game_scene_state);
         } break;
     }
 }

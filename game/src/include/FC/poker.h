@@ -93,13 +93,15 @@ namespace freckles {
                     : suit(suit),
                         face_value(face_value),
                         state(state),
-                        hold(hold_state) {
+                        hold(hold_state),
+                        selected(false) {
             }
 
             CardSuit suit;
             CardFace face_value;
             CardState state;
             CardHoldState hold;
+            bool selected;
         };
 
         struct RankedHand {
@@ -121,6 +123,7 @@ namespace freckles {
             int player_score;
             int dealer_score;
 
+            std::function<void(Card& /* old_card */, Card& /* new_card */)> on_cursor_change;
             std::function<void(Card& /* card */)> on_cardhold_pressed;
             std::function<void(std::vector<Card>& /* card_hand */, CardState /* card_visibility */)> on_cardhold_complete;
             std::function<void(HandResult /* dealer_hand */, HandResult /* player_hand */)> on_game_over;

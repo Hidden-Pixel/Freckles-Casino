@@ -120,10 +120,13 @@ void freckles::poker::start_five_card_draw(freckles::poker::Game& game_state){
         last_selection.selected = false;
         new_selection.selected = true;
     };
+
+    game_state.on_state_change = [&](auto old_state, auto new_state) -> auto {
+
+    };
 }
 
-void
-freckles::poker::start_texas_holdem(freckles::poker::Game& game_state){
+void freckles::poker::start_texas_holdem(freckles::poker::Game& game_state){
     game_state.player_hand.clear();
     game_state.dealer_hand.clear();
 

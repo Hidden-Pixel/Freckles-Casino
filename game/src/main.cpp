@@ -201,6 +201,7 @@ int main(void)
         {
             UpdateSounds();
             freckles::input::update(game_state, &game_scene_state);
+            freckles::poker::update(game_state);
             RenderScene(&game_state, &game_scene_state);
             if (WindowShouldClose())
             {

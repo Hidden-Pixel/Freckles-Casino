@@ -15,7 +15,7 @@ using namespace freckles;
 
 static int card_cursor_index = 0;
 
-void process_game_play_input(poker::Game& game_poker_state, Game_Scene_State* game_scene_state, int max_index)
+void process_game_play_input(poker::Game& game_poker_state, Game_Scene_State* game_scene_state)
 {
     if (IsKeyPressed(KEY_SPACE) &&
             game_poker_state.poker_state == poker::PokerState::NotStarted)
@@ -26,14 +26,17 @@ void process_game_play_input(poker::Game& game_poker_state, Game_Scene_State* ga
     {
         if (game_poker_state.poker_state == poker::PokerState::SelectHolds)
         {
+            auto max_index = game_poker_state.player_hand.size();
+
             if (IsKeyPressed(KEY_RIGHT))
             {
+                auto old_index = card_cursor_index;
+                card_cursor_index++;
                 if (card_cursor_index >= max_index)
                 {
-                    auto old_index = card_cursor_index;
                     card_cursor_index = 0;
-                    game_poker_state.on_cursor_change(game_poker_state.player_hand[old_index], game_poker_state.player_hand[card_cursor_index]);
                 }
+                game_poker_state.on_cursor_change(game_poker_state.player_hand[old_index], game_poker_state.player_hand[card_cursor_index]);
             }
             if (IsKeyPressed(KEY_LEFT))
             {
@@ -98,7 +101,7 @@ void freckles::input::update(poker::Game& game_poker_state, Game_Scene_State* ga
     {
         case Scene_MainPokerTable:
         {
-            process_game_play_input(game_poker_state, game_scene_state, 5);
+            process_game_play_input(game_poker_state, game_scene_state);
         } break;
 
         case Scene_TitleScreen:

@@ -2,14 +2,14 @@
 #include <algorithm>
 using namespace freckles;
 
-poker::RankedHand AI_FiveCardDraw_RankHand(const std::vector<poker::Card>& hand) {
+poker::RankedHand<5> AI_FiveCardDraw_RankHand(const std::vector<poker::Card>& hand) {
     std::vector<poker::Card> sorted_hand(hand.begin(), hand.end());
     std::sort(sorted_hand.begin(), sorted_hand.end(), [](const poker::Card& a, const poker::Card& b) {
         return a.face_value < b.face_value ||
                 (a.face_value == b.face_value && poker::rank_card(a) < poker::rank_card(b));
     });
 
-    poker::RankedHand result;
+    poker::RankedHand<5> result;
     result.hand_type = poker::HandResult::None;
     for (int i = 0; i < 5; ++i) {
         result.card_counts[static_cast<int>(sorted_hand[i].face_value)]++;
@@ -26,7 +26,7 @@ poker::RankedHand AI_FiveCardDraw_RankHand(const std::vector<poker::Card>& hand)
 
 
 void AI_FiveCardDraw_MakeHoldDecision(std::vector<poker::Card>& hand) {
-    poker::RankedHand rankedHand = AI_FiveCardDraw_RankHand(hand);
+    poker::RankedHand<5> rankedHand = AI_FiveCardDraw_RankHand(hand);
     int rankedToHandMap[5];
 
     for (int i = 0; i < 5; ++i) {

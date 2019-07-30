@@ -104,7 +104,15 @@ namespace freckles {
             bool selected;
         };
 
+        template <unsigned int HandSize>
         struct RankedHand {
+            RankedHand() :
+                hand_type(HandResult::None),
+                card_counts(std::vector<int>(52)),
+                ranked_cards(std::vector<Card>(HandSize)) {
+
+            }
+
             HandResult hand_type;
             std::vector<int> card_counts;
             // 0 is the highest ranked card.

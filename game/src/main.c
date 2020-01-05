@@ -86,6 +86,8 @@ global_variable Vector2 HoldCursorPositions[5];
 global_variable unsigned char CurrentHoldCursorIndex;
 global_variable Texture2D SpeechBubbleTexture;
 global_variable Vector2 SpeechBubblePosition;
+global_variable Vector2 BettingWindowSize;
+global_variable Vector2 BettingWindowPosition;
 
 // Card Texture(s) / Position(s)
 global_variable Texture2D BackOfCardTexture;
@@ -113,6 +115,8 @@ global_variable float BankFontSize = 45.0f;
 global_variable float BankFontSpacing = 0.0f;
 global_variable float StartTextSize = 80.0f;
 global_variable float StartTextSpacing = 0.0f;
+global_variable float GeneralTextSize = 60.0f;
+global_variable float GeneralTextSpacing = 0.0f;
 global_variable BlinkAnimation StartTextBlinkAnimation;
 global_variable int BankAmount = 0;
 global_variable Font PixellariFont;
@@ -156,6 +160,9 @@ DrawHorizontalCardArea(Texture2D texture, Vector2 area, int card_count, float x_
 
 void
 DrawFaceCard(Poker_Card card, int x, int y);
+
+void
+DrawDialogueBox(Vector2 size, Vector2 position, Color dialogueColor, const char *topText, Color topTextColor, const char *centerText, Color centerTextColor);
 
 void
 RenderScene(Poker_Game* game_state, Game_Input_State *game_input_state, Game_Scene_State *game_scene_state);
@@ -217,6 +224,9 @@ main(void)
     GameInit(&game_state, &game_scene_state, &game_input_state);
     if (IsWindowReady())
     {
+#ifdef FULL_SCREEN
+        ToggleFullscreen();
+#endif
         PlaySounds();
         while (GlobalRunning)
         {
@@ -627,11 +637,10 @@ SetPositions()
     NamePlatePosition.y = (GreenTablePosition.y + GameScreen_LocalUnitsToScreen(10.0f));
     BankPosition.x = BorderPosition.x + GameScreen_LocalUnitsToScreen(20.0f);
     BankPosition.y = GreenTablePosition.y - BankTexture.height - GameScreen_LocalUnitsToScreen(20.0f);
-    // TODO(nick): this will more than likely need to be updated on windows
-    // - create an update position function
-    TextSize = MeasureTextEx(ArcadePixFont, "1,000,000", BankFontSize, BankFontSpacing);
-    BankTextPosition.x = BankPosition.x + BankTexture.width - TextSize.x - (GameScreen_LocalUnitsToScreen(2.0f));
-    BankTextPosition.y = BankPosition.y + (TextSize.y / 2); 
+    BettingWindowSize.x = GameScreen_LocalUnitsToScreen(200.0f);
+    BettingWindowSize.y = GameScreen_LocalUnitsToScreen(100.0f);
+    BettingWindowPosition.x = CenterScreenPosition.x - (BettingWindowSize.x / 2);
+    BettingWindowPosition.y = CenterScreenPosition.y - (BettingWindowSize.y / 2);
     Vector2 CardSlotStartingPositionTop =
     {
         .x = CenterScreenPosition.x - (CardSlotTexture.width * 0.5f) - (CardSlotTexture.width * 3.0f),
@@ -771,10 +780,10 @@ RenderTitleScreen()
             .Text            = "PRESS START",
         };
         DrawBlinkAnimation(&fontInfo, AssetType_Text, &StartTextBlinkAnimation, &StartTextPosition, GlobalTargetFPS);
-        //DrawTextEx(ArcadePixFont, "PRESS START", StartTextPosition, StartTextSize, StartTextSpacing, MAGENTA);
     }
     EndDrawing();
 }
+
 
 // TODO(nick): possible start storing hold states in game state instead of game input state
 void
@@ -788,10 +797,12 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
         DrawTexture(NamePlateTexture, NamePlatePosition.x, NamePlatePosition.y, WHITE);
         DrawTexture(FrecklesNamePlateTexture, FrecklesNamePlatePosition.x, FrecklesNamePlatePosition.y, WHITE);
         DrawTexture(BankTexture, BankPosition.x, BankPosition.y, WHITE);
-        // TODO(nick):
-        // - fix positioning
-        // - set an actual amount
-        DrawTextEx(ArcadePixFont, "1,000,000", BankTextPosition, BankFontSize, BankFontSpacing, WHITE);
+        char buffer[64] = { 0 };
+        sprintf(buffer, "%d", game_state->player_score);
+        Vector2 TextSize = MeasureTextEx(ArcadePixFont, buffer, BankFontSize, BankFontSpacing);
+        BankTextPosition.x = BankPosition.x + BankTexture.width - TextSize.x - (GameScreen_LocalUnitsToScreen(2.0f));
+        BankTextPosition.y = BankPosition.y + (TextSize.y / 2); 
+        DrawTextEx(ArcadePixFont, buffer, BankTextPosition, BankFontSize, BankFontSpacing, WHITE);
         DrawTexture(BorderTexture, BorderPosition.x, BorderPosition.y, WHITE);
         for (unsigned int i = 0; i < len(CardSlotPositions); i++)
         {
@@ -808,7 +819,7 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
                 }
                 else if (game_input_state->hold_cursor_selects[i] == CURSOR_SELECTED)
                 {
-                    DrawTexture(HoldCursorTexture, HoldCursorPositions[i].x, HoldCursorPositions[i].y, WHITE);
+                    DrawTexture(HoldCursorTexture, HoldCursorPositions[i].x, HoldCursorPositions[i].y, RED);
                 }
             }
         }
@@ -872,6 +883,18 @@ RenderGame(Poker_Game* game_state, Game_Input_State *game_input_state)
             DrawTextEx(GameFont, buf, vec, 16.f, 0.f, BLACK);
         }
 #endif
+        // NOTE(nick): betting window has to be rendered on top of the other assets
+        // TODO(nick):
+        // - deal animation for cards and pause for card confirmation
+        if (game_state->poker_state == PokerState_Betting)
+        {
+            // TODO(nick):
+            // - render betting text
+            // - set amount and confirmation of amount
+            char buffer[50] = { 0 };
+            sprintf(buffer, "Amount: $%d", game_state->current_player_bet);
+            DrawDialogueBox(BettingWindowSize, BettingWindowPosition, Fade(BLACK, 0.75f), "Place Your Bet!", Fade(GOLD, 0.75f), buffer, Fade(GREEN, 0.75f));
+        }
     }
     EndDrawing();
     GlobalFrameCount++;
@@ -914,6 +937,74 @@ DrawFaceCard(Poker_Card card, int x, int y)
     int cardIndex = Poker_CardRank(card);
     assert(cardIndex < 52);
     DrawTexture(CardTextures[cardIndex], x, y, WHITE);
+}
+
+// TODO(nick): 
+// - add basis position and replace with CenterScreenPosition 
+// - add resizing of dialogue in seperate function to replace current resizing code?
+// - add bounding box around dialogue box
+void
+DrawDialogueBox(Vector2 size, Vector2 position, Color dialogueColor, const char *topText, Color topTextColor, const char *centerText, Color centerTextColor)
+{
+    Vector2 TopTextSize = MeasureTextEx(ArcadePixFont, topText, GeneralTextSize, GeneralTextSpacing);
+    Vector2 CenterTextSize = MeasureTextEx(ArcadePixFont, centerText, GeneralTextSize, GeneralTextSpacing);
+    // NOTE(nick): check if the text is too large for the dialogue box and resize
+    if (TopTextSize.x >= size.x)
+    {
+        size.x = (size.x + GameScreen_LocalUnitsToScreen(50.0f));
+        position.x = (CenterScreenPosition.x - (size.x / 2));
+    }
+    if (TopTextSize.y >= size.y)
+    {
+        size.y = (size.y + GameScreen_LocalUnitsToScreen(50.0f));
+        position.y = (CenterScreenPosition.y - (size.y / 2));
+    }
+    int HorizontalTopPadding = ((size.x - TopTextSize.x) / 2);
+    Vector2 TopTextPosition = 
+    {
+        .x = position.x + HorizontalTopPadding,
+        .y = position.y,
+    };
+    int HorizontalCenterPadding = ((size.x - CenterTextSize.x) / 2); 
+    Vector2 CenterTextPosition = 
+    {
+        .x = position.x + HorizontalTopPadding,
+        .y = position.x + TopTextSize.y + CenterTextSize.y, 
+    };
+    // NOTE(nick): main dialogue box
+    DrawRectangleV(position, size, dialogueColor);
+    // NOTE(nick: draw dialogue bounding box
+    // TODO(nick): 
+    // - add color to parameters?
+    // - break out to a for loop or a funciton?
+    Vector2 BoundingBoxSize = 
+    {
+        .x = size.x,
+        .y = GameScreen_LocalUnitsToScreen(10.0f),
+    };
+    Vector2 BoundingPosition = 
+    {
+        .x = position.x,
+        .y = position.y - BoundingBoxSize.y,
+    };
+    // NOTE(nick): top bounding box rect
+    DrawRectangleV(BoundingPosition, BoundingBoxSize, Fade(WHITE, 0.85f));
+    // NOTE(nick): bottom bounding box rect
+    BoundingPosition.y = (position.y + size.y);
+    DrawRectangleV(BoundingPosition, BoundingBoxSize, Fade(WHITE, 0.85f));
+    // NOTE(nick): set new size for vertical boudning box portion
+    int priorYValue = BoundingBoxSize.y;
+    BoundingBoxSize.y = (size.y + (priorYValue * 2));
+    BoundingBoxSize.x = GameScreen_LocalUnitsToScreen(10.0f);
+    // NOTE(nick): left bounding box rect
+    BoundingPosition.x = position.x - BoundingBoxSize.x;
+    BoundingPosition.y = position.y - priorYValue;
+    DrawRectangleV(BoundingPosition, BoundingBoxSize, Fade(WHITE, 0.85f));
+    // NOTE(nick): right bounding box rect
+    BoundingPosition.x = position.x + size.x;
+    DrawRectangleV(BoundingPosition, BoundingBoxSize, Fade(WHITE, 0.85f));
+    DrawTextEx(ArcadePixFont, topText, TopTextPosition, GeneralTextSize, GeneralTextSpacing, topTextColor);
+    DrawTextEx(ArcadePixFont, centerText, CenterTextPosition, GeneralTextSize, GeneralTextSpacing, centerTextColor);
 }
 
 void
@@ -1005,6 +1096,5 @@ ExitGame()
     UnloadTextures();
     UnloadFonts();
     UnloadSounds();
-    CloseAudioDevice();
-    CloseWindow();
+    CloseAudioDevice(); CloseWindow();
 }

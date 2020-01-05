@@ -46,6 +46,36 @@ ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_
     }
     if (game_poker_state->poker_state >= PokerState_PlayerCardsDealt)
     {
+        if (game_poker_state->poker_state == PokerState_Betting) 
+        {
+            // TODO(nick): 
+            // - have a game state increment amount?
+            // - make sure to reset current_player_bet on confirmation of bet
+            if (IsKeyPressed(KEY_UP))
+            {
+                if (game_poker_state->current_player_bet < game_poker_state->player_score) 
+                {
+                    game_poker_state->current_player_bet += 25;
+                }
+            }
+            if (IsKeyPressed(KEY_DOWN))
+            {
+                if (game_poker_state->current_player_bet > 0) 
+                {
+                    game_poker_state->current_player_bet -= 25;
+                }
+            }
+            if (IsKeyPressed(KEY_ENTER))
+            {
+                if (game_poker_state->current_player_bet > 0)
+                {
+                    game_poker_state->poker_state = PokerState_Bets_Placed;
+                    // TODO(nick): account for the AI bets as well
+                    game_poker_state->current_pot_size += game_poker_state->current_player_bet;
+                    game_poker_state->current_player_bet = 0;
+                }
+            }
+        }
         if (game_poker_state->poker_state == PokerState_SelectHolds)
         {
             if (IsKeyPressed(KEY_RIGHT))
@@ -98,7 +128,9 @@ ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_
                 game_poker_state->poker_state = PokerState_ExchangeCards;
             }
         }
-        if (game_poker_state->poker_state == PokerState_ExchangeCards) {
+
+        if (game_poker_state->poker_state == PokerState_ExchangeCards) 
+        {
             if (IsKeyPressed(KEY_SPACE)) {
                 Poker_RevealHand(game_poker_state->dealer_hand, 5);
                 game_poker_state->poker_state = PokerState_GameOver;
@@ -107,7 +139,8 @@ ProcessGamePlayInput(Poker_Game *game_poker_state, Game_Scene_State *game_scene_
             }
         }
 
-        if (game_poker_state->poker_state == PokerState_GameOver) {
+        if (game_poker_state->poker_state == PokerState_GameOver)
+        {
             if (IsKeyPressed(KEY_N)) {
                 Poker_StartNewRound(game_poker_state);
             }

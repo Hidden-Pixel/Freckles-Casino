@@ -7,8 +7,8 @@ IF NOT EXIST .\win32 MKDIR win32
 PUSHD win32
 dir
 
-::set PreprocessorFlags=-DDEBUG_FRECKLES
-::set PreprocessorFlags=-DDEBUG_FRECKLES -DGAME_SOUND_ENABLED
+set PreprocessorFlags=-DDEBUG_FRECKLES
+::set PreprocessorFlags=-DDEBUG_FRECKLES -DGAME_SOUND_ENABLED -DFULL_SCREEN
 
 cl /MDd /Zi /FC /nologo^
  ..\..\src\main.c^

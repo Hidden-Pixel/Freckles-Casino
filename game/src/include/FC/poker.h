@@ -38,8 +38,6 @@ typedef enum poker_CardFace
     CardFace_Ace    =  12,
 } Poker_CardFace;
 
-
-
 typedef enum poker_GameType
 {
     GameType_None       = 0,
@@ -67,6 +65,7 @@ typedef enum _poker_GameState
     PokerState_Betting          = 8,
     PokerState_GameOver         = 9,
     PokerState_ExchangeCards    = 10,
+    PokerState_Bets_Placed      = 11,
 } Poker_GameState;
 
 typedef enum _poker_Hand
@@ -121,6 +120,8 @@ typedef struct _poker_Game
     int             chances_left;
     int             player_score;
     int             dealer_score;
+    int             current_pot_size;
+    int             current_player_bet;
 } Poker_Game;
 
 void
